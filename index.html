@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>mohammed tasks</title>
+<meta name="theme-color" content="#c0c0c0">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLMD/CDQ5T37lQ4I0uXkP7eLh0C+U6J8rXyv/N2E9F6zG5/G7z5ZfEw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+<style>
+  /* ====== Windows 95 Theme Variables (W95 Plus) ====== */
+  :root{
+    --bg:#c0c0c0; /* Gray background */
+    --fg:#000000; /* Black foreground */
+    --accent:#000080; /* Blue Title Bar */
+    --accent-fg:#ffffff; /* White text on accent */
+    --line-dark:#808080; /* Dark gray for 3D shadow */
+    --line-medium:#a0a0a0; /* Medium gray */
+    --line-light:#ffffff; /* White for 3D highlight */
+    --input-fill:#ffffff; /* White fill for inputs */
+    --font:'Tahoma', 'Arial', sans-serif; /* Simulating MS Sans Serif/System */
+    --progress-color:#008040; /* Slightly darker green for better contrast on W95 */
+    --subtle: #d0d0d0; /* Slightly darker than BG */
+    --taskbar-green: #008080; /* W95 Taskbar Green */
+  }
+
+  /* ====== Base W95 Styling ====== */
+  *{
+    box-sizing:border-box;
+    font-family: var(--font);
+    font-size: 10pt;
+    transition: none !important;
+  }
+  html,body{
+    margin:0; background:var(--taskbar-green); /* Taskbar green background for full screen */
+  }
+  .wrap{
+    max-width:400px; /* Slimmer window for a to-do list feel */
+    margin: 40px auto;
+    padding:0;
+    background: var(--bg);
+    box-shadow: 6px 6px 0 var(--line-dark);
+    position: relative;
+  }
+  
+  /* W95 Window Frame */
+  .window {
+      border-style: solid;
+      border-width: 1px;
+      border-color: var(--fg) var(--line-light) var(--line-light) var(--fg);
+      padding: 2px;
+      background: var(--bg);
+  }
+  .window-inner {
+      border-style: solid;
+      border-width: 1px;
+      border-color: var(--line-dark) var(--line-light) var(--line-light) var(--line-dark);
+      padding: 1px;
+      background: var(--bg);
+  }
+
+  /* Title Bar (Detailed W95) */
+  .title-bar {
+    background: var(--accent);
+    color: var(--accent-fg);
+    padding: 3px 6px;
+    font-size: 11pt;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--fg);
+    /* Gradient effect for title bar */
+    background: linear-gradient(90deg, var(--accent) 0%, #1084d8 100%);
+  }
+  .title-bar-text { flex: 1; padding-left: 8px; }
+  .title-bar-controls button {
+      background: var(--bg);
+      border: 1px solid var(--fg);
+      border-right-color: var(--line-dark);
+      border-bottom-color: var(--line-dark);
+      border-top-color: var(--line-light);
+      border-left-color: var(--line-light);
+      width: 18px; height: 18px; font-size: 10pt; padding: 0; line-height: 1;
+      cursor: default; font-weight: bold;
+  }
+  .title-bar-controls button:active {
+      border-left-color: var(--line-dark);
+      border-top-color: var(--line-dark);
+      border-right-color: var(--line-light);
+      border-bottom-color: var(--line-light);
+      padding: 1px 0 0 1px; /* Slight shift down-right */
+  }
+
+  .main-content { padding: 8px; } /* Increased padding */
+
+  /* Fieldset look for controls */
+  fieldset {
+      border-style: solid; border-width: 1px;
+      border-color: var(--line-dark) var(--line-light) var(--line-light) var(--line-dark);
+      padding: 10px; margin: 8px 0; background: var(--bg);
+      /* Inner inset shadow for fieldset */
+      box-shadow: 1px 1px 0 var(--line-light) inset, -1px -1px 0 var(--line-dark) inset; 
+  }
+  legend {
+      background: var(--bg); padding: 0 6px; font-weight: bold; color: var(--accent); margin-left: 5px;
+  }
+
+  /* Controls Layout */
+  .controls{
+    display:flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 8px;
+  }
+
+  /* Input Styling (Inset) */
+  input[type="text"] {
+    border: 1px solid var(--fg); border-left-color: var(--line-dark); border-top-color: var(--line-dark);
+    border-right-color: var(--line-light); border-bottom-color: var(--line-light);
+    background: var(--input-fill); color: var(--fg); padding: 4px 6px; font-size: 10pt;
+    outline: none; box-shadow: none; flex: 1; min-width: 120px;
+  }
+  
+  /* Focus State (W95 Dashed Outline) */
+  input:focus, .btn:focus, .del:focus, input[type="checkbox"]:focus {
+      outline: 1px dashed var(--fg);
+      outline-offset: -2px;
+  }
+
+  /* Buttons (Classic W95 3D) */
+  .btn {
+    border: 1px solid var(--fg); border-right-color: var(--line-dark); border-bottom-color: var(--line-dark);
+    border-top-color: var(--line-light); border-left-color: var(--line-light);
+    background: var(--bg); color: var(--fg); padding: 5px 12px; font-weight: normal; 
+    cursor: pointer; box-shadow: none; line-height: 1; font-size: 10pt; flex-shrink: 0;
+  }
+  
+  /* Button Active/Press State - Full inset */
+  .btn:active {
+    border: 1px solid var(--fg); border-left-color: var(--line-dark); border-top-color: var(--line-dark);
+    border-right-color: var(--line-light); border-bottom-color: var(--line-light);
+    padding: 6px 12px 4px 12px;
+  }
+
+  .btn.ghost { background: var(--bg); box-shadow: none; }
+  .btn:hover { background: var(--subtle); }
+  .muted{color:var(--fg);font-size:9pt; padding: 0 4px;}
+  
+  /* Toolbar Style (Added for Add/Reset buttons) */
+  .toolbar {
+      display: flex; gap: 4px; 
+      padding: 0; /* Removed padding */
+      margin-top: 8px;
+  }
+  /* Buttons inside toolbar look more like window buttons */
+  .toolbar button {
+      border: 1px solid var(--fg); border-right-color: var(--line-dark); border-bottom-color: var(--line-dark);
+      border-top-color: var(--line-light); border-left-color: var(--line-light);
+      padding: 4px 8px;
+      flex: 1; /* Make them fill the space */
+  }
+  .toolbar button:active { padding: 5px 8px 3px 8px; }
+
+
+  /* Task List Container (W95 List Box Look) */
+  .task-list-box {
+      border: 1px solid var(--fg); border-left-color: var(--line-dark); border-top-color: var(--line-dark);
+      border-right-color: var(--line-light); border-bottom-color: var(--line-light);
+      background: var(--input-fill); padding: 0; min-height: 100px; margin-top: 8px;
+      box-shadow: 1px 1px 0 var(--line-dark) inset, -1px -1px 0 var(--line-light) inset; /* Inset effect */
+  }
+  ul{list-style:none;padding:0;margin:0}
+  
+  /* List Item: W95 Selection Highlight */
+  li{
+    display:flex; align-items:center; gap:8px; padding: 4px 8px;
+    background: var(--input-fill); color: var(--fg); margin: 0;
+    border-bottom: 1px solid var(--line-medium); /* Subtle line for separation */
+    cursor: default; 
+  }
+  li:hover { background: var(--subtle); }
+  li.done { color: var(--line-dark); opacity: 0.9; }
+  li.done .txt { text-decoration: line-through; }
+  
+  .txt{flex:1; line-height:1.4; font-size: 10pt; min-width: 0;}
+  
+  /* Checkbox: W95 Style */
+  input[type="checkbox"]{
+    appearance: none; width: 13px; height: 13px; /* Slightly smaller checkbox */
+    border: 1px solid var(--fg); background: var(--input-fill);
+    box-shadow: 1px 1px 0 var(--line-dark) inset, -1px -1px 0 var(--line-light) inset;
+    margin: 0; padding: 0; display: grid; place-items: center; flex-shrink: 0;
+    cursor: pointer;
+  }
+  input[type="checkbox"]:checked::after { content: '✓'; color: var(--fg); font-size: 10pt; line-height: 0.8; }
+  input[type="checkbox"]:active { box-shadow: 1px 1px 0 var(--line-light) inset, -1px -1px 0 var(--line-dark) inset; }
+  
+  .del{ 
+      appearance:none; border:0; background:transparent; color:var(--line-dark); font-size:10pt; 
+      cursor: pointer; padding: 0 4px; line-height:1; flex-shrink: 0; 
+  }
+  .del:hover{color:red;}
+
+  /* Linear Progress Bar (W95 look) */
+  .linear-progress-box { margin-top: 8px; }
+  .head{display:flex;justify-content:space-between;align-items:center;margin:0 0 4px 0}
+  .big{font-weight:bold; font-size: 11pt;}
+  .progress{
+    height:14px; background: var(--line-dark);
+    border: 1px solid var(--fg); border-left-color: var(--line-dark); border-top-color: var(--line-dark);
+    border-right-color: var(--line-light); border-bottom-color: var(--line-light);
+    overflow:hidden; padding: 2px;
+  }
+  .bar{ height:100%; width:0; background: var(--progress-color); }
+
+  /* Status Bar (Taskbar look) */
+  .status-bar {
+      border-top: 1px solid var(--line-light); 
+      display: flex; align-items: center;
+      padding: 0 0; 
+      background: var(--bg);
+      height: 24px;
+      position: absolute; /* Place it at the bottom of the window */
+      bottom: -2px; /* Adjust for outer border */
+      left: 2px;
+      right: 2px;
+      width: calc(100% - 4px);
+  }
+  
+  /* Start Button (W95 Logo & Look) */
+  .start-btn {
+      background: var(--bg);
+      border: 1px solid var(--fg); border-right-color: var(--line-dark); border-bottom-color: var(--line-dark);
+      border-top-color: var(--line-light); border-left-color: var(--line-light);
+      font-weight: bold;
+      padding: 1px 6px 0 6px;
+      margin-right: 2px;
+      height: 100%;
+      line-height: 1.8;
+      font-size: 11pt;
+      color: var(--fg);
+      cursor: pointer;
+      box-shadow: none;
+      flex-shrink: 0;
+  }
+  .start-btn:active {
+      border: 1px solid var(--fg); border-left-color: var(--line-dark); border-top-color: var(--line-dark);
+      border-right-color: var(--line-light); border-bottom-color: var(--line-light);
+      padding: 2px 6px 0 7px; /* Slight shift */
+  }
+  
+  /* Separator lines in status bar */
+  .separator {
+      height: 100%;
+      width: 2px;
+      background: var(--bg);
+      border-left: 1px solid var(--line-light);
+      border-right: 1px solid var(--line-dark);
+      margin: 0 2px;
+  }
+  
+  .status-panel-group {
+      display: flex;
+      margin-left: auto; /* Push status panels to the right */
+      align-items: center;
+      height: 100%;
+  }
+
+  .status-panel {
+      border: 1px solid var(--line-dark); border-left-color: var(--line-light); border-top-color: var(--line-light);
+      padding: 0 8px; line-height: 2.1; font-size: 9pt; flex-shrink: 0; min-width: 60px;
+      height: calc(100% - 4px);
+      margin: 2px 0 2px 2px;
+  }
+
+  /* Adjust main content padding to account for the status bar at the bottom */
+  .main-content { padding: 8px 8px 30px 8px; }
+  
+  /* ====== Mobile Responsiveness (Max-width 768px) ====== */
+  @media (max-width: 768px) {
+      .wrap { 
+          max-width: 100%; 
+          margin: 0; 
+          height: 100vh;
+          box-shadow: none; /* No shadow on mobile full screen */
+      }
+      .main-content { padding: 4px 4px 30px 4px; }
+      .controls { flex-direction: column; align-items: stretch; gap: 4px; }
+      .controls > * { width: 100%; }
+      .controls label { flex: none; width: 100%; padding-bottom: 2px; }
+      
+      .toolbar button { flex: 1; }
+      
+      .task-list-box { min-height: 200px; }
+      
+      li { padding: 6px 8px; }
+      .status-bar { width: 100%; left: 0; right: 0; bottom: 0; position: fixed; }
+      .status-panel-group { margin-left: auto; }
+  }
+</style>
+</head>
+<body dir="ltr">
+  <main class="wrap window">
+    <div class="window-inner">
+      <div class="title-bar">
+          <div class="title-bar-text">
+              <i class="fas fa-list-alt"></i> mohammed tasks
+          </div>
+          <div class="title-bar-controls">
+              <button title="Minimize" class="title-btn-min">_</button>
+              <button title="Maximize" class="title-btn-max">□</button>
+              <button title="Close" class="title-btn-close">X</button>
+          </div>
+      </div>
+
+      <div class="main-content">
+          
+        <fieldset>
+            <legend>Add New Task</legend>
+            <div class="controls">
+                <label for="newTask" style="flex: 0 0 100px;">Task (Required):</label>
+                <input id="newTask" type="text" placeholder="Brief description of the task…"/>
+            </div>
+            
+            <div class="toolbar">
+                <button class="btn" id="addBtn"><i class="fas fa-plus"></i> Add Task</button>
+                <button class="btn ghost" id="resetBtn" title="Delete all tasks"><i class="fas fa-trash-alt"></i> Reset All</button>
+            </div>
+        </fieldset>
+        
+        <div id="v-linear" class="linear-progress-box">
+          <div class="head">
+            <div><span class="big" id="pct1">0%</span> <span class="muted">Overall Progress</span></div>
+            <div class="muted"><span id="done1">0</span>/<span id="total1">0</span> Tasks</div>
+          </div>
+          <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <div id="bar1" class="bar"></div>
+          </div>
+        </div>
+        
+        <div class="task-list-box">
+            <ul id="list"></ul>
+        </div>
+        
+        <div id="emptyMessage" class="muted" style="text-align: center; margin-top: 8px; font-weight: bold; display: none;">
+          No tasks currently. Start by adding one!
+        </div>
+      </div>
+      
+      <div class="status-bar">
+          <button class="start-btn">Start</button>
+          <div class="separator"></div>
+          <div class="status-panel" style="flex-grow: 1; margin-right: 0; text-align: left; min-width: 0;">
+              mohammed tasks
+          </div>
+          <div class="status-panel-group">
+            <div class="status-panel" id="status-total">Total: 0</div>
+            <div class="status-panel" id="status-save">Ready</div>
+          </div>
+      </div>
+    </div>
+  </main>
+
+<script>
+  // ---- Storage Keys ----
+  const KEY_TASKS = 'mt:tasks';
+
+  // ---- State ----
+  // Task structure: {id, text, done, createdDate}
+  let tasks = []; 
+
+  // ---- DOM ----
+  const listEl    = document.getElementById('list');
+  const newTaskEl = document.getElementById('newTask');
+  const addBtn    = document.getElementById('addBtn');
+  const resetBtn  = document.getElementById('resetBtn');
+  const emptyMessageEl = document.getElementById('emptyMessage');
+  const statusTotalEl = document.getElementById('status-total');
+  const statusSaveEl = document.getElementById('status-save');
+
+  // ---- Storage helpers ----
+  function save(){ 
+      localStorage.setItem(KEY_TASKS, JSON.stringify(tasks)); 
+      updateStatus('Saved');
+  }
+  function load(){
+    try{
+      const raw = localStorage.getItem(KEY_TASKS);
+      tasks = raw ? JSON.parse(raw) : [];
+      // Clean up old tasks by removing 'notes' (if any exist) and ensuring 'createdDate' exists
+      tasks = tasks.map(t => {
+          // Destructure to safely exclude the 'notes' property if it exists
+          const { notes, ...rest } = t; 
+          return {
+              ...rest,
+              createdDate: t.createdDate || todayDate() 
+          }
+      });
+      
+    }catch(e){ tasks = []; }
+  }
+
+  // ---- UID & Date ----
+  function uid(){ return Math.random().toString(36).slice(2,9); }
+  function todayDate() { return new Date().toISOString().substring(0, 10); }
+  
+  // ---- Status Bar ----
+  function updateStatus(message) {
+      statusSaveEl.textContent = message;
+      setTimeout(() => { statusSaveEl.textContent = 'Ready'; }, 2000);
+  }
+
+  // ---- Sorting Logic (Newest first) ----
+  function getSortedTasks() {
+      // Sort by creation date (descending - newest first)
+      tasks.sort((a, b) => {
+          if (a.createdDate < b.createdDate) return 1;
+          if (a.createdDate > b.createdDate) return -1;
+          return 0;
+      });
+      
+      return tasks;
+  }
+  
+  // ---- Render list ----
+  function renderList(){
+    const sortedTasks = getSortedTasks();
+    listEl.innerHTML = '';
+    
+    if (sortedTasks.length === 0) {
+        emptyMessageEl.style.display = 'block';
+    } else {
+        emptyMessageEl.style.display = 'none';
+    }
+
+    sortedTasks.forEach(t=>{
+      const li = document.createElement('li');
+      if (t.done) li.classList.add('done');
+
+      const cb = document.createElement('input');
+      cb.type='checkbox'; cb.checked=t.done;
+      cb.addEventListener('change',()=>{ 
+          t.done=cb.checked; 
+          save(); 
+          renderList(); 
+          updateLinearView(); 
+      });
+
+      const span = document.createElement('span');
+      span.className='txt'; span.textContent=t.text;
+      
+      const del = document.createElement('button');
+      del.className='del'; del.innerHTML='<i class="fas fa-trash"></i>';
+      del.addEventListener('click',()=>{ 
+          tasks = tasks.filter(x=>x.id!==t.id); 
+          save(); 
+          renderList(); 
+          updateLinearView(); 
+      });
+
+      li.appendChild(cb); 
+      li.appendChild(span); 
+      li.appendChild(del);
+      
+      listEl.appendChild(li);
+    });
+    
+    // Update status bar fields
+    statusTotalEl.textContent = `Total: ${tasks.length}`;
+  }
+
+  // ---- Add / Reset ----
+  function addTask(){
+    const text = (newTaskEl.value||'').trim(); 
+    if(!text) {
+        alert("Task description is required.");
+        return;
+    }
+    
+    tasks.push({
+        id: uid(), 
+        text, 
+        done:false, 
+        createdDate: todayDate() 
+    });
+    
+    // Reset inputs
+    newTaskEl.value=''; 
+
+    save(); 
+    renderList(); 
+    updateLinearView();
+  }
+  
+  function resetAll(){
+    if(!confirm('Are you sure you want to reset (delete all tasks)?')) return;
+    tasks=[]; 
+    save(); 
+    renderList(); 
+    updateLinearView();
+  }
+
+  // ---- Progress calc ----
+  function getProgress(){
+    const total = tasks.length;
+    const done  = tasks.filter(t=>t.done).length;
+    const pct   = total ? Math.round((done/total)*100) : 0;
+    return {total, done, pct};
+  }
+
+  // ---- Update Linear View ----
+  function updateLinearView(){
+    const {total,done,pct} = getProgress();
+    const bar = document.getElementById('bar1');
+    const pctEl = document.getElementById('pct1');
+    const doneEl= document.getElementById('done1');
+    const totalEl= document.getElementById('total1');
+    
+    if(bar){ bar.style.width = pct + '%'; }
+    if(pctEl) pctEl.textContent = pct + '%';
+    if(doneEl) doneEl.textContent = done;
+    if(totalEl) totalEl.textContent = total;
+    
+    const pb = document.querySelector('#v-linear .progress[role="progressbar"]');
+    if(pb) pb.setAttribute('aria-valuenow', pct);
+  }
+  
+  // ---- Events ----
+  addBtn.addEventListener('click', addTask);
+  newTaskEl.addEventListener('keydown', e=>{ if(e.key==='Enter') addTask(); });
+  resetBtn.addEventListener('click', resetAll);
+
+  // ---- Init ----
+  load(); 
+  renderList(); 
+  updateLinearView();
+</script>
+</body>
+</html>
