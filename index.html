@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
 <title>mohammed tasks</title>
 <meta name="theme-color" content="#c0c0c0">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLMD/CDQ5T37lQ4I0uXkP7eLh0C+U6J8rXyv/N2E9F6zG5/G7z5ZfEw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
 <style>
   /* ====== Windows 95 Theme Variables (W95 Plus) ====== */
@@ -309,4 +309,209 @@
     </div>
   </main>
 
-<script src="
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+<script>
+// =================================================================
+// 🔥 FIREBASE INITIALIZATION & SYNC LOGIC 🔥
+// =================================================================
+
+// 2. YOUR FIREBASE CONFIGURATION (مفاتيحك الخاصة):
+const firebaseConfig = {
+  // مفاتيحك التي تم تأكيدها
+  apiKey: "AIzaSyBvpcUP-DmXH82WHgm4ZLHezeBFaaxMnCE",
+  authDomain: "mohammedtasksapp.firebaseapp.com",
+  databaseURL: "https://mohammedtasksapp-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "mohammedtasksapp",
+  storageBucket: "mohammedtasksapp.firebasestorage.app",
+  messagingSenderId: "271781862481",
+  appId: "1:271781862481:web:dfd63b2c4b4a8d74ad2c70"
+};
+
+// Initialize Firebase 
+firebase.initializeApp(firebaseConfig);
+
+// Reference to the database location
+const db = firebase.database();
+const tasksRef = db.ref('tasks');
+
+// ---- State & DOM Elements ----
+let tasks = []; 
+const listEl    = document.getElementById('list');
+const newTaskEl = document.getElementById('newTask');
+const addBtn    = document.getElementById('addBtn');
+const resetBtn  = document.getElementById('resetBtn');
+const emptyMessageEl = document.getElementById('emptyMessage');
+const statusTotalEl = document.getElementById('status-total');
+const statusSaveEl = document.getElementById('status-save');
+
+// ---- Utility Functions ----
+function todayDate() { return new Date().toISOString().substring(0, 10); }
+
+function updateStatus(message) {
+    statusSaveEl.textContent = message;
+    setTimeout(() => { statusSaveEl.textContent = 'Ready'; }, 2000);
+}
+
+// ---- Firebase Core Functions ----
+
+// 1. Listen for real-time changes
+function listenForTasks() {
+    tasksRef.on('value', (snapshot) => {
+        const rawData = snapshot.val();
+        tasks = [];
+        if (rawData) {
+            // Convert Firebase object to array for easier sorting
+            for (let id in rawData) {
+                tasks.push({ ...rawData[id], id: id });
+            }
+        }
+        
+        // Update UI
+        renderList();
+        updateLinearView();
+        updateStatus('Synced');
+    }, (error) => {
+        console.error("Firebase Read Failed (Rules check):", error);
+        updateStatus('Sync Error');
+    });
+}
+
+// 2. Add a new task
+function addTaskToDB(text) {
+    const newTask = {
+        text: text, 
+        done: false, 
+        createdDate: todayDate() 
+    };
+    tasksRef.push(newTask).catch((error) => {
+        console.error("Firebase Write Failed. Check Rules.", error);
+        updateStatus('Write Error');
+    });
+}
+
+// 3. Update task status
+function updateTaskStatus(id, isDone) {
+    tasksRef.child(id).update({ done: isDone }).catch((error) => {
+        console.error("Firebase Update Failed. Check Rules.", error);
+        updateStatus('Update Error');
+    });
+}
+
+// 4. Delete a task
+function deleteTask(id) {
+    tasksRef.child(id).remove().catch((error) => {
+        console.error("Firebase Delete Failed. Check Rules.", error);
+        updateStatus('Delete Error');
+    });
+}
+
+// 5. Delete ALL tasks
+function deleteAllTasks() {
+    tasksRef.remove().catch((error) => {
+        console.error("Firebase Clear Failed. Check Rules.", error);
+        updateStatus('Clear Error');
+    });
+}
+
+// ---- UI Rendering & Logic ----
+
+function getSortedTasks() {
+    // Sort by creation date (descending - newest first)
+    tasks.sort((a, b) => {
+        if (a.createdDate < b.createdDate) return 1;
+        if (a.createdDate > b.createdDate) return -1;
+        return 0;
+    });
+    return tasks;
+}
+
+function renderList(){
+    const sortedTasks = getSortedTasks();
+    listEl.innerHTML = '';
+    
+    if (sortedTasks.length === 0) {
+        emptyMessageEl.style.display = 'block';
+    } else {
+        emptyMessageEl.style.display = 'none';
+    }
+
+    sortedTasks.forEach(t=>{
+      const li = document.createElement('li');
+      if (t.done) li.classList.add('done');
+
+      const cb = document.createElement('input');
+      cb.type='checkbox'; cb.checked=t.done;
+      cb.addEventListener('change',()=>{ 
+          updateTaskStatus(t.id, cb.checked);
+      });
+
+      const span = document.createElement('span');
+      span.className='txt'; span.textContent=t.text;
+      
+      const del = document.createElement('button');
+      del.className='del'; del.innerHTML='<i class="fas fa-trash"></i>';
+      del.addEventListener('click',()=>{ 
+          deleteTask(t.id);
+      });
+
+      li.appendChild(cb); 
+      li.appendChild(span); 
+      li.appendChild(del);
+      
+      listEl.appendChild(li);
+    });
+    
+    statusTotalEl.textContent = `Total: ${tasks.length}`;
+}
+
+function handleAddTask(){
+    const text = (newTaskEl.value||'').trim(); 
+    if(!text) {
+        alert("Task description is required.");
+        return;
+    }
+    
+    addTaskToDB(text); 
+    newTaskEl.value=''; 
+}
+
+function handleResetAll(){
+    if(!confirm('Are you sure you want to reset (delete all tasks)?')) return;
+    deleteAllTasks(); 
+}
+
+function getProgress(){
+    const total = tasks.length;
+    const done  = tasks.filter(t=>t.done).length;
+    const pct   = total ? Math.round((done/total)*100) : 0;
+    return {total, done, pct};
+}
+
+function updateLinearView(){
+    const {total,done,pct} = getProgress();
+    const bar = document.getElementById('bar1');
+    const pctEl = document.getElementById('pct1');
+    const doneEl= document.getElementById('done1');
+    const totalEl= document.getElementById('total1');
+    
+    if(bar){ bar.style.width = pct + '%'; }
+    if(pctEl) pctEl.textContent = pct + '%';
+    if(doneEl) doneEl.textContent = done;
+    if(totalEl) totalEl.textContent = total;
+    
+    const pb = document.querySelector('#v-linear .progress[role="progressbar"]');
+    if(pb) pb.setAttribute('aria-valuenow', pct);
+}
+
+// ---- Event Listeners ----
+addBtn.addEventListener('click', handleAddTask);
+newTaskEl.addEventListener('keydown', e=>{ if(e.key==='Enter') handleAddTask(); });
+resetBtn.addEventListener('click', handleResetAll);
+
+// ---- Init ----
+listenForTasks(); // Start listening for data changes
+</script>
+</body>
+</html>
