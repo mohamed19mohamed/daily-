@@ -7,6 +7,8 @@
 <meta name="theme-color" content="#c0c0c0">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 <style>
   /* ====== Windows 95 Theme Variables (W95 Plus) ====== */
   :root{
@@ -67,7 +69,7 @@
     border-bottom: 1px solid var(--fg);
     background: linear-gradient(90deg, var(--accent) 0%, #1084d8 100%);
   }
-  .title-bar-text { flex: 1; padding-left: 8px; }
+  .title-bar-text { flex: 1; padding-left: 8px; display: flex; align-items: center; gap: 6px; }
   .title-bar-controls button {
       background: var(--bg);
       border: 1px solid var(--fg);
@@ -104,7 +106,7 @@
     background: var(--input-fill); color: var(--fg); padding: 4px 6px; font-size: 10pt;
     outline: none; box-shadow: none; flex: 1; min-width: 120px;
   }
-  input:focus, .btn:focus, .del:focus, input[type="checkbox"]:focus {
+  input:focus, .btn:focus, .del:focus, input[type="checkbox"]:focus, textarea:focus {
       outline: 1px dashed var(--fg);
       outline-offset: -2px;
   }
@@ -228,6 +230,132 @@
       margin: 2px 0 2px 2px;
   }
   .main-content { padding: 8px 8px 30px 8px; }
+  
+  /* ====== Counter Styles (ADJUSTED FOR SMALLER SIZE) ====== */
+  .counters-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px; /* Reduced gap */
+      padding: 0 0 8px 0; 
+  }
+  .counter-fieldset {
+      text-align: center;
+      padding: 8px 5px 5px 5px; /* Reduced padding */
+  }
+  .counter-fieldset legend {
+      font-weight: bold;
+      padding: 0 4px; /* Reduced legend padding */
+      font-size: 9pt; /* Smaller legend font */
+  }
+  .counter-fieldset h1 {
+      font-size: 2.2rem; /* Significantly smaller font for numbers */
+      margin: 0 0 5px 0; /* Reduced margin */
+      font-weight: bold;
+      color: #000;
+      line-height: 1; /* Adjust line height for smaller numbers */
+  }
+  .counter-fieldset button {
+      font-size: 1.1rem; /* Smaller button font */
+      font-weight: bold;
+      width: 100%;
+      height: 28px; /* Smaller button height */
+      padding: 0; /* Remove default button padding to fit text */
+  }
+  .emergency-fieldset {
+      background-color: #CC4444; 
+      color: #FFFFFF;
+  }
+  .emergency-fieldset h1 {
+      color: #FFFFFF;
+  }
+  .emergency-fieldset legend {
+      color: #FFFFFF;
+      background: #CC4444; 
+  }
+  /* ====== END: Counter Styles ====== */
+
+  /* NEW: HR Separator Style */
+  hr {
+    border: 0;
+    border-top: 1px solid var(--line-dark);
+    border-bottom: 1px solid var(--line-light);
+    margin: 15px 0;
+  }
+
+  /* Adjustments for Emergency Analysis fieldset */
+  .info-box fieldset {
+      margin-top: 0; /* Remove top margin to pull it closer */
+      padding: 8px; /* Reduced padding */
+  }
+  .info-box legend {
+      font-size: 9pt; /* Smaller legend font */
+      margin-left: 2px;
+  }
+  
+  /* UPDATED: Style for the new emergency log textarea */
+  #emergency-log {
+      width: 100%;
+      box-sizing: border-box;
+      font-family: var(--font);
+      font-size: 9pt;
+      background: var(--input-fill);
+      color: var(--fg);
+      border: 1px solid var(--fg); 
+      border-left-color: var(--line-dark); 
+      border-top-color: var(--line-dark);
+      border-right-color: var(--line-light); 
+      border-bottom-color: var(--line-light);
+      box-shadow: 1px 1px 0 var(--line-dark) inset, -1px -1px 0 var(--line-light) inset;
+  }
+
+  /* NEW: Report Button Style */
+  #report-panel-btn {
+    cursor: pointer;
+    border: 1px solid var(--line-light);
+    border-right-color: var(--line-dark);
+    border-bottom-color: var(--line-dark);
+  }
+  #report-panel-btn:active {
+    border: 1px solid var(--line-dark);
+    border-right-color: var(--line-light);
+    border-bottom-color: var(--line-light);
+  }
+
+  /* NEW: Logon Screen Styles (Idea #2) */
+  #logon-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--taskbar-green);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  #logon-window {
+    width: 350px;
+    padding-bottom: 10px;
+  }
+  #logon-content {
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  #logon-content i {
+    font-size: 48px;
+    color: var(--accent);
+  }
+  #logon-buttons {
+    text-align: center;
+    padding: 0 20px;
+  }
+  #logon-ok {
+    width: 100px;
+  }
+
   @media (max-width: 768px) {
       .wrap { 
           max-width: 100%; 
@@ -244,15 +372,57 @@
       li { padding: 6px 8px; }
       .status-bar { width: 100%; left: 0; right: 0; bottom: 0; position: fixed; }
       .status-panel-group { margin-left: auto; }
+
+      .counters-container {
+        gap: 4px;
+        padding: 4px 0 4px 0;
+      }
+      .counter-fieldset {
+        padding: 6px 4px 4px 4px;
+      }
+      .counter-fieldset h1 {
+        font-size: 1.8rem;
+      }
+      .counter-fieldset button {
+        height: 24px;
+        font-size: 1rem;
+      }
+      .counter-fieldset legend {
+          font-size: 8pt;
+      }
+      .info-box p, .info-box .sunken-panel {
+          font-size: 8pt;
+      }
   }
 </style>
 </head>
 <body dir="ltr">
+
+  <div id="logon-screen">
+    <div class="window" id="logon-window">
+        <div class="title-bar">
+            <div class="title-bar-text">Logon to Mohammed's System</div>
+        </div>
+        <div id="logon-content">
+            <i class="fas fa-user-circle"></i>
+            <div>
+                <p style="margin: 0 0 5px 0;">Welcome back, <strong>Mohammed</strong>.</p>
+                <p style="margin: 0;">Click OK to load your task environment.</p>
+            </div>
+        </div>
+        <div id="logon-buttons">
+            <button class="btn" id="logon-ok">OK</button>
+        </div>
+    </div>
+  </div>
+
+
   <main class="wrap window">
     <div class="window-inner">
       <div class="title-bar">
           <div class="title-bar-text">
-              <i class="fas fa-list-alt"></i> mohammed tasks
+              <i class="fas fa-user-circle"></i>
+              <span>mohammed tasks</span>
           </div>
           <div class="title-bar-controls">
               <button title="Minimize" class="title-btn-min">_</button>
@@ -263,6 +433,36 @@
 
       <div class="main-content">
           
+        <div class="counters-container">
+            <fieldset class="counter-fieldset">
+                <legend>Achievements</legend>
+                <h1 id="achievements-count">0</h1>
+                <button onclick="counter_increment('achievements')" class="btn">+</button>
+            </fieldset>
+
+            <fieldset class="counter-fieldset">
+                <legend>Neutral</legend>
+                <h1 id="neutral-count">0</h1>
+                <button onclick="counter_increment('neutral')" class="btn">+</button>
+            </fieldset>
+
+            <fieldset class="counter-fieldset emergency-fieldset">
+                <legend>Emergency</legend>
+                <h1 id="emergency-count">0</h1>
+                <button onclick="counter_increment('emergency')" class="btn">+</button>
+            </fieldset>
+        </div>
+        
+        <div class="info-box" style="padding: 0; margin: 0;">
+            <fieldset>
+                <legend>Today's Emergency Log</legend>
+                <div style="padding: 5px;">
+                    <textarea id="emergency-log" readonly rows="3"></textarea>
+                </div>
+            </fieldset>
+        </div>
+        
+        <hr>
         <fieldset>
             <legend>Add New Task</legend>
             <div class="controls">
@@ -302,6 +502,9 @@
               mohammed tasks
           </div>
           <div class="status-panel-group">
+            <div class="status-panel" id="report-panel-btn" role="button" title="Generate Daily Report">
+              <i class="fas fa-print"></i> Report
+            </div>
             <div class="status-panel" id="status-total">Total: 0</div>
             <div class="status-panel" id="status-save">Ready</div>
           </div>
@@ -309,15 +512,11 @@
     </div>
   </main>
 
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-
 <script>
 // =================================================================
-// 🔥 FIREBASE INITIALIZATION & SYNC LOGIC 🔥
+// 🔥 FIREBASE INITIALIZATION & CONFIG 🔥
 // =================================================================
 
-// 2. YOUR FIREBASE CONFIGURATION (مفاتيحك الخاصة):
 const firebaseConfig = {
   // مفاتيحك التي تم تأكيدها
   apiKey: "AIzaSyBvpcUP-DmXH82WHgm4ZLHezeBFaaxMnCE",
@@ -329,15 +528,89 @@ const firebaseConfig = {
   appId: "1:271781862481:web:dfd63b2c4b4a8d74ad2c70"
 };
 
-// Initialize Firebase 
 firebase.initializeApp(firebaseConfig);
-
-// Reference to the database location
 const db = firebase.database();
-const tasksRef = db.ref('tasks');
 
-// ---- State & DOM Elements ----
-let tasks = []; 
+// =================================================================
+// 🔥 COUNTER LOGIC (Firebase) 🔥
+// =================================================================
+
+let todayCounterRef = null;
+let currentCounters = { achievements: 0, neutral: 0, emergency: 0, emergencyLog: [] }; 
+
+function counter_getTodayDateString() {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+function counter_listenForChanges() {
+    const today = counter_getTodayDateString();
+    todayCounterRef = db.ref('dailyCounters/' + today);
+    
+    todayCounterRef.on('value', (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+            currentCounters = data;
+        } else {
+            currentCounters = { achievements: 0, neutral: 0, emergency: 0, emergencyLog: [] }; 
+        }
+        
+        // Update UI
+        document.getElementById('achievements-count').innerText = currentCounters.achievements || 0;
+        document.getElementById('neutral-count').innerText = currentCounters.neutral || 0;
+        document.getElementById('emergency-count').innerText = currentCounters.emergency || 0;
+        
+        const logTextarea = document.getElementById('emergency-log');
+        const logData = currentCounters.emergencyLog || [];
+        if (logData.length > 0) {
+            logTextarea.value = logData.join('\n'); // Join each log entry with a new line
+        } else {
+            logTextarea.value = '(No emergencies logged today)';
+        }
+        logTextarea.scrollTop = logTextarea.scrollHeight; // Auto-scroll to bottom
+    });
+}
+
+function counter_increment(type) {
+    let finalReason = ""; 
+    let updates = {};
+
+    if (type === 'emergency') {
+        let reasonInput = prompt("EMERGENCY: Select category or type your own:\n\n1. Social Media\n2. Phone/Calls\n3. Procrastination\n4. Other (Specify)");
+        
+        if (reasonInput === "1") finalReason = "Social Media";
+        else if (reasonInput === "2") finalReason = "Phone/Calls";
+        else if (reasonInput === "3") finalReason = "Procrastination";
+        else if (reasonInput === "4") finalReason = prompt("Specify 'Other' reason:") || "Other (Unspecified)";
+        else if (reasonInput && reasonInput.trim() !== "") finalReason = reasonInput;
+        else return; // User cancelled
+        
+        const currentLog = currentCounters.emergencyLog || [];
+        currentLog.push(finalReason);
+        updates.emergencyLog = currentLog; 
+    }
+
+    const newCount = (currentCounters[type] || 0) + 1;
+    updates[type] = newCount;
+    
+    if (todayCounterRef) {
+        todayCounterRef.update(updates).catch(e => console.error("Counter update failed:", e));
+    }
+
+    if (type === 'achievements' && newCount === 10) {
+        alert('Congratulations! You completed 10 achievements! You deserve a prize!');
+    }
+}
+
+// =================================================================
+// 🔥 TASK APP LOGIC (Firebase) 🔥
+// =================================================================
+
+const tasksRef = db.ref('tasks');
+let tasks = []; // This will hold the tasks from Firebase
 const listEl    = document.getElementById('list');
 const newTaskEl = document.getElementById('newTask');
 const addBtn    = document.getElementById('addBtn');
@@ -346,7 +619,6 @@ const emptyMessageEl = document.getElementById('emptyMessage');
 const statusTotalEl = document.getElementById('status-total');
 const statusSaveEl = document.getElementById('status-save');
 
-// ---- Utility Functions ----
 function todayDate() { return new Date().toISOString().substring(0, 10); }
 
 function updateStatus(message) {
@@ -354,21 +626,15 @@ function updateStatus(message) {
     setTimeout(() => { statusSaveEl.textContent = 'Ready'; }, 2000);
 }
 
-// ---- Firebase Core Functions ----
-
-// 1. Listen for real-time changes
 function listenForTasks() {
     tasksRef.on('value', (snapshot) => {
         const rawData = snapshot.val();
         tasks = [];
         if (rawData) {
-            // Convert Firebase object to array for easier sorting
             for (let id in rawData) {
                 tasks.push({ ...rawData[id], id: id });
             }
         }
-        
-        // Update UI
         renderList();
         updateLinearView();
         updateStatus('Synced');
@@ -378,7 +644,6 @@ function listenForTasks() {
     });
 }
 
-// 2. Add a new task
 function addTaskToDB(text) {
     const newTask = {
         text: text, 
@@ -391,7 +656,6 @@ function addTaskToDB(text) {
     });
 }
 
-// 3. Update task status
 function updateTaskStatus(id, isDone) {
     tasksRef.child(id).update({ done: isDone }).catch((error) => {
         console.error("Firebase Update Failed. Check Rules.", error);
@@ -399,7 +663,6 @@ function updateTaskStatus(id, isDone) {
     });
 }
 
-// 4. Delete a task
 function deleteTask(id) {
     tasksRef.child(id).remove().catch((error) => {
         console.error("Firebase Delete Failed. Check Rules.", error);
@@ -407,7 +670,6 @@ function deleteTask(id) {
     });
 }
 
-// 5. Delete ALL tasks
 function deleteAllTasks() {
     tasksRef.remove().catch((error) => {
         console.error("Firebase Clear Failed. Check Rules.", error);
@@ -415,10 +677,7 @@ function deleteAllTasks() {
     });
 }
 
-// ---- UI Rendering & Logic ----
-
 function getSortedTasks() {
-    // Sort by creation date (descending - newest first)
     tasks.sort((a, b) => {
         if (a.createdDate < b.createdDate) return 1;
         if (a.createdDate > b.createdDate) return -1;
@@ -440,26 +699,17 @@ function renderList(){
     sortedTasks.forEach(t=>{
       const li = document.createElement('li');
       if (t.done) li.classList.add('done');
-
       const cb = document.createElement('input');
       cb.type='checkbox'; cb.checked=t.done;
-      cb.addEventListener('change',()=>{ 
-          updateTaskStatus(t.id, cb.checked);
-      });
-
+      cb.addEventListener('change',()=>{ updateTaskStatus(t.id, cb.checked); });
       const span = document.createElement('span');
       span.className='txt'; span.textContent=t.text;
-      
       const del = document.createElement('button');
       del.className='del'; del.innerHTML='<i class="fas fa-trash"></i>';
-      del.addEventListener('click',()=>{ 
-          deleteTask(t.id);
-      });
-
+      del.addEventListener('click',()=>{ deleteTask(t.id); });
       li.appendChild(cb); 
       li.appendChild(span); 
       li.appendChild(del);
-      
       listEl.appendChild(li);
     });
     
@@ -472,14 +722,20 @@ function handleAddTask(){
         alert("Task description is required.");
         return;
     }
-    
     addTaskToDB(text); 
     newTaskEl.value=''; 
 }
 
 function handleResetAll(){
-    if(!confirm('Are you sure you want to reset (delete all tasks)?')) return;
+    if(!confirm('Are you sure you want to delete ALL tasks?\n\nThis will ALSO reset today\'s counters and emergency log.')) return;
+    
+    // 1. Delete all tasks
     deleteAllTasks(); 
+    
+    // 2. Delete today's counters and log
+    if (todayCounterRef) {
+        todayCounterRef.remove().catch(e => console.error("Counter reset failed:", e));
+    }
 }
 
 function getProgress(){
@@ -505,13 +761,166 @@ function updateLinearView(){
     if(pb) pb.setAttribute('aria-valuenow', pct);
 }
 
-// ---- Event Listeners ----
-addBtn.addEventListener('click', handleAddTask);
-newTaskEl.addEventListener('keydown', e=>{ if(e.key==='Enter') handleAddTask(); });
-resetBtn.addEventListener('click', handleResetAll);
+// =================================================================
+// 🔥 NEW: Report Generation Logic 🔥
+// =================================================================
 
-// ---- Init ----
-listenForTasks(); // Start listening for data changes
+// This function provides the "smart analysis"
+function analyzeDay() {
+    // Get data from our global variables
+    const counters = currentCounters;
+    const allTasks = tasks; 
+
+    const ach = counters.achievements || 0;
+    const emg = counters.emergency || 0;
+    const log = counters.emergencyLog || [];
+    const totalTasks = allTasks.length;
+    const doneTasks = allTasks.filter(t => t.done).length;
+    const pctTasks = totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0;
+
+    let level = "";
+    let advice = "";
+
+    // Smart Analysis Logic
+    if (ach >= 10 && emg < 3) {
+        level = "Excellent Focus";
+        advice = "Incredible performance! You hit your achievement goal with minimal distractions. This is a model day. Keep this momentum!";
+    } else if (ach >= 5 && emg < ach) {
+        level = "Productive Day";
+        advice = "A solid, productive day. You balanced your work and distractions well, with achievements leading the way. Great job!";
+    } else if (ach > 0 && emg >= ach) {
+        level = "Distracted Day";
+        advice = "You got some work done, but distractions took the lead. Review the 'Emergency Log' to see the pattern. Tomorrow is a new start.";
+    } else if (ach === 0 && emg > 0) {
+        level = "High Evasion Day";
+        advice = "It seems today was a tough day to get started. Remember, even one small 'Achievement' can break the cycle and build momentum.";
+    } else if (ach === 0 && emg === 0 && totalTasks > 0 && doneTasks === 0) {
+        level = "Task Evasion Day";
+        advice = "You've listed your tasks but haven't logged any progress. The first step is the hardest. Let's try to get one 'Achievement' tomorrow.";
+    } else {
+        level = "Quiet Day / Rest Day";
+        advice = "A quiet day. If this was a planned rest day, great! If not, remember to log your progress.";
+    }
+
+    const quotes = [
+        "The secret of getting ahead is getting started.",
+        "Discipline is the bridge between goals and accomplishment.",
+        "You don't have to be great to start, but you have to start to be great.",
+        "Focus on progress, not perfection."
+    ];
+    const quote = quotes[Math.floor(Math.random() * quotes.length)];
+
+    return { level, advice, quote, ach, emg, totalTasks, doneTasks, pctTasks, log };
+}
+
+function generateDailyReport() {
+    try {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        const today = counter_getTodayDateString();
+        const analysis = analyzeDay();
+        
+        // --- PDF Content ---
+        doc.setFont('Helvetica', 'bold');
+        doc.setFontSize(18);
+        doc.text("Mohammed's Daily Report", 14, 22);
+
+        doc.setFontSize(12);
+        doc.setFont('Helvetica', 'normal');
+        doc.text(`Date: ${today}`, 14, 30);
+
+        doc.line(14, 35, 196, 35); // Separator
+
+        // --- Analysis Section ---
+        doc.setFont('Helvetica', 'bold');
+        doc.setFontSize(14);
+        doc.text("Today's Analysis:", 14, 45);
+        
+        doc.setFont('Helvetica', 'normal');
+        doc.setFontSize(12);
+        doc.text(`Your Level: ${analysis.level}`, 14, 53);
+        
+        doc.setFont('Helvetica', 'italic');
+        // Use splitTextToSize to wrap long text
+        const adviceLines = doc.splitTextToSize(analysis.advice, 182);
+        doc.text(adviceLines, 14, 61);
+        
+        let y = 61 + (adviceLines.length * 7) + 5; // Dynamic Y position
+
+        // --- Summary Section ---
+        doc.setFont('Helvetica', 'bold');
+        doc.setFontSize(14);
+        doc.text("Summary:", 14, y);
+        y += 8;
+
+        doc.setFont('Helvetica', 'normal');
+        doc.setFontSize(12);
+        doc.text(`- Achievements Logged: ${analysis.ach}`, 20, y);
+        doc.text(`- Emergencies Logged: ${analysis.emg}`, 100, y);
+        y += 8;
+        doc.text(`- Tasks Completed: ${analysis.doneTasks} / ${analysis.totalTasks} (${analysis.pctTasks}%)`, 20, y);
+        y += 10;
+
+        // --- Emergency Log Section ---
+        doc.setFont('Helvetica', 'bold');
+        doc.setFontSize(14);
+        doc.text("Emergency Log Review:", 14, y);
+        y += 8;
+
+        doc.setFont('Helvetica', 'normal');
+        doc.setFontSize(10);
+        if (analysis.log.length > 0) {
+            const logLines = analysis.log.map((entry, index) => `${index + 1}. ${entry}`);
+            const splitLog = doc.splitTextToSize(logLines.join('\n'), 182);
+            doc.text(splitLog, 14, y);
+            y += (splitLog.length * 5) + 5;
+        } else {
+            doc.text("(No emergencies logged today. Excellent!)", 14, y);
+            y += 10;
+        }
+        
+        // --- Motivational Quote ---
+        doc.line(14, y, 196, y); // Separator
+        y += 8;
+        doc.setFont('Helvetica', 'italic');
+        doc.setFontSize(12);
+        const quoteLines = doc.splitTextToSize(`"${analysis.quote}"`, 182);
+        doc.text(quoteLines, 14, y);
+
+        // --- Save PDF ---
+        doc.save(`Daily-Report-Mohammed-${today}.pdf`);
+
+    } catch (e) {
+        console.error("PDF Generation Failed:", e);
+        alert("Error: Could not generate PDF. Make sure you are connected to the internet.\n\n(Error details: jsPDF library might be blocked or missing.)");
+    }
+}
+
+
+// =================================================================
+// 🔥 INIT (Start all listeners) 🔥
+// =================================================================
+document.addEventListener('DOMContentLoaded', () => {
+    // Logon Screen Logic
+    const logonScreenEl = document.getElementById('logon-screen');
+    const logonBtnEl = document.getElementById('logon-ok');
+    logonBtnEl.addEventListener('click', () => {
+        logonScreenEl.style.display = 'none';
+    });
+
+    // Report Button Logic
+    const reportBtnEl = document.getElementById('report-panel-btn');
+    reportBtnEl.addEventListener('click', generateDailyReport);
+
+    // Task App Listeners
+    addBtn.addEventListener('click', handleAddTask);
+    newTaskEl.addEventListener('keydown', e => { if(e.key==='Enter') handleAddTask(); });
+    resetBtn.addEventListener('click', handleResetAll);
+
+    // Start Firebase Listeners
+    listenForTasks();           // Start listening for FIREBASE task changes
+    counter_listenForChanges(); // Start listening for FIREBASE counter changes
+});
 </script>
 </body>
 </html>
