@@ -14,175 +14,116 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 <script src="https://unpkg.com/clippyjs@0.0.3/dist/clippy.min.js"></script>
 
-
 <style>
-  /* Styles are extensive, including Tabs, Settings, Notes, Quotes, Archive */
-  :root{--bg:#c0c0c0;--fg:#000000;--accent:#000080;--accent-fg:#ffffff;--line-dark:#808080;--line-medium:#a0a0a0;--line-light:#ffffff;--input-fill:#ffffff;--font:'Tahoma', 'Arial', sans-serif;--progress-color:#008040;--subtle: #d0d0d0;--taskbar-green: #008080; /* Base theme color */}
+  /* ====== Base Styles & Theme Variables ====== */
+  :root{--bg:#c0c0c0;--fg:#000000;--accent:#000080;--accent-fg:#ffffff;--line-dark:#808080;--line-medium:#a0a0a0;--line-light:#ffffff;--input-fill:#ffffff;--font:'Tahoma', 'Arial', sans-serif;--progress-color:#008040;--subtle: #d0d0d0;--taskbar-green: #008080;}
   *{box-sizing:border-box;font-family: var(--font);font-size: 10pt;transition: none !important;}
-  html,body{margin:0; background:var(--taskbar-green);} /* Use taskbar-green for body */
-  body.theme-grey { --taskbar-green: #808080; } /* Grey theme */
-
-  .wrap{max-width:400px;margin: 40px auto;padding:0;background: var(--bg);box-shadow: 6px 6px 0 var(--line-dark);position: relative;}
-  .window {border: 1px solid; border-color: var(--fg) var(--line-light) var(--line-light) var(--fg); padding: 2px; background: var(--bg);}
+  html,body{margin:0; background:var(--taskbar-green);}
+  body.theme-grey { --taskbar-green: #808080; }
+  .wrap{max-width:400px;margin: 20px auto; padding:0;background: var(--bg);box-shadow: 4px 4px 0 var(--line-dark);position: relative;} /* Reduced margin/shadow */
+  .window {border: 1px solid; border-color: var(--fg) var(--line-light) var(--line-light) var(--fg); padding: 1px; background: var(--bg);} /* Reduced padding */
   .window-inner {border: 1px solid; border-color: var(--line-dark) var(--line-light) var(--line-light) var(--line-dark); padding: 1px; background: var(--bg);}
-  .title-bar {background: linear-gradient(90deg, var(--accent) 0%, #1084d8 100%); color: var(--accent-fg); padding: 3px 6px; font-size: 11pt; font-weight: bold; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--fg);}
-  .title-bar-text { flex: 1; padding-left: 8px; display: flex; align-items: center; gap: 6px; }
-  .title-bar-controls button {background: var(--bg); border: 1px solid; border-color: var(--line-light) var(--line-dark) var(--line-dark) var(--line-light); width: 18px; height: 18px; font-size: 10pt; padding: 0; line-height: 1; cursor: default; font-weight: bold;}
+  .title-bar {background: linear-gradient(90deg, var(--accent) 0%, #1084d8 100%); color: var(--accent-fg); padding: 2px 4px; font-size: 10pt; font-weight: bold; display: flex; justify-content: space-between; align-items: center;} /* Reduced padding/font */
+  .title-bar-text { flex: 1; padding-left: 4px; display: flex; align-items: center; gap: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+  .title-bar-controls button {background: var(--bg); border: 1px solid; border-color: var(--line-light) var(--line-dark) var(--line-dark) var(--line-light); width: 16px; height: 16px; font-size: 8pt; padding: 0; line-height: 14px; cursor: default; font-weight: bold;} /* Smaller buttons */
   .title-bar-controls button:active {border-color: var(--line-dark) var(--line-light) var(--line-light) var(--line-dark); padding: 1px 0 0 1px;}
-  .main-content { padding: 8px 8px 30px 8px; } /* Add padding for status bar */
-
-  /* Tabs */
-  .tabs { display: flex; border-bottom: 1px solid var(--line-dark); background: var(--bg); padding: 3px 3px 0 3px; }
-  .tab { padding: 5px 10px; border: 1px solid; border-color: var(--line-light) var(--line-dark) transparent var(--line-light); background: var(--bg); cursor: pointer; margin-bottom: -1px; /* Overlap border */ font-size: 9pt; }
-  .tab.active { border-color: var(--line-light) var(--line-dark) var(--bg) var(--line-light); /* Bottom border matches bg */ z-index: 1; position: relative; font-weight: bold; }
-  .tab:not(.active):hover { background: var(--subtle); }
-  .tab-content { display: none; padding: 10px; border: 1px solid; border-color: var(--line-dark) var(--line-light) var(--line-light) var(--line-dark); border-top: none; }
-  .tab-content.active { display: block; }
-
-  fieldset {border: 1px solid; border-color: var(--line-dark) var(--line-light) var(--line-light) var(--line-dark); padding: 10px; margin: 8px 0; background: var(--bg); box-shadow: 1px 1px 0 var(--line-light) inset, -1px -1px 0 var(--line-dark) inset;}
-  legend {background: var(--bg); padding: 0 6px; font-weight: bold; color: var(--accent); margin-left: 5px; font-size: 9pt;} /* Smaller legend */
-  .controls{display:flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 8px;}
-  input[type="text"], input[type="number"], input[type="date"], textarea, select {border: 1px solid; border-color: var(--line-dark) var(--line-light) var(--line-light) var(--line-dark); background: var(--input-fill); color: var(--fg); padding: 4px 6px; font-size: 10pt; outline: none; box-shadow: 1px 1px 0 var(--line-dark) inset, -1px -1px 0 var(--line-light) inset; }
-  textarea { width: 100%; box-sizing: border-box; font-family: var(--font); }
+  .main-content { padding: 6px 6px 28px 6px; } /* Adjusted padding for status bar */
+  fieldset {border: 1px solid; border-color: var(--line-dark) var(--line-light) var(--line-light) var(--line-dark); padding: 8px; margin: 6px 0; background: var(--bg); box-shadow: 1px 1px 0 var(--line-light) inset, -1px -1px 0 var(--line-dark) inset;}
+  legend {background: var(--bg); padding: 0 4px; font-weight: bold; color: var(--accent); margin-left: 3px; font-size: 9pt;}
+  .controls{display:flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-bottom: 6px;}
+  input[type="text"], input[type="number"], input[type="date"], textarea, select {border: 1px solid; border-color: var(--line-dark) var(--line-light) var(--line-light) var(--line-dark); background: var(--input-fill); color: var(--fg); padding: 3px 5px; font-size: 9pt; outline: none; box-shadow: 1px 1px 0 var(--line-dark) inset, -1px -1px 0 var(--line-light) inset; } /* Consistent input style */
+  textarea { width: 100%; box-sizing: border-box; font-family: var(--font); min-height: 60px;}
   input:focus, .btn:focus, .del:focus, input[type="checkbox"]:focus, textarea:focus, select:focus { outline: 1px dashed var(--fg); outline-offset: -2px; }
-  .btn {border: 1px solid; border-color: var(--line-light) var(--line-dark) var(--line-dark) var(--line-light); background: var(--bg); color: var(--fg); padding: 5px 12px; cursor: pointer; box-shadow: none; line-height: 1; font-size: 10pt; flex-shrink: 0;}
-  .btn:active {border-color: var(--line-dark) var(--line-light) var(--line-light) var(--line-dark); padding: 6px 11px 4px 13px;} /* Simulate push */
+  .btn {border: 1px solid; border-color: var(--line-light) var(--line-dark) var(--line-dark) var(--line-light); background: var(--bg); color: var(--fg); padding: 4px 10px; cursor: pointer; box-shadow: none; line-height: 1; font-size: 9pt; flex-shrink: 0;} /* Smaller buttons */
+  .btn:active {border-color: var(--line-dark) var(--line-light) var(--line-light) var(--line-dark); padding: 5px 9px 3px 11px;}
   .btn.ghost { background: transparent; box-shadow: none; border-color: transparent; }
-  .btn.ghost:active { padding: 6px 11px 4px 13px; }
-  .btn:hover { /* No default hover for classic buttons */ }
+  .btn.ghost:active { padding: 5px 9px 3px 11px; }
   .btn:disabled { color: var(--line-dark); text-shadow: 1px 1px var(--line-light); cursor: not-allowed;}
-  .muted{color:var(--line-dark);font-size:9pt; padding: 0 4px;} /* Adjusted muted color */
-  .toolbar {display: flex; gap: 4px; padding: 0; margin-top: 8px;}
+  .muted{color:var(--line-dark);font-size:8pt; padding: 0 4px;} /* Smaller muted text */
+  .toolbar {display: flex; gap: 4px; padding: 0; margin-top: 6px;}
   .toolbar button { flex: 1; }
-  .task-list-box {border: 1px solid; border-color: var(--line-dark) var(--line-light) var(--line-light) var(--line-dark); background: var(--input-fill); padding: 0; min-height: 100px; margin-top: 8px; box-shadow: 1px 1px 0 var(--line-dark) inset, -1px -1px 0 var(--line-light) inset;}
+  .task-list-box {border: 1px solid; border-color: var(--line-dark) var(--line-light) var(--line-light) var(--line-dark); background: var(--input-fill); padding: 0; min-height: 80px; margin-top: 6px; box-shadow: 1px 1px 0 var(--line-dark) inset, -1px -1px 0 var(--line-light) inset;}
   ul{list-style:none;padding:0;margin:0}
-  li{display:flex; align-items:center; gap:8px; padding: 4px 8px;background: var(--input-fill); color: var(--fg); margin: 0;border-bottom: 1px solid var(--line-medium);cursor: default;}
+  li{display:flex; align-items:center; gap:6px; padding: 3px 6px;background: var(--input-fill); color: var(--fg); margin: 0;border-bottom: 1px solid var(--line-medium);cursor: default; font-size: 9pt;} /* Smaller list items */
   li:last-child { border-bottom: none; }
   li:hover { background: var(--subtle); }
   li.done { color: var(--line-dark); opacity: 0.9; }
   li.done .txt { text-decoration: line-through; }
-  .txt{flex:1; line-height:1.4; font-size: 10pt; min-width: 0; word-break: break-word;} /* Allow long words to break */
-  input[type="checkbox"]{appearance: none; width: 13px; height: 13px;border: 1px solid var(--fg); background: var(--input-fill);box-shadow: 1px 1px 0 var(--line-dark) inset, -1px -1px 0 var(--line-light) inset;margin: 0; padding: 0; display: grid; place-items: center; flex-shrink: 0;cursor: pointer;}
-  input[type="checkbox"]:checked::after { content: '✓'; color: var(--fg); font-size: 10pt; line-height: 0.8; }
+  .txt{flex:1; line-height:1.3; font-size: 9pt; min-width: 0; word-break: break-word;}
+  input[type="checkbox"]{appearance: none; width: 12px; height: 12px;border: 1px solid var(--fg); background: var(--input-fill);box-shadow: 1px 1px 0 var(--line-dark) inset, -1px -1px 0 var(--line-light) inset;margin: 0; padding: 0; display: grid; place-items: center; flex-shrink: 0;cursor: pointer;}
+  input[type="checkbox"]:checked::after { content: '✓'; color: var(--fg); font-size: 9pt; line-height: 0.8; }
   input[type="checkbox"]:active { box-shadow: 1px 1px 0 var(--line-light) inset, -1px -1px 0 var(--line-dark) inset; }
   input[type="checkbox"]:disabled { background: var(--subtle); box-shadow: none; cursor: not-allowed; }
   input[type="checkbox"]:disabled::after { color: var(--line-dark); }
-  .del{appearance:none; border:0; background:transparent; color:var(--line-dark); font-size:10pt;cursor: pointer; padding: 0 4px; line-height:1; flex-shrink: 0;}
+  .del{appearance:none; border:0; background:transparent; color:var(--line-dark); font-size:9pt;cursor: pointer; padding: 0 3px; line-height:1; flex-shrink: 0;}
   .del:hover{color:red;}
   .del:disabled { color: var(--line-medium); cursor: not-allowed; }
-  .linear-progress-box { margin-top: 8px; }
-  .head{display:flex;justify-content:space-between;align-items:center;margin:0 0 4px 0}
-  .big{font-weight:bold; font-size: 11pt;}
-  .progress{height:14px; background: var(--line-dark);border: 1px solid; border-color: var(--line-dark) var(--line-light) var(--line-light) var(--line-dark); overflow:hidden; padding: 2px;}
+  .linear-progress-box { margin-top: 6px; }
+  .head{display:flex;justify-content:space-between;align-items:center;margin:0 0 3px 0}
+  .big{font-weight:bold; font-size: 10pt;}
+  .progress{height:12px; background: var(--line-dark);border: 1px solid; border-color: var(--line-dark) var(--line-light) var(--line-light) var(--line-dark); overflow:hidden; padding: 1px;} /* Smaller progress */
   .bar{ height:100%; width:0; background: var(--progress-color); }
-  .status-bar {border-top: 1px solid var(--line-light);display: flex; align-items: center;padding: 0 0;background: var(--bg);height: 24px;position: absolute;bottom: 0; left: 0; right: 0; width: 100%;} /* Adjusted for tabs */
-  .start-btn {background: var(--bg);border: 1px solid; border-color: var(--line-light) var(--line-dark) var(--line-dark) var(--line-light);font-weight: bold;padding: 1px 6px 0 6px;margin: 2px; height: calc(100% - 4px); line-height: 1.6; font-size: 11pt;color: var(--fg);cursor: pointer;box-shadow: none;flex-shrink: 0;}
-  .start-btn:active {border-color: var(--line-dark) var(--line-light) var(--line-light) var(--line-dark);padding: 2px 5px 0 7px;}
+  .status-bar {border-top: 1px solid var(--line-light);display: flex; align-items: center;padding: 0 0;background: var(--bg);height: 22px;position: absolute;bottom: 0; left: 0; right: 0; width: 100%;} /* Smaller status bar */
+  .start-btn {background: var(--bg);border: 1px solid; border-color: var(--line-light) var(--line-dark) var(--line-dark) var(--line-light);font-weight: bold;padding: 0px 5px 0 5px; margin: 1px; height: calc(100% - 2px); line-height: 18px; font-size: 9pt;color: var(--fg);cursor: pointer;box-shadow: none;flex-shrink: 0;} /* Smaller start button */
+  .start-btn:active {border-color: var(--line-dark) var(--line-light) var(--line-light) var(--line-dark);padding: 1px 4px 0 6px;}
   .separator {height: calc(100% - 4px); width: 1px; background: var(--line-dark); border-right: 1px solid var(--line-light); margin: 2px;}
   .status-panel-group {display: flex;margin-left: auto;align-items: center;height: 100%;}
-  .status-panel {border: 1px solid var(--line-dark); border-left-color: var(--line-light); border-top-color: var(--line-light);padding: 0 8px; line-height: 2.1; font-size: 9pt; flex-shrink: 0; min-width: 50px; height: calc(100% - 4px); margin: 2px 0 2px 2px; text-align: center;}
+  .status-panel {border: 1px solid var(--line-dark); border-left-color: var(--line-light); border-top-color: var(--line-light);padding: 0 6px; line-height: 18px; font-size: 8pt; flex-shrink: 0; min-width: 40px; height: calc(100% - 4px); margin: 2px 0 2px 1px; text-align: center;} /* Smaller status panels */
   /* Counters */
-  .counters-container {display: grid;grid-template-columns: 1fr 1fr 1fr;gap: 8px;padding: 0 0 8px 0;}
-  .counter-fieldset {text-align: center;padding: 8px 5px 5px 5px;}
-  .counter-fieldset legend {padding: 0 4px;font-size: 9pt;}
-  .counter-fieldset h1 {font-size: 2.2rem;margin: 0 0 5px 0;font-weight: bold;color: #000;line-height: 1;}
-  .counter-fieldset button {font-size: 1.1rem;font-weight: bold;width: 100%;height: 28px;padding: 0;}
+  .counters-container {display: grid;grid-template-columns: 1fr 1fr 1fr;gap: 6px;padding: 0 0 6px 0;}
+  .counter-fieldset {text-align: center;padding: 6px 4px 4px 4px;}
+  .counter-fieldset legend {padding: 0 3px;font-size: 8pt;}
+  .counter-fieldset h1 {font-size: 2rem;margin: 0 0 4px 0;font-weight: bold;color: #000;line-height: 1;}
+  .counter-fieldset button {font-size: 1rem;font-weight: bold;width: 100%;height: 24px;padding: 0;}
   .counter-fieldset button:disabled {color: var(--line-dark);text-shadow: 1px 1px var(--line-light);cursor: not-allowed;}
-  .emergency-fieldset {background-color: #CC4444;color: #FFFFFF;}
-  .emergency-fieldset h1 {color: #FFFFFF;}
-  .emergency-fieldset legend {color: #FFFFFF;background: #CC4444;}
-  hr {border: 0;border-top: 1px solid var(--line-dark);border-bottom: 1px solid var(--line-light);margin: 15px 0;}
-  .info-box fieldset {margin-top: 0;padding: 8px;}
-  .info-box legend {font-size: 9pt;margin-left: 2px;}
-  #emergency-log {width: 100%;box-sizing: border-box;font-family: var(--font);font-size: 9pt;background: var(--input-fill);color: var(--fg);border: 1px solid; border-color: var(--line-dark) var(--line-light) var(--line-light) var(--line-dark);box-shadow: 1px 1px 0 var(--line-dark) inset, -1px -1px 0 var(--line-light) inset; min-height: 60px;} /* Min height for log */
-  .status-panel-btn {cursor: pointer;border: 1px solid var(--line-light);border-right-color: var(--line-dark);border-bottom-color: var(--line-dark);}
+  .emergency-fieldset {background-color: #CC4444;color: #FFFFFF;} .emergency-fieldset h1 {color: #FFFFFF;} .emergency-fieldset legend {color: #FFFFFF;background: #CC4444;}
+  hr {border: 0;border-top: 1px solid var(--line-dark);border-bottom: 1px solid var(--line-light);margin: 10px 0;} /* Smaller margin */
+  .info-box fieldset {margin-top: 0;padding: 6px;}
+  .info-box legend {font-size: 8pt;margin-left: 2px;}
+  #emergency-log {font-size: 8pt; min-height: 50px;}
+  /* Buttons in Status Bar */
+  .status-panel-btn {cursor: pointer;border: 1px solid var(--line-light);border-right-color: var(--line-dark);border-bottom-color: var(--line-dark); padding: 0 4px; min-width: auto;} /* Smaller padding/min-width */
   .status-panel-btn:active {border-color: var(--line-dark) var(--line-light) var(--line-light) var(--line-dark);}
-  #clippy-panel-btn {font-size: 1.2rem;line-height: 1.5;padding: 0 6px;min-width: 30px;}
-  #report-panel-btn {padding: 0 6px;}
-  #reset-today-panel-btn {padding: 0 6px;}
+  #clippy-panel-btn {font-size: 1rem; line-height: 16px; padding: 0 4px;}
+  #report-panel-btn i { font-size: 0.9em; }
+  #reset-today-panel-btn i { font-size: 0.9em; }
+  /* Logon */
   #logon-screen {position: fixed;top: 0;left: 0;width: 100%;height: 100%;background: var(--taskbar-green);display: flex;justify-content: center;align-items: center;z-index: 1000;}
-  #logon-window {width: 350px;padding-bottom: 10px;}
-  #logon-content {padding: 20px;display: flex;align-items: center;gap: 15px;}
-  #logon-content i {font-size: 48px;color: var(--accent);}
-  #logon-buttons {text-align: center;padding: 0 20px;}
-  #logon-ok {width: 100px;}
-  .dread-btn {appearance: none; border: 0; background: transparent;font-size: 1.1rem; cursor: pointer; padding: 0 4px; line-height: 1; flex-shrink: 0;}
-  .dread-btn:hover { opacity: 0.6; } .dread-btn:active { transform: scale(0.9); }
-  .dread-btn:disabled { cursor: not-allowed; opacity: 0.5; }
-  .dread-analysis-panel {padding: 5px;font-size: 0.95rem;}
-  .dread-analysis-panel .task-name {font-weight: bold;color: var(--accent);}
-  .history-controls {display: flex;gap: 8px;align-items: center;}
-  .history-controls input[type="date"] {border: 1px solid; border-color: var(--line-dark) var(--line-light) var(--line-light) var(--line-dark); background: var(--input-fill); color: var(--fg); padding: 4px 6px; font-size: 10pt;outline: none; box-shadow: 1px 1px 0 var(--line-dark) inset, -1px -1px 0 var(--line-light) inset; flex: 1; height: 30px;}
-  .history-controls button {flex-shrink: 0; height: 30px;}
-  /* Settings Tab Styles */
-  .setting-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-  .setting-row label { flex: 0 0 120px; /* Fixed width for labels */ text-align: right; font-size: 9pt;}
-  .setting-row input[type="number"], .setting-row input[type="text"], .setting-row select { flex: 1; }
-  input[type="checkbox"].settings-checkbox { width: auto; height: auto; box-shadow: none; border: none; /* Simplify checkbox */ margin-right: 5px; vertical-align: middle;}
-  /* Quotes Tab Styles */
-  #quotes-list li { justify-content: space-between; }
-  /* Archive Tab Styles */
-  #archive-controls { display: flex; gap: 10px; margin-bottom: 10px; }
-  #archive-controls label { font-size: 9pt; align-self: center; }
-  #archive-controls input[type="date"] { flex: 1; }
-  #archive-list-box { border: 1px solid; border-color: var(--line-dark) var(--line-light) var(--line-light) var(--line-dark); background: var(--input-fill); padding: 0; min-height: 150px; margin-top: 8px; box-shadow: 1px 1px 0 var(--line-dark) inset, -1px -1px 0 var(--line-light) inset; }
-  #archive-list li { border-bottom: 1px solid var(--line-medium); }
-  #archive-list li .date-stamp { font-size: 8pt; color: var(--line-dark); margin-left: auto; padding-left: 10px; }
-  /* Random Quote Style */
-  #random-quote-display { border: 1px solid var(--line-dark); border-left-color: var(--line-light); border-top-color: var(--line-light); padding: 5px 8px; font-size: 9pt; margin: 10px 0; background: var(--input-fill); font-style: italic; }
+  #logon-window {width: 300px; padding-bottom: 8px;} /* Smaller logon */
+  #logon-content {padding: 15px; gap: 10px;}
+  #logon-content i {font-size: 36px;} #logon-buttons {padding: 0 15px;} #logon-ok {width: 80px;}
+  /* Dread */
+  .dread-btn {font-size: 1rem; padding: 0 3px;} .dread-btn:disabled { cursor: not-allowed; opacity: 0.5; }
+  .dread-analysis-panel {padding: 4px;font-size: 9pt;}
+  /* History */
+  .history-controls {display: flex;gap: 6px;align-items: center;}
+  .history-controls input[type="date"] {padding: 3px 5px; font-size: 9pt; height: 28px;}
+  .history-controls button {height: 28px; padding: 4px 8px; font-size: 9pt;}
+  /* Settings */
+  .setting-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .setting-row label { flex: 0 0 100px; text-align: right; font-size: 9pt;}
+  .setting-row input[type="number"], .setting-row input[type="text"], .setting-row select { flex: 1; font-size: 9pt; padding: 3px 5px;}
+  input[type="checkbox"].settings-checkbox { width: auto; height: auto; box-shadow: none; border: none; margin-right: 5px; vertical-align: middle;}
+  /* Quotes */
+  #quotes-list li { justify-content: space-between; font-size: 9pt; }
+  /* Archive */
+  #archive-controls { display: flex; gap: 8px; margin-bottom: 8px; align-items: center;}
+  #archive-controls label { font-size: 9pt; }
+  #archive-controls input[type="date"] { flex: 1; font-size: 9pt; padding: 3px 5px;}
+  #archive-list-box { min-height: 120px; margin-top: 6px; }
+  #archive-list li { font-size: 9pt; }
+  #archive-list li .date-stamp { font-size: 7pt; margin-left: auto; padding-left: 8px; }
+  /* Random Quote */
+  #random-quote-display { border: 1px solid; border-color: var(--line-dark) var(--line-light) var(--line-light) var(--line-dark); padding: 4px 6px; font-size: 8pt; margin: 8px 0; background: var(--input-fill); font-style: italic; box-shadow: 1px 1px 0 var(--line-dark) inset, -1px -1px 0 var(--line-light) inset; text-align: center; }
 
-  @media (max-width: 768px) {
-      .wrap {max-width: 100%;margin: 0;height: 100vh;box-shadow: none;}
-      .main-content { padding: 4px 4px 30px 4px; }
-      /* Adjust tab padding for small screens */
-      .tab { padding: 4px 6px; font-size: 8pt; }
-      .tab-content { padding: 6px; }
-      /* Stack settings */
-      .setting-row { flex-direction: column; align-items: stretch; gap: 4px; margin-bottom: 8px;}
-      .setting-row label { text-align: left; margin-bottom: 2px;}
-      .controls { flex-direction: column; align-items: stretch; gap: 4px; }
-      .controls > * { width: 100%; }
-      .controls label { flex: none; width: 100%; padding-bottom: 2px; }
-      .toolbar button { flex: 1; }
-      .task-list-box { min-height: 150px; } /* Adjusted height */
-      li { padding: 6px 8px; }
-      .status-bar { width: 100%; left: 0; right: 0; bottom: 0; position: fixed; }
-      .status-panel-group { margin-left: auto; }
-      .counters-container {gap: 4px;padding: 4px 0 4px 0;}
-      .counter-fieldset {padding: 6px 4px 4px 4px;}
-      .counter-fieldset h1 {font-size: 1.8rem;}
-      .counter-fieldset button {height: 24px;font-size: 1rem;}
-      .counter-fieldset legend {font-size: 8pt;}
-      .info-box p, .info-box .sunken-panel {font-size: 8pt;}
-      .history-controls {flex-direction: column;align-items: stretch;}
-      .history-controls input[type="date"] {margin-bottom: 4px;}
-      /* Stack archive controls */
-      #archive-controls { flex-direction: column; align-items: stretch; gap: 4px; }
-  }
+  @media (max-width: 768px) {.wrap {max-width: 100%;margin: 0;height: 100vh;box-shadow: none;}.main-content { padding: 4px 4px 26px 4px; } /* Adjusted bottom padding */ .tab { padding: 4px 6px; font-size: 8pt; } .tab-content { padding: 6px; }.setting-row { flex-direction: column; align-items: stretch; gap: 4px; margin-bottom: 8px;}.setting-row label { text-align: left; margin-bottom: 2px;}.controls { flex-direction: column; align-items: stretch; gap: 4px; }.controls > * { width: 100%; }.controls label { flex: none; width: 100%; padding-bottom: 2px; }.toolbar button { flex: 1; }.task-list-box { min-height: 150px; }li { padding: 5px 6px; font-size: 9pt; }.status-bar { width: 100%; left: 0; right: 0; bottom: 0; position: fixed; height: 22px;} .status-panel { height: calc(100% - 2px); margin: 1px 0 1px 1px; line-height: 18px;}.start-btn{height: calc(100% - 2px); margin: 1px; line-height: 18px;} .separator{height: calc(100% - 4px); margin: 2px;}.counters-container {gap: 4px;padding: 4px 0 4px 0;}.counter-fieldset {padding: 5px 3px 3px 3px;}.counter-fieldset h1 {font-size: 1.6rem;}.counter-fieldset button {height: 22px;font-size: 0.9rem;}.counter-fieldset legend {font-size: 7pt;}.info-box p, .info-box .sunken-panel {font-size: 8pt;}.history-controls {flex-direction: column;align-items: stretch;}.history-controls input[type="date"] {margin-bottom: 4px; height: 28px;} .history-controls button { height: 28px;} #archive-controls { flex-direction: column; align-items: stretch; gap: 4px; }}
 </style>
 </head>
-<body class="theme-grey"> <div id="logon-screen">
-    <div class="window" id="logon-window">
-        <div class="title-bar"><div class="title-bar-text">Logon</div></div>
-        <div id="logon-content">
-            <i class="fas fa-user-circle"></i>
-            <div>
-                <p style="margin: 0 0 5px 0;">Welcome back, <strong>Mohammed</strong>.</p>
-                <p style="margin: 0;">Click OK to load.</p>
-            </div>
-        </div>
-        <div id="logon-buttons"><button class="btn" id="logon-ok">OK</button></div>
-    </div>
-  </div>
+<body class="theme-grey"> <div id="logon-screen"> <div class="window" id="logon-window"> <div class="title-bar"><div class="title-bar-text">Logon</div></div> <div id="logon-content"> <i class="fas fa-user-circle"></i> <div> <p style="margin: 0 0 5px 0;">Welcome back, <strong>Mohammed</strong>.</p> <p style="margin: 0;">Click OK to load.</p> </div> </div> <div id="logon-buttons"><button class="btn" id="logon-ok">OK</button></div> </div> </div>
 
   <main class="wrap window">
     <div class="window-inner">
-      <div class="title-bar">
-          <div class="title-bar-text"><i class="fas fa-user-circle"></i><span>mohammed tasks</span></div>
-          <div class="title-bar-controls">
-              <button title="Minimize">_</button><button title="Maximize">□</button><button title="Close">X</button>
-          </div>
-      </div>
+      <div class="title-bar"> <div class="title-bar-text"><i class="fas fa-user-circle"></i><span>mohammed tasks</span></div> <div class="title-bar-controls"> <button title="Minimize">_</button><button title="Maximize">□</button><button title="Close">X</button> </div> </div>
 
       <div class="tabs">
           <div class="tab active" data-tab="main-tab">Main</div>
@@ -197,108 +138,63 @@
 
           <div id="main-tab" class="tab-content active">
               <div class="counters-container">
-                  <fieldset class="counter-fieldset">
-                      <legend id="counter-label-achievements">Achievements</legend>
-                      <h1 id="achievements-count">0</h1>
-                      <button onclick="counter_increment('achievements')" class="btn">+</button>
-                  </fieldset>
-                  <fieldset class="counter-fieldset">
-                      <legend id="counter-label-neutral">Neutral</legend>
-                      <h1 id="neutral-count">0</h1>
-                      <button onclick="counter_increment('neutral')" class="btn">+</button>
-                  </fieldset>
-                  <fieldset class="counter-fieldset emergency-fieldset">
-                      <legend id="counter-label-emergency">Emergency</legend>
-                      <h1 id="emergency-count">0</h1>
-                      <button onclick="counter_increment('emergency')" class="btn">+</button>
-                  </fieldset>
+                  <fieldset class="counter-fieldset"><legend id="counter-label-achievements">Achievements</legend><h1 id="achievements-count">0</h1><button onclick="counter_increment('achievements')" class="btn">+</button></fieldset>
+                  <fieldset class="counter-fieldset"><legend id="counter-label-neutral">Neutral</legend><h1 id="neutral-count">0</h1><button onclick="counter_increment('neutral')" class="btn">+</button></fieldset>
+                  <fieldset class="counter-fieldset emergency-fieldset"><legend id="counter-label-emergency">Emergency</legend><h1 id="emergency-count">0</h1><button onclick="counter_increment('emergency')" class="btn">+</button></fieldset>
               </div>
-              <div class="info-box" style="padding: 0; margin: 0;">
-                  <fieldset><legend id="emergency-log-legend">Today's Emergency Log</legend><div style="padding: 5px;"><textarea id="emergency-log" readonly rows="3"></textarea></div></fieldset>
-              </div>
-              <div id="random-quote-display">(Loading quote...)</div>
+              <div class="info-box" style="padding: 0; margin: 0;"><fieldset><legend id="emergency-log-legend">Today's Log</legend><div style="padding: 5px;"><textarea id="emergency-log" readonly rows="3"></textarea></div></fieldset></div>
+              <div id="random-quote-display">(Quote...)</div>
               <hr>
-              <fieldset id="add-task-fieldset">
-                  <legend>Add New Task</legend>
-                  <div class="controls"><label for="newTask" style="flex: 0 0 100px;">Task:</label><input id="newTask" type="text" placeholder="Brief description…"/></div>
-                  <div class="toolbar"><button class="btn" id="addBtn"><i class="fas fa-plus"></i> Add Task</button><button class="btn ghost" id="resetAllBtn" title="Delete ALL tasks & Today's Counters"><i class="fas fa-trash-alt"></i> Reset All</button></div>
-              </fieldset>
-              <div id="progress-bar-container" class="linear-progress-box">
-                <div class="head"><div><span class="big" id="pct1">0%</span> <span class="muted">Progress</span></div><div class="muted"><span id="done1">0</span>/<span id="total1">0</span> Tasks</div></div>
-                <div class="progress"><div id="bar1" class="bar"></div></div>
-              </div>
-              <fieldset id="dread-analysis-fieldset" class="info-box" style="padding: 8px; margin-top: 15px;"><legend>Dread Analysis</legend><div class="dread-analysis-panel"><span>Most Evaded:</span> <span id="dread-task-name" class="task-name">(None)</span></div></fieldset>
-              <fieldset id="task-list-fieldset"><legend id="task-list-legend">Current Tasks</legend><div class="task-list-box"><ul id="list"></ul></div><div id="emptyMessage" class="muted" style="text-align: center; margin-top: 8px; font-weight: bold; display: none;">No tasks.</div></fieldset>
+              <fieldset id="add-task-fieldset"><legend>Add New Task</legend><div class="controls"><label for="newTask" style="flex: 0 0 60px;">Task:</label><input id="newTask" type="text" placeholder="Description…"/></div><div class="toolbar"><button class="btn" id="addBtn"><i class="fas fa-plus"></i> Add</button><button class="btn ghost" id="resetAllBtn" title="Delete ALL tasks & Today's Counters"><i class="fas fa-trash-alt"></i> Reset All</button></div></fieldset>
+              <div id="progress-bar-container" class="linear-progress-box"><div class="head"><div><span class="big" id="pct1">0%</span> <span class="muted">Progress</span></div><div class="muted"><span id="done1">0</span>/<span id="total1">0</span></div></div><div class="progress"><div id="bar1" class="bar"></div></div></div>
+              <fieldset id="dread-analysis-fieldset" class="info-box" style="padding: 6px; margin-top: 10px;"><legend>Dread Analysis</legend><div class="dread-analysis-panel"><span>Most Evaded:</span> <span id="dread-task-name" class="task-name">(None)</span></div></fieldset>
+              <fieldset id="task-list-fieldset"><legend id="task-list-legend">Current Tasks</legend><div class="task-list-box"><ul id="list"></ul></div><div id="emptyMessage" class="muted msg-box">No tasks.</div></fieldset>
           </div>
 
           <div id="settings-tab" class="tab-content">
-              <fieldset><legend>General Settings</legend>
+              <fieldset><legend>General</legend>
                   <div class="setting-row"><label for="setting-goal">Daily Goal:</label><input type="number" id="setting-goal" min="1" value="10"></div>
-                  <div class="setting-row"><label><input type="checkbox" id="setting-sounds" class="settings-checkbox" checked> Enable Sounds</label></div>
+                  <div class="setting-row"><label><input type="checkbox" id="setting-sounds" class="settings-checkbox" checked> Sounds</label></div>
                   <div class="setting-row"><label for="setting-theme">Theme:</label><select id="setting-theme"><option value="theme-grey">Classic Grey</option><option value="theme-teal">Teal Green</option></select></div>
               </fieldset>
-              <fieldset><legend>Counter Labels</legend>
-                  <div class="setting-row"><label for="setting-label-ach">Achievement:</label><input type="text" id="setting-label-ach" value="Achievements"></div>
-                  <div class="setting-row"><label for="setting-label-neu">Neutral:</label><input type="text" id="setting-label-neu" value="Neutral"></div>
-                  <div class="setting-row"><label for="setting-label-emg">Emergency:</label><input type="text" id="setting-label-emg" value="Emergency"></div>
+              <fieldset><legend>Labels</legend>
+                  <div class="setting-row"><label for="setting-label-ach">Achieve:</label><input type="text" id="setting-label-ach"></div>
+                  <div class="setting-row"><label for="setting-label-neu">Neutral:</label><input type="text" id="setting-label-neu"></div>
+                  <div class="setting-row"><label for="setting-label-emg">Emergency:</label><input type="text" id="setting-label-emg"></div>
               </fieldset>
-              <button class="btn" id="save-settings-btn">Save Settings</button>
+              <button class="btn" id="save-settings-btn" style="width: 100%; margin-top: 10px;">Save Settings</button>
           </div>
 
           <div id="notes-tab" class="tab-content">
-              <fieldset><legend>Daily Notes (<span id="notes-date"></span>)</legend>
-                  <textarea id="notes-textarea" rows="15" placeholder="Write your thoughts for the day here..."></textarea>
-                  <p class="muted" style="text-align: right; margin-top: 5px;">Notes are saved automatically.</p>
+              <fieldset><legend>Notes (<span id="notes-date"></span>)</legend>
+                  <textarea id="notes-textarea" rows="15" placeholder="Thoughts for the day..."></textarea>
+                  <p class="muted status-msg">Saved automatically.</p>
               </fieldset>
           </div>
 
           <div id="quotes-tab" class="tab-content">
-              <fieldset><legend>Add New Quote</legend>
-                  <div class="controls"><input type="text" id="new-quote-input" placeholder="Enter motivational quote..." style="flex: 1;"><button class="btn" id="add-quote-btn"><i class="fas fa-plus"></i> Add</button></div>
-              </fieldset>
+              <fieldset><legend>Add Quote</legend><div class="controls"><input type="text" id="new-quote-input" placeholder="Enter quote..." style="flex: 1;"><button class="btn" id="add-quote-btn"><i class="fas fa-plus"></i></button></div></fieldset>
               <fieldset><legend>My Quotes</legend><div class="task-list-box" style="min-height: 200px;"><ul id="quotes-list"></ul></div></fieldset>
           </div>
 
           <div id="archive-tab" class="tab-content">
-              <fieldset><legend>View Completed Tasks Archive</legend>
-                  <div id="archive-controls">
-                      <label for="archive-start-date">From:</label><input type="date" id="archive-start-date">
-                      <label for="archive-end-date">To:</label><input type="date" id="archive-end-date">
-                      <button class="btn" id="load-archive-btn">Load Archive</button>
-                  </div>
+              <fieldset><legend>View Completed Tasks</legend>
+                  <div id="archive-controls"><label for="archive-start-date">From:</label><input type="date" id="archive-start-date"><label for="archive-end-date">To:</label><input type="date" id="archive-end-date"><button class="btn" id="load-archive-btn">Load</button></div>
                   <div id="archive-list-box"><ul id="archive-list"></ul></div>
-                  <p id="archive-empty" class="muted" style="text-align: center; display: none;">No completed tasks found in this date range.</p>
+                  <p id="archive-empty" class="muted msg-box" style="display: none;">No completed tasks found.</p>
               </fieldset>
           </div>
 
-          <div id="about-tab" class="tab-content">
-              <fieldset><legend>About Mohammed Tasks</legend>
-                  <p>This is your personal task and progress tracker, built with a classic Windows 95 style.</p>
-                  <p>Features:</p>
-                  <ul>
-                      <li>Daily Counters (Achievements, Neutral, Emergency)</li>
-                      <li>Task List with Progress Tracking</li>
-                      <li>Emergency Log & Dread Analysis</li>
-                      <li>Historical Counter View (via Archive Tab dates)</li>
-                      <li>Daily Notes & Motivational Quotes</li>
-                      <li>Daily PDF Report & Clippy Analysis</li>
-                      <li>Settings & Themes</li>
-                  </ul>
-                  <p>All data is synced with Firebase.</p>
-                  <p class="muted">Version: 2.0 (Tabs Update)</p>
-              </fieldset>
-          </div>
+          <div id="about-tab" class="tab-content"><fieldset><legend>About</legend><p>Mohammed Tasks - v2.0</p><p>Personal task & progress tracker.</p><p class="muted">Uses Firebase, jsPDF, ClippyJS.</p></fieldset></div>
 
       </div> <div class="status-bar">
           <button class="start-btn">Start</button><div class="separator"></div>
-          <div class="status-panel" style="flex-grow: 1; margin-right: 0; text-align: left; min-width: 0;">mohammed tasks</div>
+          <div class="status-panel" style="flex-grow: 1; margin-right: 0; text-align: left; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">mohammed tasks</div>
           <div class="status-panel-group">
-            <div class="status-panel status-panel-btn" id="clippy-panel-btn" role="button" title="Get Smart Analysis" disabled>📎</div>
-            <div class="status-panel status-panel-btn" id="report-panel-btn" role="button" title="Generate Daily Report"><i class="fas fa-print"></i> Report</div>
-            <div class="status-panel status-panel-btn" id="reset-today-panel-btn" role="button" title="Reset Today's Counters & Log"><i class="fas fa-undo"></i> Reset Today</div>
-            <div class="status-panel" id="status-total">Total: 0</div>
-            <div class="status-panel" id="status-save">Loading...</div>
-          </div>
+            <div class="status-panel status-panel-btn" id="clippy-panel-btn" role="button" title="Analysis" disabled>📎</div>
+            <div class="status-panel status-panel-btn" id="report-panel-btn" role="button" title="Report"><i class="fas fa-print"></i></div>
+            <div class="status-panel status-panel-btn" id="reset-today-panel-btn" role="button" title="Reset Today"><i class="fas fa-undo"></i></div>
+            <div class="status-panel" id="status-total">T:0</div> <div class="status-panel" id="status-save" style="min-width: 45px;">Init...</div> </div>
       </div>
     </div> </main> <audio id="sound-tada" src="https://www.myinstants.com/media/sounds/tada.mp3" preload="auto"></audio>
   <audio id="sound-error" src="https://www.myinstants.com/media/sounds/windows-xp-error.mp3" preload="auto"></audio>
@@ -307,10 +203,7 @@
 // =================================================================
 // 🔥 FIREBASE INITIALIZATION & CONFIG 🔥
 // =================================================================
-const firebaseConfig = { /* Your Config */
-  apiKey: "AIzaSyBvpcUP-DmXH82WHgm4ZLHezeBFaaxMnCE", authDomain: "mohammedtasksapp.firebaseapp.com", databaseURL: "https://mohammedtasksapp-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "mohammedtasksapp", storageBucket: "mohammedtasksapp.appspot.com", messagingSenderId: "271781862481", appId: "1:271781862481:web:dfd63b2c4b4a8d74ad2c70"
-};
-
+const firebaseConfig = { apiKey: "AIzaSyBvpcUP-DmXH82WHgm4ZLHezeBFaaxMnCE", authDomain: "mohammedtasksapp.firebaseapp.com", databaseURL: "https://mohammedtasksapp-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "mohammedtasksapp", storageBucket: "mohammedtasksapp.appspot.com", messagingSenderId: "271781862481", appId: "1:271781862481:web:dfd63b2c4b4a8d74ad2c70" };
 let db = null; let firebaseInitialized = false;
 try {
     if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); console.log("Firebase initialized."); } else { firebase.app(); console.log("Firebase already initialized."); }
@@ -321,9 +214,11 @@ try {
 // 🔥 GLOBAL VARIABLES & DOM ELEMENTS 🔥
 // =================================================================
 let todayCounterRef = null; let currentCounters = { achievements: 0, neutral: 0, emergency: 0, emergencyLog: [] };
-let isViewingHistory = false; let tasks = []; let clippyAgent = null; let quotes = []; let currentSettings = { dailyGoal: 10, soundsEnabled: true, theme: 'theme-grey', labels: { achievements: 'Achievements', neutral: 'Neutral', emergency: 'Emergency' } }; let notesRef = null; let currentNote = ""; let settingsRef = null; let quotesRef = null;
+let isViewingHistory = false; let tasks = []; let clippyAgent = null; let quotes = [];
+let currentSettings = { dailyGoal: 10, soundsEnabled: true, theme: 'theme-grey', labels: { achievements: 'Achievements', neutral: 'Neutral', emergency: 'Emergency' } };
+let notesRef = null; let currentNote = ""; let settingsRef = null; let quotesRef = null; let noteSaveTimeout;
 
-// DOM Elements
+// DOM Elements (assigned in initApp)
 let listEl, newTaskEl, addBtn, resetAllBtn, emptyMessageEl, statusTotalEl, statusSaveEl;
 let historyDateInput, historyLoadBtn, historyTodayBtn;
 let dreadTaskNameEl; let allCounterButtons;
@@ -331,439 +226,204 @@ let reportBtnEl, clippyBtnEl, resetTodayBtnEl;
 let logTextareaEl, emergencyLogLegendEl; let soundTada, soundError;
 let logonScreenEl, logonBtnEl;
 let addTaskFieldset, progressBarContainer, dreadAnalysisFieldset, taskListLegendEl;
-// Tab Elements
 let tabs, tabContents;
-// Settings Elements
 let settingGoalInput, settingSoundsCheckbox, settingThemeSelect;
 let settingLabelAchInput, settingLabelNeuInput, settingLabelEmgInput, saveSettingsBtn;
-// Notes Elements
 let notesTextarea, notesDateSpan;
-// Quotes Elements
 let newQuoteInput, addQuoteBtn, quotesListEl;
 let randomQuoteDisplayEl;
-// Archive Elements
 let archiveStartDateInput, archiveEndDateInput, loadArchiveBtn, archiveListEl, archiveEmptyMsg;
 
 // =================================================================
-// 🔥 HELPER FUNCTIONS (UTILS) 🔥
+// 🔥 HELPER FUNCTIONS 🔥
 // =================================================================
-// ... (getTodayDateString, updateStatus, clippySpeak, checkPdfLibraries - largely unchanged) ...
 function getTodayDateString() { const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
-function updateStatus(message) { if (statusSaveEl) { statusSaveEl.textContent = message; const isError = /error|fail|missing/i.test(message); if (!isError) { setTimeout(() => { if (statusSaveEl && statusSaveEl.textContent === message) statusSaveEl.textContent = 'Ready'; }, 2500); } } }
+function updateStatus(message, isError = false) { if (statusSaveEl) { statusSaveEl.textContent = message; if (!isError) { setTimeout(() => { if (statusSaveEl && statusSaveEl.textContent === message) statusSaveEl.textContent = 'Ready'; }, 2500); } } }
 function clippySpeak(message, hold = false) { if (clippyAgent) { clippyAgent.speak(message, hold); } else { console.log("Clippy fallback:", message); } }
-function checkPdfLibraries() { const ready = typeof window.jspdf !== 'undefined' && typeof window.jspdf.jsPDF === 'function' && typeof window.jspdf.plugin !== 'undefined' && typeof window.jspdf.plugin.autotable === 'function'; if (!ready) { console.error("PDF Libs not loaded!"); clippySpeak("PDF libraries missing. Check internet?"); updateStatus("PDF Lib Error"); alert("Error: PDF Libs Missing. Check internet & refresh (Ctrl+Shift+R)."); } return ready; }
-
+function checkPdfLibraries() { const ready = typeof window.jspdf?.jsPDF === 'function' && typeof window.jspdf?.plugin?.autotable === 'function'; if (!ready) { console.error("PDF Libs not ready!"); clippySpeak("PDF libraries missing. Check internet?"); updateStatus("PDF Lib Error", true); alert("Error: PDF Libs Missing. Check internet & refresh (Ctrl+Shift+R). Wait before trying again."); } return ready; }
 
 // =================================================================
 // 🔥 TABS LOGIC 🔥
 // =================================================================
 function activateTab(tabId) {
     if (!tabs || !tabContents) return;
-    tabs.forEach(tab => {
-        tab.classList.toggle('active', tab.dataset.tab === tabId);
-    });
-    tabContents.forEach(content => {
-        content.classList.toggle('active', content.id === tabId);
-    });
-    // Load notes if Notes tab is activated
-    if (tabId === 'notes-tab' && !isViewingHistory) {
-        listenForNotes(); // Load today's notes
-    }
+    tabs.forEach(tab => tab.classList.toggle('active', tab.dataset.tab === tabId));
+    tabContents.forEach(content => content.classList.toggle('active', content.id === tabId));
+    // Load notes only when notes tab is active and not in history mode
+    if (tabId === 'notes-tab' && !isViewingHistory) { listenForNotes(); }
+    else if (notesRef) { notesRef.off('value'); notesRef = null; console.log("Turned off notes listener."); } // Turn off listener when leaving notes tab
 }
 
 // =================================================================
-// 🔥 COUNTER LOGIC (Firebase) 🔥
+// 🔥 COUNTER LOGIC 🔥
 // =================================================================
-// ... (counter_listenForChanges, updateCounterUI, counter_increment - largely unchanged, but uses currentSettings.labels) ...
-function counter_listenForChanges(dateString) {
-    if (!db) { console.warn("DB not ready."); return; }
-    const dateToLoad = dateString || getTodayDateString();
-    const newRefPath = 'dailyCounters/' + dateToLoad;
-    const newRef = db.ref(newRefPath);
-    if (todayCounterRef && todayCounterRef.toString() !== newRef.toString()) { todayCounterRef.off('value'); todayCounterRef = null; }
-    if (!todayCounterRef) {
-        todayCounterRef = newRef;
-        todayCounterRef.on('value', (snapshot) => {
-            const data = snapshot.val();
-            currentCounters = data ? { ...data, emergencyLog: data.emergencyLog || [] } : { achievements: 0, neutral: 0, emergency: 0, emergencyLog: [] };
-            if (!data && !isViewingHistory && dateToLoad === getTodayDateString()) { todayCounterRef.set(currentCounters).catch(e => console.error("Init counter set fail:", e)); }
-            updateCounterUI();
-        }, (error) => { console.error(`Counter Read Fail ${dateToLoad}:`, error); updateStatus('Counter Sync Err'); currentCounters = { achievements: 0, neutral: 0, emergency: 0, emergencyLog: [] }; updateCounterUI(); });
-    } else { updateCounterUI(); }
-}
-
-function updateCounterUI() {
-    const achEl = document.getElementById('achievements-count');
-    const neuEl = document.getElementById('neutral-count');
-    const emgEl = document.getElementById('emergency-count');
-    // Use labels from settings
-    const achLabelEl = document.getElementById('counter-label-achievements');
-    const neuLabelEl = document.getElementById('counter-label-neutral');
-    const emgLabelEl = document.getElementById('counter-label-emergency');
-
-    if (achEl) achEl.innerText = currentCounters.achievements || 0;
-    if (neuEl) neuEl.innerText = currentCounters.neutral || 0;
-    if (emgEl) emgEl.innerText = currentCounters.emergency || 0;
-
-    if(achLabelEl) achLabelEl.textContent = currentSettings.labels.achievements || 'Achievements';
-    if(neuLabelEl) neuLabelEl.textContent = currentSettings.labels.neutral || 'Neutral';
-    if(emgLabelEl) emgLabelEl.textContent = currentSettings.labels.emergency || 'Emergency';
-
-
-    const logData = currentCounters.emergencyLog || [];
-    if (logTextareaEl) {
-        logTextareaEl.value = logData.length > 0 ? logData.join('\n') : (isViewingHistory ? '(No data)' : '(No logs)');
-        logTextareaEl.scrollTop = logTextareaEl.scrollHeight;
-    }
-    if (allCounterButtons) allCounterButtons.forEach(btn => btn.disabled = isViewingHistory);
-    if (historyTodayBtn) historyTodayBtn.style.display = isViewingHistory ? 'inline-block' : 'none';
-    if (historyLoadBtn) historyLoadBtn.style.display = isViewingHistory ? 'none' : 'inline-block';
-    if (emergencyLogLegendEl) { emergencyLogLegendEl.textContent = isViewingHistory && historyDateInput ? `Log (${historyDateInput.value})` : "Today's Log"; }
-    const showTodayElements = !isViewingHistory;
-    if (addTaskFieldset) addTaskFieldset.style.display = showTodayElements ? '' : 'none';
-    if (progressBarContainer) progressBarContainer.style.display = showTodayElements ? '' : 'none';
-    if (dreadAnalysisFieldset) dreadAnalysisFieldset.style.display = showTodayElements ? '' : 'none';
-    if (taskListLegendEl) taskListLegendEl.textContent = showTodayElements ? "Current Tasks" : (historyDateInput ? `Tasks Created (${historyDateInput.value})` : "Tasks");
-}
-
-function counter_increment(type) {
-    if (!db || !todayCounterRef) { clippySpeak("DB error."); return; }
-    if (isViewingHistory) { clippySpeak("Cannot add in History View."); return; }
-    let finalReason = ""; let updates = {};
-    if (type === 'emergency') {
-        let reasonInput = prompt(`EMERGENCY (${currentSettings.labels.emergency}):\n\n1. Social Media\n2. Phone\n3. Procrastination\n4. Other`, "");
-        if (reasonInput === null) return;
-        finalReason = reasonInput === "1" ? "Social Media" : reasonInput === "2" ? "Phone/Calls" : reasonInput === "3" ? "Procrastination" : reasonInput === "4" ? (prompt("Specify:", "") || "Other") : reasonInput.trim() || "Other";
-        const currentLog = Array.isArray(currentCounters.emergencyLog) ? [...currentCounters.emergencyLog] : [];
-        currentLog.push(finalReason); updates.emergencyLog = currentLog;
-        if (currentSettings.soundsEnabled && soundError) soundError.play().catch(e => console.warn("Audio fail:", e));
-    }
-    todayCounterRef.child(type).transaction((c) => (c || 0) + 1, (err, comm, snap) => {
-        if (err) { console.error('Count Tx fail!', err); updateStatus('Count Save Err'); }
-        else if (comm) { if (type === 'achievements' && snap.val() >= currentSettings.dailyGoal) { clippySpeak(`Goal reached! ${snap.val()} ${currentSettings.labels.achievements}!`); } }
-    });
-    if (updates.emergencyLog) { todayCounterRef.update({ emergencyLog: updates.emergencyLog }).catch(e => { console.error("Log update fail:", e); updateStatus('Log Save Err'); }); }
-}
+function counter_listenForChanges(dateString) { /* ... same as before ... */ if (!db) { console.warn("DB not ready."); return; } const dateToLoad = dateString || getTodayDateString(); const newRefPath = 'dailyCounters/' + dateToLoad; const newRef = db.ref(newRefPath); if (todayCounterRef && todayCounterRef.toString() !== newRef.toString()) { console.log("Off listener:", todayCounterRef.toString()); todayCounterRef.off('value'); todayCounterRef = null; } if (!todayCounterRef) { console.log("On listener:", newRefPath); todayCounterRef = newRef; todayCounterRef.on('value', (s) => { const d = s.val(); currentCounters = d ? { ...d, emergencyLog: d.emergencyLog || [] } : { achievements: 0, neutral: 0, emergency: 0, emergencyLog: [] }; if (!d && !isViewingHistory && dateToLoad === getTodayDateString()) { todayCounterRef.set(currentCounters).catch(e => console.error("Init counter set fail:", e)); } updateCounterUI(); }, (e) => { console.error(`Counter Read Fail ${dateToLoad}:`, e); updateStatus('Counter Sync Err', true); currentCounters = { achievements: 0, neutral: 0, emergency: 0, emergencyLog: [] }; updateCounterUI(); }); } else { console.log("Already listening:", newRefPath); updateCounterUI(); } }
+function updateCounterUI() { /* ... same as before, uses currentSettings.labels ... */ const achEl=document.getElementById('achievements-count'); const neuEl=document.getElementById('neutral-count'); const emgEl=document.getElementById('emergency-count'); const achLbl=document.getElementById('counter-label-achievements'); const neuLbl=document.getElementById('counter-label-neutral'); const emgLbl=document.getElementById('counter-label-emergency'); if(achEl)achEl.innerText=currentCounters.achievements||0; if(neuEl)neuEl.innerText=currentCounters.neutral||0; if(emgEl)emgEl.innerText=currentCounters.emergency||0; if(achLbl)achLbl.textContent=currentSettings.labels.achievements||'Achievements'; if(neuLbl)neuLbl.textContent=currentSettings.labels.neutral||'Neutral'; if(emgLbl)emgLbl.textContent=currentSettings.labels.emergency||'Emergency'; const logData=currentCounters.emergencyLog||[]; if(logTextareaEl){logTextareaEl.value=logData.length>0?logData.join('\n'):(isViewingHistory?'(No data)':'(No logs)'); logTextareaEl.scrollTop=logTextareaEl.scrollHeight;} if(allCounterButtons)allCounterButtons.forEach(b=>b.disabled=isViewingHistory); if(historyTodayBtn)historyTodayBtn.style.display=isViewingHistory?'inline-block':'none'; if(historyLoadBtn)historyLoadBtn.style.display=isViewingHistory?'none':'inline-block'; if(emergencyLogLegendEl){emergencyLogLegendEl.textContent=isViewingHistory&&historyDateInput?`Log (${historyDateInput.value})`:"Today's Log";} const showToday= !isViewingHistory; if(addTaskFieldset)addTaskFieldset.style.display=showToday?'':'none'; if(progressBarContainer)progressBarContainer.style.display=showToday?'':'none'; if(dreadAnalysisFieldset)dreadAnalysisFieldset.style.display=showToday?'':'none'; if(taskListLegendEl)taskListLegendEl.textContent=showToday?"Current Tasks":(historyDateInput?`Tasks Created (${historyDateInput.value})`:"Tasks"); }
+function counter_increment(type) { /* ... same as before, uses currentSettings.soundsEnabled ... */ if(!db||!todayCounterRef){clippySpeak("DB error.");return;} if(isViewingHistory){clippySpeak("Cannot add in History View.");return;} let reason=""; let updates={}; if(type==='emergency'){let inp=prompt(`EMERGENCY (${currentSettings.labels.emergency}):\n\n1. Social Media\n2. Phone\n3. Procrastination\n4. Other`,""); if(inp===null)return; reason=inp==="1"?"Social Media":inp==="2"?"Phone/Calls":inp==="3"?"Procrastination":inp==="4"?(prompt("Specify:","")||"Other"):inp.trim()||"Other"; const log=Array.isArray(currentCounters.emergencyLog)?[...currentCounters.emergencyLog]:[]; log.push(reason); updates.emergencyLog=log; if(currentSettings.soundsEnabled&&soundError)soundError.play().catch(e=>console.warn("Audio fail:",e));} todayCounterRef.child(type).transaction(c=>(c||0)+1,(err,comm,snap)=>{if(err){console.error('Count Tx fail!',err);updateStatus('Count Save Err', true);}else if(comm){if(type==='achievements'&&snap.val()>=currentSettings.dailyGoal){clippySpeak(`Goal ${currentSettings.dailyGoal} reached!`);}}}); if(updates.emergencyLog){todayCounterRef.update({emergencyLog:updates.emergencyLog}).catch(e=>{console.error("Log update fail:",e);updateStatus('Log Save Err', true);});}}
 
 // =================================================================
-// 🔥 TASK APP LOGIC (Firebase) 🔥
+// 🔥 TASK APP LOGIC 🔥
 // =================================================================
 const tasksRef = db ? db.ref('tasks') : null;
 // ... (listenForTasks, addTaskToDB, updateTaskStatus, incrementDreadCount, deleteTask, deleteAllTasks - unchanged but check db/tasksRef) ...
-function listenForTasks() {
-    if (!tasksRef) { console.warn("DB not ready."); return; }
-    tasksRef.on('value', (snapshot) => {
-        const rawData = snapshot.val(); tasks = [];
-        if (rawData) { for (let id in rawData) { tasks.push({ ...rawData[id], id: id, dreadCount: rawData[id].dreadCount || 0 }); } }
-        if (!isViewingHistory) { renderList(); } // Only render full list if not in history
-        else if (historyDateInput && historyDateInput.value) { const filtered = tasks.filter(t => t.createdDate === historyDateInput.value); renderList(filtered); } // Re-render filtered if in history
-        updateLinearView(); updateDreadAnalysis(); updateStatus('Synced');
-    }, (error) => { console.error("Task Read Fail:", error); updateStatus('Task Sync Err'); });
-}
-function addTaskToDB(text) { if (!tasksRef) return; const newTask = { text: text, done: false, createdDate: getTodayDateString(), dreadCount: 0 }; tasksRef.push(newTask).catch((e) => { console.error("Task Write Fail:", e); updateStatus('Write Err'); }); }
-function updateTaskStatus(id, isDone) { if (!tasksRef) return; tasksRef.child(id).update({ done: isDone }).catch((e) => { console.error("Task Update Fail:", e); updateStatus('Update Err'); }); if (isDone && currentSettings.soundsEnabled && soundTada) soundTada.play().catch(e => console.warn("Audio fail:", e)); }
-function incrementDreadCount(id) { if (!tasksRef) return; tasksRef.child(id).child('dreadCount').transaction((c) => (c || 0) + 1); }
-function deleteTask(id) { if (!tasksRef) return; tasksRef.child(id).remove().catch((e) => { console.error("Task Delete Fail:", e); updateStatus('Delete Err'); }); }
-function deleteAllTasks() { if (!tasksRef) return; tasksRef.remove().catch((e) => { console.error("Task Clear Fail:", e); updateStatus('Clear Err'); }); }
+function listenForTasks() { if (!tasksRef) return; tasksRef.on('value', (s) => { const d = s.val(); tasks = []; if (d) { for (let id in d) { tasks.push({ ...d[id], id: id, dreadCount: d[id].dreadCount || 0 }); } } if (!isViewingHistory) { renderList(); } else if (historyDateInput?.value) { const f = tasks.filter(t => t.createdDate === historyDateInput.value); renderList(f); } updateLinearView(); updateDreadAnalysis(); updateStatus('Synced'); }, (e) => { console.error("Task Read Fail:", e); updateStatus('Task Sync Err', true); }); }
+function addTaskToDB(text) { if (!tasksRef) {updateStatus("DB Error", true); return;} const t = { text: text, done: false, createdDate: getTodayDateString(), dreadCount: 0 }; tasksRef.push(t).catch((e)=>{console.error("Task Write Fail:",e);updateStatus('Write Err', true);}); }
+function updateTaskStatus(id, isDone) { if (!tasksRef){updateStatus("DB Error", true); return;} tasksRef.child(id).update({ done: isDone }).catch((e)=>{console.error("Task Update Fail:",e);updateStatus('Update Err', true);}); if (isDone && currentSettings.soundsEnabled && soundTada) soundTada.play().catch(e=>console.warn("Audio fail:",e)); }
+function incrementDreadCount(id) { if (!tasksRef) return; tasksRef.child(id).child('dreadCount').transaction(c=>(c||0)+1); }
+function deleteTask(id) { if (!tasksRef) {updateStatus("DB Error", true); return;} tasksRef.child(id).remove().catch((e)=>{console.error("Task Delete Fail:",e);updateStatus('Delete Err', true);}); }
+function deleteAllTasks() { if (!tasksRef) {updateStatus("DB Error", true); return;} tasksRef.remove().catch((e)=>{console.error("Task Clear Fail:",e);updateStatus('Clear Err', true);}); }
 
-// ... (getSortedTasks, renderList, updateDreadAnalysis - unchanged, renderList disables controls in history) ...
-function getSortedTasks(tasksArray = tasks) { return [...tasksArray].sort((a, b) => (b.createdDate || "").localeCompare(a.createdDate || "")); }
-function renderList(tasksToRender) {
-    const displayTasks = tasksToRender || tasks; const sortedTasks = getSortedTasks(displayTasks);
-    if (!listEl) return; listEl.innerHTML = ''; const isInHistory = isViewingHistory;
-    if (sortedTasks.length === 0) { if (emptyMessageEl) { emptyMessageEl.textContent = isInHistory ? "No tasks created on this date." : "No tasks currently."; emptyMessageEl.style.display = 'block'; } }
-    else { if (emptyMessageEl) emptyMessageEl.style.display = 'none'; }
-    sortedTasks.forEach(t => {
-        const li = document.createElement('li'); if (t.done) li.classList.add('done');
-        const cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = t.done; cb.disabled = isInHistory; if (!isInHistory) { cb.addEventListener('change', () => { updateTaskStatus(t.id, cb.checked); }); }
-        const span = document.createElement('span'); span.className = 'txt'; span.textContent = t.text;
-        const dreadBtn = document.createElement('button'); dreadBtn.className = 'dread-btn'; dreadBtn.title = `Dread (${t.dreadCount||0})`; dreadBtn.innerHTML = '😰'; dreadBtn.disabled = isInHistory; if (!isInHistory) { dreadBtn.addEventListener('click', () => { incrementDreadCount(t.id); }); }
-        const del = document.createElement('button'); del.className = 'del'; del.innerHTML = '<i class="fas fa-trash"></i>'; del.disabled = isInHistory; if (!isInHistory) { del.addEventListener('click', () => { deleteTask(t.id); }); }
-        li.appendChild(cb); li.appendChild(span); li.appendChild(dreadBtn); li.appendChild(del); listEl.appendChild(li);
-    });
-    if (statusTotalEl) statusTotalEl.textContent = `Total: ${tasks.length}`; // Always show total count
-}
-function updateDreadAnalysis() { /* ... remains same ... */ if (!dreadTaskNameEl) return; const pending = tasks.filter(t => !t.done); if(pending.length===0){dreadTaskNameEl.textContent = '(None)'; return;} const mostDreaded = pending.sort((a,b)=>{const d=(b.dreadCount||0)-(a.dreadCount||0); return d!==0?d:(b.createdDate||"").localeCompare(a.createdDate||"");})[0]; dreadTaskNameEl.textContent = (mostDreaded && mostDreaded.dreadCount > 0) ? `${mostDreaded.text} (${mostDreaded.dreadCount})` : '(None)'; }
+// ... (getSortedTasks, renderList, updateDreadAnalysis - unchanged, renderList disables controls) ...
+function getSortedTasks(a=tasks){return[...a].sort((x,y)=>(y.createdDate||"").localeCompare(x.createdDate||""));}
+function renderList(tasksToRender) { const dispT=tasksToRender||tasks; const sortedT=getSortedTasks(dispT); if(!listEl)return; listEl.innerHTML=''; const inHist=isViewingHistory; if(sortedT.length===0){if(emptyMessageEl){emptyMessageEl.textContent=inHist?"No tasks created.":"No tasks."; emptyMessageEl.style.display='block';}}else{if(emptyMessageEl)emptyMessageEl.style.display='none';} sortedT.forEach(t=>{const li=document.createElement('li'); if(t.done)li.classList.add('done'); const cb=document.createElement('input'); cb.type='checkbox';cb.checked=t.done;cb.disabled=inHist; if(!inHist){cb.addEventListener('change',()=>{updateTaskStatus(t.id,cb.checked);});} const span=document.createElement('span'); span.className='txt';span.textContent=t.text; const dread=document.createElement('button'); dread.className='dread-btn';dread.title=`Dread (${t.dreadCount||0})`;dread.innerHTML='😰';dread.disabled=inHist; if(!inHist){dread.addEventListener('click',()=>{incrementDreadCount(t.id);});} const del=document.createElement('button'); del.className='del';del.innerHTML='<i class="fas fa-trash"></i>';del.disabled=inHist; if(!inHist){del.addEventListener('click',()=>{deleteTask(t.id);});} li.appendChild(cb);li.appendChild(span);li.appendChild(dread);li.appendChild(del);listEl.appendChild(li);}); if(statusTotalEl)statusTotalEl.textContent=`T:${tasks.length}`; } // Shorter Total label
+function updateDreadAnalysis() { if (!dreadTaskNameEl) return; const p = tasks.filter(t=>!t.done); if(p.length===0){dreadTaskNameEl.textContent='(None)'; return;} const m=p.sort((a,b)=>{const d=(b.dreadCount||0)-(a.dreadCount||0); return d!==0?d:(b.createdDate||"").localeCompare(a.createdDate||"");})[0]; dreadTaskNameEl.textContent=(m&&m.dreadCount>0)?`${m.text} (${m.dreadCount})`:'(None)'; }
 
 // ... (handleAddTask, handleResetAll, handleResetTodayCounters, getProgress, updateLinearView - unchanged) ...
-function handleAddTask(){ if (isViewingHistory) return; const text = (newTaskEl.value||'').trim(); if(!text) { clippySpeak("Enter task description!"); return; } addTaskToDB(text); newTaskEl.value=''; newTaskEl.focus(); }
-function handleResetAll(){ if(!confirm('SURE?\n\nDelete ALL tasks?\nReset today\'s counters & log?')) return; deleteAllTasks(); if (todayCounterRef && !isViewingHistory) { const d = { achievements: 0, neutral: 0, emergency: 0, emergencyLog: [] }; todayCounterRef.set(d).then(() => { clippySpeak("All reset."); updateStatus("All Reset"); }).catch(e => console.error("Counter reset fail:", e)); } else if (isViewingHistory) { clippySpeak("Tasks cleared."); } }
-function handleResetTodayCounters() { if (isViewingHistory) { clippySpeak("Cannot reset history."); return; } if (!confirm('Reset Today\'s Counters & Log?\n(Tasks NOT affected)')) return; if (todayCounterRef) { const d = { achievements: 0, neutral: 0, emergency: 0, emergencyLog: [] }; todayCounterRef.set(d).then(() => { clippySpeak("Today's counters reset."); updateStatus("Counters Reset"); }).catch(e => { console.error("Counter reset fail:", e); updateStatus('Reset Error'); }); } }
-function getProgress(){ const total=tasks.length; const done=tasks.filter(t=>t.done).length; const pct=total?Math.round((done/total)*100):0; return {total,done,pct}; }
-function updateLinearView(){ const{total,done,pct}=getProgress(); const bar=document.getElementById('bar1'); const pctEl=document.getElementById('pct1'); const doneEl=document.getElementById('done1'); const totalEl=document.getElementById('total1'); if(bar)bar.style.width=pct+'%'; if(pctEl)pctEl.textContent=pct+'%'; if(doneEl)doneEl.textContent=done; if(totalEl)totalEl.textContent=total; const pb=document.querySelector('#v-linear .progress[role="progressbar"]'); if(pb)pb.setAttribute('aria-valuenow',pct); }
+function handleAddTask(){ if (isViewingHistory) return; const text=(newTaskEl.value||'').trim(); if(!text){clippySpeak("Enter task!");return;} addTaskToDB(text); newTaskEl.value=''; newTaskEl.focus(); }
+function handleResetAll(){ if(!confirm('SURE?\n\nDelete ALL tasks?\nReset today\'s counters & log?')) return; deleteAllTasks(); if (todayCounterRef&&!isViewingHistory) { const d={achievements:0,neutral:0,emergency:0,emergencyLog:[]}; todayCounterRef.set(d).then(()=>{clippySpeak("All reset."); updateStatus("All Reset");}).catch(e=>console.error("Counter reset fail:",e)); } else if(isViewingHistory) { clippySpeak("Tasks cleared."); } }
+function handleResetTodayCounters() { if (isViewingHistory) { clippySpeak("Cannot reset history."); return; } if (!confirm('Reset Today\'s Counters & Log?\n(Tasks NOT affected)')) return; if (todayCounterRef) { const d={achievements:0,neutral:0,emergency:0,emergencyLog:[]}; todayCounterRef.set(d).then(()=>{clippySpeak("Today's counters reset."); updateStatus("Counters Reset");}).catch(e=>{console.error("Counter reset fail:", e); updateStatus('Reset Error', true);}); } }
+function getProgress(){ const t=tasks.length; const d=tasks.filter(x=>x.done).length; const p=t?Math.round((d/t)*100):0; return {total:t,done:d,pct:p}; }
+function updateLinearView(){ const{total,done,pct}=getProgress(); const b=document.getElementById('bar1'); const pE=document.getElementById('pct1'); const dE=document.getElementById('done1'); const tE=document.getElementById('total1'); if(b)b.style.width=pct+'%'; if(pE)pE.textContent=pct+'%'; if(dE)dE.textContent=done; if(tE)tE.textContent=total; const pb=document.querySelector('#v-linear .progress[role="progressbar"]'); if(pb)pb.setAttribute('aria-valuenow',pct); }
+
 
 // =================================================================
-// 🔥 SETTINGS LOGIC (Firebase) 🔥
+// 🔥 SETTINGS LOGIC 🔥
 // =================================================================
 settingsRef = db ? db.ref('settings') : null;
 
 function applySettings() {
-    // Apply Theme
-    document.body.className = currentSettings.theme || 'theme-grey'; // Default to grey
-    // Apply Labels (already done in updateCounterUI)
-    updateCounterUI();
-    // Apply Goal (checked in counter_increment)
-    // Apply Sounds (checked in relevant functions)
-    // Update settings UI elements
-    if(settingGoalInput) settingGoalInput.value = currentSettings.dailyGoal || 10;
-    if(settingSoundsCheckbox) settingSoundsCheckbox.checked = currentSettings.soundsEnabled !== false; // Checked by default if undefined
+    document.body.className = currentSettings.theme || 'theme-grey';
+    if(settingGoalInput) settingGoalInput.value = currentSettings.dailyGoal ?? 10; // Use ?? for nullish coalescing
+    if(settingSoundsCheckbox) settingSoundsCheckbox.checked = currentSettings.soundsEnabled !== false;
     if(settingThemeSelect) settingThemeSelect.value = currentSettings.theme || 'theme-grey';
     if(settingLabelAchInput) settingLabelAchInput.value = currentSettings.labels?.achievements || 'Achievements';
     if(settingLabelNeuInput) settingLabelNeuInput.value = currentSettings.labels?.neutral || 'Neutral';
     if(settingLabelEmgInput) settingLabelEmgInput.value = currentSettings.labels?.emergency || 'Emergency';
+    updateCounterUI(); // Re-apply labels to counter UI
+    displayRandomQuote(); // Display quote which might depend on settings later
 }
 
 function listenForSettings() {
-    if (!settingsRef) { console.warn("DB not ready for settings."); applySettings(); return; } // Apply defaults if no DB
-    settingsRef.on('value', (snapshot) => {
-        const data = snapshot.val();
-        if (data) {
-            currentSettings = { // Merge defaults with loaded data
-                 dailyGoal: data.dailyGoal || 10,
-                 soundsEnabled: data.soundsEnabled !== false,
-                 theme: data.theme || 'theme-grey',
-                 labels: {
-                     achievements: data.labels?.achievements || 'Achievements',
-                     neutral: data.labels?.neutral || 'Neutral',
-                     emergency: data.labels?.emergency || 'Emergency'
-                 }
-            };
-            console.log("Settings loaded:", currentSettings);
-        } else {
-            console.log("No settings found in DB, using defaults.");
-            // Optionally save defaults if they don't exist
-            settingsRef.set(currentSettings).catch(e => console.error("Failed to save default settings", e));
-        }
-        applySettings(); // Apply loaded or default settings
-    }, (error) => {
-        console.error("Firebase Settings Read Failed:", error);
-        updateStatus("Settings Load Error");
-        applySettings(); // Apply defaults on error
-    });
+    if (!settingsRef) { console.warn("DB not ready for settings."); applySettings(); return; }
+    settingsRef.on('value', (s) => {
+        const d = s.val(); if (d) { currentSettings = { dailyGoal: d.dailyGoal||10, soundsEnabled: d.soundsEnabled!==false, theme: d.theme||'theme-grey', labels:{achievements:d.labels?.achievements||'Achievements', neutral:d.labels?.neutral||'Neutral', emergency:d.labels?.emergency||'Emergency'} }; console.log("Settings loaded:", currentSettings); } else { console.log("No settings found, using defaults."); settingsRef.set(currentSettings).catch(e=>console.error("Failed save default settings", e)); } applySettings();
+    }, (e) => { console.error("Settings Read Fail:", e); updateStatus("Settings Load Err", true); applySettings(); });
 }
 
 function saveSettings() {
-    if (!settingsRef) { clippySpeak("DB error, cannot save."); return; }
-    const newSettings = {
-        dailyGoal: parseInt(settingGoalInput.value) || 10,
-        soundsEnabled: settingSoundsCheckbox.checked,
-        theme: settingThemeSelect.value,
-        labels: {
-            achievements: settingLabelAchInput.value || 'Achievements',
-            neutral: settingLabelNeuInput.value || 'Neutral',
-            emergency: settingLabelEmgInput.value || 'Emergency'
-        }
-    };
-    settingsRef.set(newSettings).then(() => {
-        updateStatus("Settings Saved");
-        clippySpeak("Settings saved successfully!");
-        currentSettings = newSettings; // Update local state immediately
-        applySettings(); // Re-apply to reflect changes instantly
-    }).catch(e => {
-        console.error("Settings save failed:", e);
-        updateStatus("Settings Save Error");
-        clippySpeak("Oops, couldn't save settings.");
-    });
+    if (!settingsRef) { clippySpeak("DB error."); return; }
+    const newSettings = { dailyGoal: parseInt(settingGoalInput.value)||10, soundsEnabled: settingSoundsCheckbox.checked, theme: settingThemeSelect.value, labels: { achievements: settingLabelAchInput.value||'Achievements', neutral: settingLabelNeuInput.value||'Neutral', emergency: settingLabelEmgInput.value||'Emergency' } };
+    settingsRef.set(newSettings).then(() => { updateStatus("Settings Saved"); clippySpeak("Settings saved!"); currentSettings = newSettings; applySettings(); }).catch(e => { console.error("Settings save fail:", e); updateStatus("Settings Save Err", true); clippySpeak("Save settings failed."); });
 }
 
 // =================================================================
-// 🔥 NOTES LOGIC (Firebase) 🔥
+// 🔥 NOTES LOGIC 🔥
 // =================================================================
 function listenForNotes() {
-    if (!db || isViewingHistory) return; // Only load today's notes
-    const today = getTodayDateString();
+    if (!db || isViewingHistory) return; const today = getTodayDateString();
+    // Turn off previous listener if exists
+    if(notesRef) { notesRef.off('value'); console.log("Turned off old notes listener."); }
+
     notesRef = db.ref('notes/' + today);
     if(notesDateSpan) notesDateSpan.textContent = today;
-
-    notesRef.on('value', (snapshot) => {
-        currentNote = snapshot.val() || "";
-        if (notesTextarea) notesTextarea.value = currentNote;
-        console.log("Note loaded for", today);
-    }, (error) => {
-        console.error("Firebase Notes Read Failed:", error);
-        updateStatus("Notes Load Error");
-    });
+    notesRef.on('value', (s) => { currentNote = s.val() || ""; if (notesTextarea) notesTextarea.value = currentNote; console.log("Note loaded for", today); }, (e) => { console.error("Notes Read Fail:", e); updateStatus("Notes Load Err", true); });
 }
-
-function saveNote() {
-    if (!notesRef || isViewingHistory) return; // Don't save if ref not set or in history
-    const newNote = notesTextarea.value || "";
-    if (newNote !== currentNote) { // Only save if changed
-        notesRef.set(newNote).then(() => {
-            console.log("Note saved.");
-            updateStatus("Note Saved");
-            currentNote = newNote; // Update local state
-        }).catch(e => {
-            console.error("Note save failed:", e);
-            updateStatus("Note Save Error");
-        });
-    }
-}
-
-// Debounce function
-let noteSaveTimeout;
-function debounceSaveNote() {
-    clearTimeout(noteSaveTimeout);
-    noteSaveTimeout = setTimeout(saveNote, 1500); // Save after 1.5 seconds of inactivity
-}
-
+function saveNote() { if (!notesRef || isViewingHistory) return; const newNote = notesTextarea.value || ""; if (newNote !== currentNote) { notesRef.set(newNote).then(() => { console.log("Note saved."); updateStatus("Note Saved"); currentNote = newNote; }).catch(e => { console.error("Note save fail:", e); updateStatus("Note Save Err", true); }); } }
+function debounceSaveNote() { clearTimeout(noteSaveTimeout); noteSaveTimeout = setTimeout(saveNote, 1500); }
 
 // =================================================================
-// 🔥 QUOTES LOGIC (Firebase) 🔥
+// 🔥 QUOTES LOGIC 🔥
 // =================================================================
 quotesRef = db ? db.ref('quotes') : null;
 
 function listenForQuotes() {
     if (!quotesRef) { console.warn("DB not ready for quotes."); return; }
-    quotesRef.on('value', (snapshot) => {
-        const data = snapshot.val();
-        quotes = [];
-        if (data) {
-            // Handle both array and object structures from Firebase
-            if (Array.isArray(data)) {
-                quotes = data.filter(q => q); // Filter out potential null/empty values if saved as array
-            } else {
-                for (let key in data) {
-                    quotes.push({ id: key, text: data[key].text }); // Assuming object structure { key: { text: "..." } }
-                }
-            }
-        }
-        renderQuotesList();
-        displayRandomQuote(); // Update random quote when list changes
-        console.log("Quotes loaded:", quotes.length);
-    }, (error) => {
-        console.error("Firebase Quotes Read Failed:", error);
-        updateStatus("Quotes Load Error");
-    });
+    quotesRef.on('value', (s) => { const d = s.val(); quotes = []; if (d) { if (Array.isArray(d)) { quotes = d.filter(q=>q); } else { for (let k in d) { quotes.push({ id: k, text: d[k].text }); } } } renderQuotesList(); displayRandomQuote(); console.log("Quotes loaded:", quotes.length); }, (e) => { console.error("Quotes Read Fail:", e); updateStatus("Quotes Load Err", true); });
 }
-
-function renderQuotesList() {
-    if (!quotesListEl) return;
-    quotesListEl.innerHTML = '';
-    if (quotes.length === 0) {
-        quotesListEl.innerHTML = '<li class="muted" style="text-align: center;">No quotes saved yet.</li>';
-    } else {
-        quotes.forEach(quote => {
-            const li = document.createElement('li');
-            const span = document.createElement('span');
-            span.className = 'txt';
-            span.textContent = quote.text;
-            const del = document.createElement('button');
-            del.className = 'del';
-            del.innerHTML = '<i class="fas fa-trash"></i>';
-            del.onclick = () => deleteQuote(quote.id);
-            li.appendChild(span);
-            li.appendChild(del);
-            quotesListEl.appendChild(li);
-        });
-    }
-}
-
-function addQuote() {
-    if (!quotesRef || !newQuoteInput) return;
-    const text = newQuoteInput.value.trim();
-    if (!text) { clippySpeak("Please enter a quote first."); return; }
-    // Push as an object with text property for easier future expansion if needed
-    quotesRef.push({ text: text }).then(() => {
-        newQuoteInput.value = '';
-        updateStatus("Quote Added");
-    }).catch(e => {
-        console.error("Add quote failed:", e);
-        updateStatus("Quote Add Error");
-    });
-}
-
-function deleteQuote(id) {
-    if (!quotesRef) return;
-    if (confirm("Delete this quote?")) {
-        quotesRef.child(id).remove().catch(e => {
-            console.error("Delete quote failed:", e);
-            updateStatus("Quote Delete Error");
-        });
-    }
-}
-
-function displayRandomQuote() {
-    if (!randomQuoteDisplayEl) return;
-    if (quotes.length > 0) {
-        const randomIndex = Math.floor(Math.random() * quotes.length);
-        randomQuoteDisplayEl.textContent = `"${quotes[randomIndex].text}"`;
-    } else {
-        randomQuoteDisplayEl.textContent = "(Add some quotes in the Quotes tab!)";
-    }
-}
-
+function renderQuotesList() { if (!quotesListEl) return; quotesListEl.innerHTML = ''; if (quotes.length === 0) { quotesListEl.innerHTML = '<li class="muted" style="text-align:center;">No quotes yet.</li>'; } else { quotes.forEach(q => { const li=document.createElement('li'); const span=document.createElement('span'); span.className='txt'; span.textContent=q.text; const del=document.createElement('button'); del.className='del'; del.innerHTML='<i class="fas fa-trash"></i>'; del.onclick=()=>deleteQuote(q.id); li.appendChild(span); li.appendChild(del); quotesListEl.appendChild(li); }); } }
+function addQuote() { if (!quotesRef || !newQuoteInput) return; const text = newQuoteInput.value.trim(); if (!text) { clippySpeak("Enter a quote!"); return; } quotesRef.push({ text: text }).then(() => { newQuoteInput.value = ''; updateStatus("Quote Added"); }).catch(e => { console.error("Add quote fail:", e); updateStatus("Quote Add Err", true); }); }
+function deleteQuote(id) { if (!quotesRef) return; if (confirm("Delete quote?")) { quotesRef.child(id).remove().catch(e => { console.error("Delete quote fail:", e); updateStatus("Quote Del Err", true); }); } }
+function displayRandomQuote() { if (!randomQuoteDisplayEl) return; if (quotes.length > 0) { const i = Math.floor(Math.random() * quotes.length); randomQuoteDisplayEl.textContent = `"${quotes[i].text}"`; } else { randomQuoteDisplayEl.textContent = "(Add quotes!)"; } }
 
 // =================================================================
 // 🔥 ARCHIVE LOGIC 🔥
 // =================================================================
 function loadArchive() {
     if (!archiveStartDateInput || !archiveEndDateInput || !archiveListEl || !archiveEmptyMsg) return;
-    const startDate = archiveStartDateInput.value;
-    const endDate = archiveEndDateInput.value;
-
-    if (!startDate || !endDate) {
-        clippySpeak("Please select both a start and end date for the archive.");
-        return;
-    }
-    if (startDate > endDate) {
-         clippySpeak("Start date cannot be after end date.");
-         return;
-    }
-
-    // Filter the global 'tasks' array
-    const archivedTasks = tasks.filter(task =>
-        task.done && // Only completed tasks
-        task.createdDate >= startDate &&
-        task.createdDate <= endDate
-    ).sort((a, b) => (b.createdDate || "").localeCompare(a.createdDate || "")); // Sort by date desc
-
+    const start = archiveStartDateInput.value, end = archiveEndDateInput.value;
+    if (!start || !end) { clippySpeak("Select start & end dates."); return; }
+    if (start > end) { clippySpeak("Start date after end date?"); return; }
+    const archived = tasks.filter(t => t.done && t.createdDate >= start && t.createdDate <= end)
+                         .sort((a, b) => (b.createdDate || "").localeCompare(a.createdDate || ""));
     archiveListEl.innerHTML = '';
-    if (archivedTasks.length === 0) {
-        archiveEmptyMsg.style.display = 'block';
-    } else {
-        archiveEmptyMsg.style.display = 'none';
-        archivedTasks.forEach(task => {
-            const li = document.createElement('li');
-            const span = document.createElement('span');
-            span.className = 'txt';
-            span.textContent = task.text;
-            const dateSpan = document.createElement('span');
-            dateSpan.className = 'date-stamp';
-            dateSpan.textContent = task.createdDate; // Show creation date
-            li.appendChild(span);
-            li.appendChild(dateSpan);
-            archiveListEl.appendChild(li);
-        });
-    }
-     clippySpeak(`Found ${archivedTasks.length} completed tasks between ${startDate} and ${endDate}.`);
+    if (archived.length === 0) { archiveEmptyMsg.style.display = 'block'; }
+    else { archiveEmptyMsg.style.display = 'none'; archived.forEach(t => { const li=document.createElement('li'); const span=document.createElement('span'); span.className='txt'; span.textContent=t.text; const date=document.createElement('span'); date.className='date-stamp'; date.textContent=t.createdDate; li.appendChild(span); li.appendChild(date); archiveListEl.appendChild(li); }); }
+    clippySpeak(`Found ${archived.length} completed tasks.`);
 }
-
 
 // =================================================================
 // 🔥 Report Generation Logic 🔥
 // =================================================================
-// ... (analyzeDay, generateDailyReport - unchanged from previous version, check PDF libs before generating) ...
-function analyzeDay() { /* ... remains same ... */ const counters = currentCounters; const allTasks = tasks; const ach = counters.achievements || 0; const emg = counters.emergency || 0; const log = counters.emergencyLog || []; let taskAnalysis = ""; let level = ""; let advice = ""; const { total, done, pct } = getProgress(); if (!isViewingHistory) { taskAnalysis = ` ${done}/${total} tasks done (${pct}%).`; } if (ach >= currentSettings.dailyGoal && emg < 3) { level = "Excellent"; advice = `Incredible! ${taskAnalysis} Keep momentum!`; } else if (ach >= Math.ceil(currentSettings.dailyGoal / 2) && emg < ach) { level = "Productive"; advice = `Solid work. ${taskAnalysis} Great job!`; } else if (ach > 0 && emg >= ach) { level = "Distracted"; advice = `Distractions led. Review log. ${taskAnalysis} New start tomorrow.`; } else if (ach === 0 && emg > 0) { level = "High Evasion"; advice = `Tough start. One achievement helps. ${taskAnalysis}`; } else { level = "Quiet/Rest"; advice = `Quiet day. Planned rest? ${taskAnalysis}`; } const quotes = ["Get started.", "Discipline bridges goals & accomplishment.", "Focus on progress."]; const quote = quotes[Math.floor(Math.random() * quotes.length)]; return { level, advice, quote, ach, emg, totalTasks: total, doneTasks: done, pctTasks: pct, log, allTasks }; }
-function generateDailyReport() { if (!checkPdfLibraries()) return; try { const { jsPDF } = window.jspdf; const doc = new jsPDF(); const dateStr = isViewingHistory && historyDateInput ? historyDateInput.value : getTodayDateString(); const analysis = analyzeDay(); doc.setFont('Helvetica', 'normal'); doc.setFont('Helvetica', 'bold'); doc.setFontSize(18); doc.text("Mohammed's Daily Report", 14, 22); doc.setFontSize(12); doc.setFont('Helvetica', 'normal'); doc.text(`Date: ${dateStr}`, 14, 30); doc.line(14, 35, 196, 35); doc.setFont('Helvetica', 'bold'); doc.setFontSize(14); doc.text("Analysis:", 14, 45); doc.setFont('Helvetica', 'normal'); doc.setFontSize(12); doc.text(`Level: ${analysis.level}`, 14, 53); doc.setFont('Helvetica', 'italic'); const adviceLines = doc.splitTextToSize(analysis.advice, 182); doc.text(adviceLines, 14, 61); let y = 61 + (adviceLines.length * 7) + 5; if (y > 270) { doc.addPage(); y = 20; } doc.setFont('Helvetica', 'bold'); doc.setFontSize(14); doc.text("Summary:", 14, y); y += 8; doc.setFont('Helvetica', 'normal'); doc.setFontSize(12); doc.text(`- ${currentSettings.labels.achievements}: ${analysis.ach}`, 20, y); doc.text(`- ${currentSettings.labels.emergency}: ${analysis.emg}`, 100, y); y += 8; doc.text(`- Tasks Completed: ${analysis.doneTasks}/${analysis.totalTasks} (${analysis.pctTasks}%)`, 20, y); y += 10; if (y > 270) { doc.addPage(); y = 20; } doc.setFont('Helvetica', 'bold'); doc.setFontSize(14); doc.text("Emergency Log:", 14, y); y += 8; doc.setFont('Helvetica', 'normal'); doc.setFontSize(10); if (analysis.log && analysis.log.length > 0) { const logLines = analysis.log.map((e, i) => `${i + 1}. ${e}`); const splitLog = doc.splitTextToSize(logLines.join('\n'), 182); if (y + (splitLog.length * 5) > 280) { doc.addPage(); y = 20;} doc.text(splitLog, 14, y, { lang: 'ar' }); y += (splitLog.length * 5) + 5; } else { if (y > 270) { doc.addPage(); y = 20; } doc.text("(No logs)", 14, y); y += 10; } if (analysis.allTasks.length > 0) { const completed = analysis.allTasks.filter(t => t.done).map(t => [t.text]); const pending = analysis.allTasks.filter(t => !t.done).map(t => [t.text]); const tblOpt = { startY: y, theme: 'grid', headStyles:{font:'Helvetica',fontStyle:'bold',fillColor:[220,220,220],textColor:[0,0,0],fontSize:10}, bodyStyles:{font:'Helvetica',fontSize:9,cellPadding:2}, columnStyles:{0:{cellWidth:'auto'}}, margin:{left:14,right:14}, didDrawPage: (d)=>{y=d.cursor.y+10;} }; const drawTbl=(h,b)=>{const estH=(b.length+1)*7+10; if(y+estH>280){doc.addPage();y=20;} tblOpt.startY=y; doc.autoTable({...tblOpt,head:[[h]],body:b}); y=doc.autoTable.previous.finalY+10;}; if(completed.length>0){drawTbl('Completed Tasks', completed);} if(pending.length>0){drawTbl('Pending Tasks', pending);}} if(y>270){doc.addPage();y=20;} doc.setFont('Helvetica','italic');doc.setFontSize(12); const quoteLines=doc.splitTextToSize(`"${analysis.quote}"`,182); doc.text(quoteLines,14,y); doc.save(`Report-${dateStr}.pdf`); clippySpeak("PDF report generated!"); } catch(e){ console.error("PDF Fail:",e); clippySpeak("PDF generation error. Check console?"); alert("PDF Fail. See console."); } }
+// ... (analyzeDay remains same) ...
+function analyzeDay(){const c=currentCounters; const aT=tasks; const ach=c.achievements||0; const emg=c.emergency||0; const log=c.emergencyLog||[]; let taskAn=""; let lvl=""; let adv=""; const{total,done,pct}=getProgress(); if(!isViewingHistory){taskAn=` ${done}/${total} tasks done (${pct}%).`;} if(ach>=currentSettings.dailyGoal&&emg<3){lvl="Excellent";adv=`Incredible!${taskAn} Keep momentum!`;}else if(ach>=Math.ceil(currentSettings.dailyGoal/2)&&emg<ach){lvl="Productive";adv=`Solid work.${taskAn} Great job!`;}else if(ach>0&&emg>=ach){lvl="Distracted";adv=`Distractions led. Review log.${taskAn} New start.`;}else if(ach===0&&emg>0){lvl="High Evasion";adv=`Tough start. One achievement helps.${taskAn}`;}else{lvl="Quiet/Rest";adv=`Quiet day. Planned?${taskAn}`;} const q=["Get started.","Discipline bridges goals & accomplishment.","Focus on progress."]; const quote=q[Math.floor(Math.random()*q.length)]; return{level:lvl,advice:adv,quote:quote,ach:ach,emg:emg,totalTasks:total,doneTasks:done,pctTasks:pct,log:log,allTasks:aT};}
+
+function generateDailyReport() {
+    if (!checkPdfLibraries()) return; // Check libraries right before use
+    try {
+        const { jsPDF } = window.jspdf; // Use window.jspdf
+        const doc = new jsPDF();
+        const dateStr = isViewingHistory && historyDateInput ? historyDateInput.value : getTodayDateString();
+        const analysis = analyzeDay();
+
+        doc.setFont('Helvetica', 'normal');
+        doc.setFont('Helvetica', 'bold'); doc.setFontSize(18); doc.text("Mohammed's Daily Report", 14, 22);
+        doc.setFontSize(12); doc.setFont('Helvetica', 'normal'); doc.text(`Date: ${dateStr}`, 14, 30);
+        doc.line(14, 35, 196, 35);
+        doc.setFont('Helvetica', 'bold'); doc.setFontSize(14); doc.text("Analysis:", 14, 45);
+        doc.setFont('Helvetica', 'normal'); doc.setFontSize(12); doc.text(`Level: ${analysis.level}`, 14, 53);
+        doc.setFont('Helvetica', 'italic');
+        const adviceLines = doc.splitTextToSize(analysis.advice, 182); doc.text(adviceLines, 14, 61);
+        let y = 61 + (adviceLines.length * 7) + 5;
+        if (y > 270) { doc.addPage(); y = 20; }
+        doc.setFont('Helvetica', 'bold'); doc.setFontSize(14); doc.text("Summary:", 14, y); y += 8;
+        doc.setFont('Helvetica', 'normal'); doc.setFontSize(12);
+        doc.text(`- ${currentSettings.labels.achievements}: ${analysis.ach}`, 20, y); doc.text(`- ${currentSettings.labels.emergency}: ${analysis.emg}`, 100, y); y += 8;
+        doc.text(`- Tasks Completed: ${analysis.doneTasks} / ${analysis.totalTasks} (${analysis.pctTasks}%)`, 20, y); y += 10;
+        if (y > 270) { doc.addPage(); y = 20; }
+        doc.setFont('Helvetica', 'bold'); doc.setFontSize(14); doc.text("Emergency Log:", 14, y); y += 8;
+        doc.setFont('Helvetica', 'normal'); doc.setFontSize(10);
+        if (analysis.log && analysis.log.length > 0) { const logL = analysis.log.map((e, i) => `${i + 1}. ${e}`); const sL = doc.splitTextToSize(logL.join('\n'), 182); if (y + (sL.length * 5) > 280) { doc.addPage(); y = 20;} doc.text(sL, 14, y, { lang: 'ar' }); y += (sL.length * 5) + 5; }
+        else { if (y > 270) { doc.addPage(); y = 20; } doc.text("(No logs)", 14, y); y += 10; }
+        if (analysis.allTasks.length > 0) {
+            const completed=analysis.allTasks.filter(t=>t.done).map(t=>[t.text]); const pending=analysis.allTasks.filter(t=>!t.done).map(t=>[t.text]);
+            const tblOpt={startY:y,theme:'grid',headStyles:{font:'Helvetica',fontStyle:'bold',fillColor:[220,220,220],textColor:[0,0,0],fontSize:10},bodyStyles:{font:'Helvetica',fontSize:9,cellPadding:2},columnStyles:{0:{cellWidth:'auto'}},margin:{left:14,right:14},didDrawPage:(d)=>{y=d.cursor.y+10;}};
+            const drawTbl=(h,b)=>{const estH=(b.length+1)*7+10; if(y+estH>280){doc.addPage();y=20;} tblOpt.startY=y; doc.autoTable({...tblOpt,head:[[h]],body:b}); y=doc.autoTable.previous.finalY+10;};
+            if(completed.length>0){drawTbl('Completed Tasks', completed);} if(pending.length>0){drawTbl('Pending Tasks', pending);}
+        }
+        if (y > 270) { doc.addPage(); y = 20; }
+        doc.setFont('Helvetica', 'italic'); doc.setFontSize(12); const quoteL = doc.splitTextToSize(`"${analysis.quote}"`, 182); doc.text(quoteL, 14, y);
+        doc.save(`Report-${dateStr}.pdf`); clippySpeak("PDF report generated!");
+    } catch (e) { console.error("PDF Fail:", e); clippySpeak("PDF generation error. Console?"); alert("PDF Fail. See console."); }
+}
 
 // =================================================================
-// 🔥 INIT (Assign Elements & Attach Listeners) 🔥
+// 🔥 INIT APP 🔥
 // =================================================================
-document.addEventListener('DOMContentLoaded', () => {
-
+function initApp() {
     // Assign DOM Elements
-    listEl = document.getElementById('list'); newTaskEl = document.getElementById('newTask'); addBtn = document.getElementById('addBtn'); resetAllBtn = document.getElementById('resetAllBtn'); emptyMessageEl = document.getElementById('emptyMessage'); statusTotalEl = document.getElementById('status-total'); statusSaveEl = document.getElementById('status-save'); dreadTaskNameEl = document.getElementById('dread-task-name'); allCounterButtons = document.querySelectorAll('.counter-fieldset button'); logTextareaEl = document.getElementById('emergency-log'); emergencyLogLegendEl = document.getElementById('emergency-log-legend'); soundTada = document.getElementById('sound-tada'); soundError = document.getElementById('sound-error'); addTaskFieldset = document.getElementById('add-task-fieldset'); progressBarContainer = document.getElementById('progress-bar-container'); dreadAnalysisFieldset = document.getElementById('dread-analysis-fieldset'); taskListLegendEl = document.getElementById('task-list-legend'); logonScreenEl = document.getElementById('logon-screen'); logonBtnEl = document.getElementById('logon-ok'); reportBtnEl = document.getElementById('report-panel-btn'); clippyBtnEl = document.getElementById('clippy-panel-btn'); resetTodayBtnEl = document.getElementById('reset-today-panel-btn'); historyDateInput = document.getElementById('history-date-input'); historyLoadBtn = document.getElementById('history-load-btn'); historyTodayBtn = document.getElementById('history-today-btn');
-    tabs = document.querySelectorAll('.tab'); tabContents = document.querySelectorAll('.tab-content');
-    settingGoalInput = document.getElementById('setting-goal'); settingSoundsCheckbox = document.getElementById('setting-sounds'); settingThemeSelect = document.getElementById('setting-theme'); settingLabelAchInput = document.getElementById('setting-label-ach'); settingLabelNeuInput = document.getElementById('setting-label-neu'); settingLabelEmgInput = document.getElementById('setting-label-emg'); saveSettingsBtn = document.getElementById('save-settings-btn');
-    notesTextarea = document.getElementById('notes-textarea'); notesDateSpan = document.getElementById('notes-date');
-    newQuoteInput = document.getElementById('new-quote-input'); addQuoteBtn = document.getElementById('add-quote-btn'); quotesListEl = document.getElementById('quotes-list'); randomQuoteDisplayEl = document.getElementById('random-quote-display');
-    archiveStartDateInput = document.getElementById('archive-start-date'); archiveEndDateInput = document.getElementById('archive-end-date'); loadArchiveBtn = document.getElementById('load-archive-btn'); archiveListEl = document.getElementById('archive-list'); archiveEmptyMsg = document.getElementById('archive-empty');
+    listEl = document.getElementById('list'); newTaskEl = document.getElementById('newTask'); addBtn = document.getElementById('addBtn'); resetAllBtn = document.getElementById('resetAllBtn'); emptyMessageEl = document.getElementById('emptyMessage'); statusTotalEl = document.getElementById('status-total'); statusSaveEl = document.getElementById('status-save'); dreadTaskNameEl = document.getElementById('dread-task-name'); allCounterButtons = document.querySelectorAll('.counter-fieldset button'); logTextareaEl = document.getElementById('emergency-log'); emergencyLogLegendEl = document.getElementById('emergency-log-legend'); soundTada = document.getElementById('sound-tada'); soundError = document.getElementById('sound-error'); addTaskFieldset = document.getElementById('add-task-fieldset'); progressBarContainer = document.getElementById('progress-bar-container'); dreadAnalysisFieldset = document.getElementById('dread-analysis-fieldset'); taskListLegendEl = document.getElementById('task-list-legend'); logonScreenEl = document.getElementById('logon-screen'); logonBtnEl = document.getElementById('logon-ok'); reportBtnEl = document.getElementById('report-panel-btn'); clippyBtnEl = document.getElementById('clippy-panel-btn'); resetTodayBtnEl = document.getElementById('reset-today-panel-btn'); historyDateInput = document.getElementById('history-date-input'); historyLoadBtn = document.getElementById('history-load-btn'); historyTodayBtn = document.getElementById('history-today-btn'); tabs = document.querySelectorAll('.tab'); tabContents = document.querySelectorAll('.tab-content'); settingGoalInput = document.getElementById('setting-goal'); settingSoundsCheckbox = document.getElementById('setting-sounds'); settingThemeSelect = document.getElementById('setting-theme'); settingLabelAchInput = document.getElementById('setting-label-ach'); settingLabelNeuInput = document.getElementById('setting-label-neu'); settingLabelEmgInput = document.getElementById('setting-label-emg'); saveSettingsBtn = document.getElementById('save-settings-btn'); notesTextarea = document.getElementById('notes-textarea'); notesDateSpan = document.getElementById('notes-date'); newQuoteInput = document.getElementById('new-quote-input'); addQuoteBtn = document.getElementById('add-quote-btn'); quotesListEl = document.getElementById('quotes-list'); randomQuoteDisplayEl = document.getElementById('random-quote-display'); archiveStartDateInput = document.getElementById('archive-start-date'); archiveEndDateInput = document.getElementById('archive-end-date'); loadArchiveBtn = document.getElementById('load-archive-btn'); archiveListEl = document.getElementById('archive-list'); archiveEmptyMsg = document.getElementById('archive-empty');
 
-    // Basic check if elements were found
-    if (!logonBtnEl || !listEl || !tabs.length) { console.error("Essential DOM elements missing!"); return; }
+    // Check if essential elements exist
+    if (!logonBtnEl || !listEl || !tabs.length || !firebaseInitialized) {
+        console.error("Essential DOM elements missing or Firebase failed!");
+        if (statusSaveEl) updateStatus('Initialization Error!', true);
+        // Optionally hide the main wrap or show a more prominent error
+        const mainWrap = document.querySelector('.wrap');
+        if (mainWrap) mainWrap.innerHTML = '<p style="color:red; padding: 20px; font-weight:bold;">Application failed to initialize. Check console.</p>';
+        return; // Stop initialization
+    }
 
-    // Load Clippy Agent (check library existence first)
+    // Load Clippy Agent
     if (typeof clippy !== 'undefined') {
         clippy.load('Clippy', (agent) => { clippyAgent = agent; console.log("Clippy loaded."); if (clippyBtnEl) clippyBtnEl.disabled = false; }, (error) => { console.error("Clippy load fail:", error); if (clippyBtnEl) clippyBtnEl.disabled = true; });
     } else { console.error("Clippy library missing!"); if (clippyBtnEl) clippyBtnEl.disabled = true; }
@@ -771,54 +431,48 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Attach Event Listeners ---
     logonBtnEl.addEventListener('click', () => { if (logonScreenEl) logonScreenEl.style.display = 'none'; });
     if (reportBtnEl) reportBtnEl.addEventListener('click', generateDailyReport);
-    if (clippyBtnEl) clippyBtnEl.addEventListener('click', showClippyAnalysis);
+    if (clippyBtnEl) clippyBtnEl.addEventListener('click', showClippyAnalysis); // Listener attached here now
     if (resetTodayBtnEl) resetTodayBtnEl.addEventListener('click', handleResetTodayCounters);
     if (addBtn) addBtn.addEventListener('click', handleAddTask);
     if (newTaskEl) newTaskEl.addEventListener('keydown', e => { if(e.key==='Enter') handleAddTask(); });
     if (resetAllBtn) resetAllBtn.addEventListener('click', handleResetAll);
     if (saveSettingsBtn) saveSettingsBtn.addEventListener('click', saveSettings);
-    if (notesTextarea) notesTextarea.addEventListener('input', debounceSaveNote); // Auto-save notes
+    if (notesTextarea) notesTextarea.addEventListener('input', debounceSaveNote);
     if (addQuoteBtn) addQuoteBtn.addEventListener('click', addQuote);
     if (newQuoteInput) newQuoteInput.addEventListener('keydown', e => { if(e.key==='Enter') addQuote(); });
     if (loadArchiveBtn) loadArchiveBtn.addEventListener('click', loadArchive);
 
     // Tab switching listener
-    tabs.forEach(tab => {
-        tab.addEventListener('click', () => activateTab(tab.dataset.tab));
-    });
+    tabs.forEach(tab => { tab.addEventListener('click', () => activateTab(tab.dataset.tab)); });
 
     // History View Listeners
     if (historyLoadBtn && historyDateInput) {
         historyLoadBtn.addEventListener('click', () => {
             const date = historyDateInput.value; if (!date) { clippySpeak("Select date."); return; }
             isViewingHistory = true; const filtered = tasks.filter(t => t.createdDate === date); renderList(filtered);
-            counter_listenForChanges(date); clippySpeak(`Loading ${date}...`); updateCounterUI(); // Ensure buttons disable
+            counter_listenForChanges(date); clippySpeak(`Loading ${date}...`);
         });
     }
     if (historyTodayBtn) {
         historyTodayBtn.addEventListener('click', () => {
             isViewingHistory = false; historyDateInput.value = ''; renderList();
-            counter_listenForChanges(null); clippySpeak("Back to today."); updateCounterUI(); // Ensure buttons enable
+            counter_listenForChanges(null); clippySpeak("Back to today.");
         });
     }
 
-    // --- Start Firebase Listeners (only if initialized) ---
-    if (firebaseInitialized && db) {
-        listenForSettings(); // Load settings first to apply theme/labels
-        listenForTasks();    // Then load tasks
-        listenForQuotes();   // Then load quotes
-        counter_listenForChanges(null); // Load today's counters (will trigger UI update)
-        updateStatus("Ready");
-    } else {
-        updateStatus('DB Connection Error!'); console.error("DB not initialized. Listeners not started.");
-        // Disable UI elements reliant on DB
-        const elementsToDisable = [addBtn, resetAllBtn, reportBtnEl, clippyBtnEl, resetTodayBtnEl, historyLoadBtn, newTaskEl, saveSettingsBtn, notesTextarea, addQuoteBtn, loadArchiveBtn];
-        elementsToDisable.forEach(el => { if (el) el.disabled = true; });
-        if (allCounterButtons) allCounterButtons.forEach(btn => btn.disabled = true);
-        if (listEl) listEl.innerHTML = '<li><span class="txt" style="color: red; font-weight: bold;">DB Connection Failed. Refresh.</span></li>';
-        applySettings(); // Apply default UI settings even if DB fails
-    }
-});
+    // --- Start Firebase Listeners ---
+    listenForSettings(); // Load settings first
+    listenForTasks();    // Then load tasks
+    listenForQuotes();   // Then load quotes
+    counter_listenForChanges(null); // Load today's counters
+    updateStatus("Ready"); // Set initial status after setup
+    activateTab('main-tab'); // Ensure main tab is active initially
+
+}
+
+// Start the app initialization process after the DOM is ready
+document.addEventListener('DOMContentLoaded', initApp);
+
 </script>
 </body>
 </html>
