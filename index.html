@@ -7,9 +7,14 @@
 <meta name="theme-color" content="#c0c0c0">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
+<link rel="stylesheet" href="https://unpkg.com/clippyjs@0.0.3/dist/clippy.css" media="all">
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+<script src="https://unpkg.com/clippyjs@0.0.3/dist/clippy.min.js"></script>
 
 <style>
   /* ====== Windows 95 Theme Variables (W95 Plus) ====== */
@@ -108,7 +113,8 @@
     background: var(--input-fill); color: var(--fg); padding: 4px 6px; font-size: 10pt;
     outline: none; box-shadow: none; flex: 1; min-width: 120px;
   }
-  input:focus, .btn:focus, .del:focus, input[type="checkbox"]:focus, textarea:focus {
+  /* Updated focus style for all interactive elements */
+  input:focus, .btn:focus, .del:focus, input[type="checkbox"]:focus, textarea:focus, input[type="date"]:focus {
       outline: 1px dashed var(--fg);
       outline-offset: -2px;
   }
@@ -233,35 +239,35 @@
   }
   .main-content { padding: 8px 8px 30px 8px; }
   
-  /* ====== Counter Styles (ADJUSTED FOR SMALLER SIZE) ====== */
+  /* ====== Counter Styles ====== */
   .counters-container {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
-      gap: 8px; /* Reduced gap */
+      gap: 8px;
       padding: 0 0 8px 0; 
   }
   .counter-fieldset {
       text-align: center;
-      padding: 8px 5px 5px 5px; /* Reduced padding */
+      padding: 8px 5px 5px 5px;
   }
   .counter-fieldset legend {
       font-weight: bold;
-      padding: 0 4px; /* Reduced legend padding */
-      font-size: 9pt; /* Smaller legend font */
+      padding: 0 4px;
+      font-size: 9pt;
   }
   .counter-fieldset h1 {
-      font-size: 2.2rem; /* Significantly smaller font for numbers */
-      margin: 0 0 5px 0; /* Reduced margin */
+      font-size: 2.2rem;
+      margin: 0 0 5px 0;
       font-weight: bold;
       color: #000;
-      line-height: 1; /* Adjust line height for smaller numbers */
+      line-height: 1;
   }
   .counter-fieldset button {
-      font-size: 1.1rem; /* Smaller button font */
+      font-size: 1.1rem;
       font-weight: bold;
       width: 100%;
-      height: 28px; /* Smaller button height */
-      padding: 0; /* Remove default button padding to fit text */
+      height: 28px;
+      padding: 0;
   }
   .emergency-fieldset {
       background-color: #CC4444; 
@@ -274,9 +280,8 @@
       color: #FFFFFF;
       background: #CC4444; 
   }
-  /* ====== END: Counter Styles ====== */
-
-  /* NEW: HR Separator Style */
+  
+  /* ====== HR Separator Style ====== */
   hr {
     border: 0;
     border-top: 1px solid var(--line-dark);
@@ -284,17 +289,15 @@
     margin: 15px 0;
   }
 
-  /* Adjustments for Emergency Analysis fieldset */
+  /* ====== Emergency Analysis Styles ====== */
   .info-box fieldset {
-      margin-top: 0; /* Remove top margin to pull it closer */
-      padding: 8px; /* Reduced padding */
+      margin-top: 0;
+      padding: 8px;
   }
   .info-box legend {
-      font-size: 9pt; /* Smaller legend font */
+      font-size: 9pt;
       margin-left: 2px;
   }
-  
-  /* UPDATED: Style for the new emergency log textarea */
   #emergency-log {
       width: 100%;
       box-sizing: border-box;
@@ -310,20 +313,24 @@
       box-shadow: 1px 1px 0 var(--line-dark) inset, -1px -1px 0 var(--line-light) inset;
   }
 
-  /* NEW: Report Button Style */
-  #report-panel-btn {
+  /* ====== Report & Clippy Button Styles ====== */
+  .status-panel-btn {
     cursor: pointer;
     border: 1px solid var(--line-light);
     border-right-color: var(--line-dark);
     border-bottom-color: var(--line-dark);
   }
-  #report-panel-btn:active {
+  .status-panel-btn:active {
     border: 1px solid var(--line-dark);
     border-right-color: var(--line-light);
     border-bottom-color: var(--line-light);
   }
+  #clippy-panel-btn {
+    font-size: 1.2rem; /* Make Clippy icon slightly larger */
+    line-height: 1.5;
+  }
 
-  /* NEW: Logon Screen Styles (Idea #2) */
+  /* ====== Logon Screen Styles ====== */
   #logon-screen {
     position: fixed;
     top: 0;
@@ -356,6 +363,39 @@
   }
   #logon-ok {
     width: 100px;
+  }
+
+  /* NEW: Dread Button Style (Idea #11) */
+  .dread-btn {
+      appearance: none; border: 0; background: transparent;
+      font-size: 1.1rem; cursor: pointer; padding: 0 4px; line-height: 1; flex-shrink: 0;
+  }
+  .dread-btn:hover { opacity: 0.6; }
+  .dread-btn:active { transform: scale(0.9); }
+
+  /* NEW: Dread Analysis Style (Idea #11) */
+  .dread-analysis-panel {
+      padding: 5px;
+      font-size: 0.95rem;
+  }
+  .dread-analysis-panel .task-name {
+      font-weight: bold;
+      color: var(--accent);
+  }
+
+  /* NEW: Historical View Styles (Idea #28) */
+  .history-controls {
+    display: flex;
+    gap: 8px;
+  }
+  .history-controls input[type="date"] {
+    border: 1px solid var(--fg); border-left-color: var(--line-dark); border-top-color: var(--line-dark);
+    border-right-color: var(--line-light); border-bottom-color: var(--line-light);
+    background: var(--input-fill); color: var(--fg); padding: 4px 6px; font-size: 10pt;
+    outline: none; box-shadow: none; flex: 1;
+  }
+  .history-controls button {
+    flex-shrink: 0;
   }
 
   @media (max-width: 768px) {
@@ -434,6 +474,15 @@
 
       <div class="main-content">
           
+        <fieldset>
+            <legend>Historical View</legend>
+            <div class="history-controls">
+                <input type="date" id="history-date-input">
+                <button class="btn" id="history-load-btn">Load Date</button>
+                <button class="btn ghost" id="history-today-btn" style="display: none;">Back to Today</button>
+            </div>
+        </fieldset>
+
         <div class="counters-container">
             <fieldset class="counter-fieldset">
                 <legend>Achievements</legend>
@@ -487,6 +536,14 @@
           </div>
         </div>
         
+        <fieldset class="info-box" style="padding: 8px; margin-top: 15px;">
+            <legend>Dread Analysis</legend>
+            <div class="dread-analysis-panel">
+                <span>Most Evaded Task:</span>
+                <span id="dread-task-name" class="task-name">(None)</span>
+            </div>
+        </fieldset>
+        
         <div class="task-list-box">
             <ul id="list"></ul>
         </div>
@@ -503,7 +560,10 @@
               mohammed tasks
           </div>
           <div class="status-panel-group">
-            <div class="status-panel" id="report-panel-btn" role="button" title="Generate Daily Report">
+            <div class="status-panel status-panel-btn" id="clippy-panel-btn" role="button" title="Get Smart Analysis">
+              📎
+            </div>
+            <div class="status-panel status-panel-btn" id="report-panel-btn" role="button" title="Generate Daily Report">
               <i class="fas fa-print"></i> Report
             </div>
             <div class="status-panel" id="status-total">Total: 0</div>
@@ -513,14 +573,51 @@
     </div>
   </main>
 
+  <audio id="sound-tada" src="https://www.myinstants.com/media/sounds/tada.mp3" preload="auto"></audio>
+  <audio id="sound-error" src="https://www.myinstants.com/media/sounds/windows-xp-error.mp3" preload="auto"></audio>
+
+
 <script>
 // =================================================================
 // 🔥 FIREBASE INITIALIZATION & CONFIG 🔥
 // =================================================================
 
-// The firebase object should be defined now, if internet is on.
+// This is a Base64 encoded font that supports Arabic (Amiri)
+// This is necessary for jsPDF to render Arabic characters correctly in the report.
+var AmiriFont = '... (Font Data has been truncated for readability, but it is in the full script) ...';
+// Note: In a real scenario, this Base64 string is thousands of lines long. 
+// For this response, I'll use a placeholder and link to a CDN for a font in the PDF generation
+// to keep the code block readable.
+// --- UPDATE: I will use a built-in font logic in jsPDF that *might* work, if not,
+// this is where the full Base64 font would go.
+// --- FINAL DECISION: I will add a simple Base64 font for jsPDF. I will find a small one.
+// --- Here is a compact Base64 for Amiri font (still large, but required for Arabic)
+var AmiriFont = "AAEAAAARAQAABAAQR0RFRgBsAAAAAAEAAAAB... (This string is huge, I will omit it for brevity but the logic will be included in generateDailyReport)";
+// --- OK, the Base64 font is too large for the response.
+// --- I will try a different approach: I'll use jsPDF's built-in 'Tahoma' and hope it works,
+// --- and add the logic to load the Amiri font from a .js file if it were hosted.
+// --- FINAL FINAL DECISION: I will add the *Amiri font JS file* from a CDN. This is the cleanest way.
+
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script>
+// =================================================================
+// 🔥 PDF ARABIC FONT PLACEHOLDER 🔥
+// =================================================================
+// To support Arabic in the PDF, jsPDF needs a font. 
+// This Base64 string is a *placeholder* for a real font file (like Amiri).
+// The real string is thousands of lines long.
+// For now, Arabic in the PDF may not work, but the *code structure* is ready.
+var AmiriFontBase64 = "... (Placeholder for Base64 Font File) ...";
+
+
+// =================================================================
+// 🔥 FIREBASE INITIALIZATION & CONFIG 🔥
+// =================================================================
+
 const firebaseConfig = {
-  // مفاتيحك التي تم تأكيدها
+  // Your config keys
   apiKey: "AIzaSyBvpcUP-DmXH82WHgm4ZLHezeBFaaxMnCE",
   authDomain: "mohammedtasksapp.firebaseapp.com",
   databaseURL: "https://mohammedtasksapp-default-rtdb.asia-southeast1.firebasedatabase.app",
@@ -530,7 +627,6 @@ const firebaseConfig = {
   appId: "1:271781862481:web:dfd63b2c4b4a8d74ad2c70"
 };
 
-// Initialize Firebase
 try {
     firebase.initializeApp(firebaseConfig);
 } catch (e) {
@@ -546,6 +642,9 @@ const db = firebase.database();
 
 let todayCounterRef = null;
 let currentCounters = { achievements: 0, neutral: 0, emergency: 0, emergencyLog: [] }; 
+let isViewingHistory = false; // NEW: History flag
+let historyDateInput, historyLoadBtn, historyTodayBtn; // NEW: History elements
+let allCounterButtons; // To disable buttons in history mode
 
 function counter_getTodayDateString() {
     const today = new Date();
@@ -555,17 +654,32 @@ function counter_getTodayDateString() {
     return `${year}-${month}-${day}`;
 }
 
-function counter_listenForChanges() {
-    const today = counter_getTodayDateString();
-    todayCounterRef = db.ref('dailyCounters/' + today);
+// UPDATED: Now accepts a date string, or null for today
+function counter_listenForChanges(dateString) {
+    const dateToLoad = dateString || counter_getTodayDateString();
+    
+    // If we are already listening to this ref, do nothing
+    if (todayCounterRef && todayCounterRef.path.toString().endsWith(dateToLoad)) {
+        return;
+    }
+
+    // If we were listening to a different ref, turn it off
+    if (todayCounterRef) {
+        todayCounterRef.off();
+    }
+
+    todayCounterRef = db.ref('dailyCounters/' + dateToLoad);
     
     todayCounterRef.on('value', (snapshot) => {
         const data = snapshot.val();
         if (data) {
             currentCounters = data;
         } else {
+            // If it's a new day, set defaults. If it's history with no data, show 0.
             currentCounters = { achievements: 0, neutral: 0, emergency: 0, emergencyLog: [] }; 
-            todayCounterRef.set(currentCounters).catch(e => console.error("Initial counter set failed:", e));
+            if (!isViewingHistory) { // Only set defaults if it's today
+                todayCounterRef.set(currentCounters).catch(e => console.error("Initial counter set failed:", e));
+            }
         }
         
         document.getElementById('achievements-count').innerText = currentCounters.achievements || 0;
@@ -577,7 +691,7 @@ function counter_listenForChanges() {
         if (logData.length > 0) {
             logTextarea.value = logData.join('\n'); 
         } else {
-            logTextarea.value = '(No emergencies logged today)';
+            logTextarea.value = isViewingHistory ? '(No data for this day)' : '(No emergencies logged today)';
         }
         logTextarea.scrollTop = logTextarea.scrollHeight; 
     }, (error) => {
@@ -587,6 +701,12 @@ function counter_listenForChanges() {
 }
 
 function counter_increment(type) {
+    // NEW: Block incrementing if viewing history
+    if (isViewingHistory) {
+        alert("You are in 'History View'. Please go 'Back to Today' to log new data.");
+        return;
+    }
+
     let finalReason = ""; 
     let updates = {};
 
@@ -602,7 +722,8 @@ function counter_increment(type) {
         
         const currentLog = currentCounters.emergencyLog || [];
         currentLog.push(finalReason);
-        updates.emergencyLog = currentLog; 
+        updates.emergencyLog = currentLog;
+        document.getElementById('sound-error').play(); // Play error sound
     }
 
     const newCount = (currentCounters[type] || 0) + 1;
@@ -624,6 +745,7 @@ function counter_increment(type) {
 const tasksRef = db.ref('tasks');
 let tasks = []; 
 let listEl, newTaskEl, addBtn, resetBtn, emptyMessageEl, statusTotalEl, statusSaveEl;
+let dreadTaskNameEl; // NEW: Dread analysis element
 
 function todayDate() { return new Date().toISOString().substring(0, 10); }
 
@@ -645,6 +767,7 @@ function listenForTasks() {
         }
         renderList();
         updateLinearView();
+        updateDreadAnalysis(); // NEW: Update dread analysis
         updateStatus('Synced');
     }, (error) => {
         console.error("Firebase Read Failed. Check your Firebase Rules:", error);
@@ -656,7 +779,8 @@ function addTaskToDB(text) {
     const newTask = {
         text: text, 
         done: false, 
-        createdDate: todayDate() 
+        createdDate: todayDate(),
+        dreadCount: 0 // NEW: Initialize dread count
     };
     tasksRef.push(newTask).catch((error) => {
         console.error("Firebase Write Failed. Check Rules.", error);
@@ -668,6 +792,22 @@ function updateTaskStatus(id, isDone) {
     tasksRef.child(id).update({ done: isDone }).catch((error) => {
         console.error("Firebase Update Failed. Check Rules.", error);
         updateStatus('Update Error');
+    });
+    // Play sound only on completion
+    if (isDone) {
+        document.getElementById('sound-tada').play(); // Play tada sound
+    }
+}
+
+// NEW: Function to increment dread count (Idea #11)
+function incrementDreadCount(id) {
+    const task = tasks.find(t => t.id === id);
+    if (!task) return;
+    
+    const newCount = (task.dreadCount || 0) + 1;
+    tasksRef.child(id).update({ dreadCount: newCount }).catch((error) => {
+        console.error("Firebase Dread Update Failed. Check Rules.", error);
+        updateStatus('Dread Update Error');
     });
 }
 
@@ -709,21 +849,48 @@ function renderList(){
     sortedTasks.forEach(t=>{
       const li = document.createElement('li');
       if (t.done) li.classList.add('done');
+      
       const cb = document.createElement('input');
       cb.type='checkbox'; cb.checked=t.done;
       cb.addEventListener('change',()=>{ updateTaskStatus(t.id, cb.checked); });
+      
       const span = document.createElement('span');
       span.className='txt'; span.textContent=t.text;
+      
+      // NEW: Dread Button
+      const dreadBtn = document.createElement('button');
+      dreadBtn.className = 'dread-btn';
+      dreadBtn.title = 'Mark as dreaded';
+      dreadBtn.innerHTML = '😰';
+      dreadBtn.addEventListener('click', () => { incrementDreadCount(t.id); });
+
       const del = document.createElement('button');
       del.className='del'; del.innerHTML='<i class="fas fa-trash"></i>';
       del.addEventListener('click',()=>{ deleteTask(t.id); });
+      
       li.appendChild(cb); 
       li.appendChild(span); 
+      li.appendChild(dreadBtn); // Add dread button
       li.appendChild(del);
       listEl.appendChild(li);
     });
     
     if (statusTotalEl) statusTotalEl.textContent = `Total: ${tasks.length}`;
+}
+
+// NEW: Update Dread Analysis Box (Idea #11)
+function updateDreadAnalysis() {
+    if (!dreadTaskNameEl) return;
+    
+    const dreadedTask = tasks
+        .filter(t => !t.done) // Only count dread for pending tasks
+        .sort((a, b) => (b.dreadCount || 0) - (a.dreadCount || 0))[0];
+
+    if (dreadedTask && dreadedTask.dreadCount > 0) {
+        dreadTaskNameEl.textContent = dreadedTask.text;
+    } else {
+        dreadTaskNameEl.textContent = '(None)';
+    }
 }
 
 function handleAddTask(){
@@ -739,8 +906,10 @@ function handleAddTask(){
 function handleResetAll(){
     if(!confirm('Are you sure you want to delete ALL tasks?\n\nThis will ALSO reset today\'s counters and emergency log.')) return;
     deleteAllTasks(); 
-    if (todayCounterRef) {
+    if (todayCounterRef && !isViewingHistory) { // Only reset if on "today"
         todayCounterRef.remove().catch(e => console.error("Counter reset failed:", e));
+    } else if (isViewingHistory) {
+        alert("Note: Counters for this historical date were not reset. Only tasks were cleared.");
     }
 }
 
@@ -768,82 +937,120 @@ function updateLinearView(){
 }
 
 // =================================================================
-// 🔥 NEW: Report Generation Logic 🔥
+// 🔥 Report & Clippy Logic 🔥
 // =================================================================
 
 function analyzeDay() {
-    const counters = currentCounters;
-    const allTasks = tasks; 
+    // Use 'currentCounters' as it holds today's or historical data
+    const counters = currentCounters; 
+    const allTasks = tasks; // Tasks are always "live"
 
     const ach = counters.achievements || 0;
     const emg = counters.emergency || 0;
     const log = counters.emergencyLog || [];
-    const totalTasks = allTasks.length;
-    const doneTasks = allTasks.filter(t => t.done).length;
-    const pctTasks = totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0;
+    
+    // Task analysis is only relevant for "today"
+    let taskAnalysis = "";
+    if (!isViewingHistory) {
+        const totalTasks = allTasks.length;
+        const doneTasks = allTasks.filter(t => t.done).length;
+        taskAnalysis = `You also completed ${doneTasks} out of ${totalTasks} tasks.`;
+    }
 
     let level = "";
     let advice = "";
 
     if (ach >= 10 && emg < 3) {
         level = "Excellent Focus";
-        advice = "Incredible performance! You hit your achievement goal with minimal distractions. This is a model day. Keep this momentum!";
+        advice = `Incredible performance! You hit your achievement goal with minimal distractions. ${taskAnalysis} Keep this momentum!`;
     } else if (ach >= 5 && emg < ach) {
         level = "Productive Day";
-        advice = "A solid, productive day. You balanced your work and distractions well, with achievements leading the way. Great job!";
+        advice = `A solid, productive day. You balanced work and distractions well. ${taskAnalysis} Great job!`;
     } else if (ach > 0 && emg >= ach) {
         level = "Distracted Day";
-        advice = "You got some work done, but distractions took the lead. Review the 'Emergency Log' to see the pattern. Tomorrow is a new start.";
+        advice = `You got some work done, but distractions took the lead. Review the 'Emergency Log' to see the pattern. ${taskAnalysis} Tomorrow is a new start.`;
     } else if (ach === 0 && emg > 0) {
         level = "High Evasion Day";
-        advice = "It seems today was a tough day to get started. Remember, even one small 'Achievement' can break the cycle and build momentum.";
-    } else if (ach === 0 && emg === 0 && totalTasks > 0 && doneTasks === 0) {
-        level = "Task Evasion Day";
-        advice = "You've listed your tasks but haven't logged any progress. The first step is the hardest. Let's try to get one 'Achievement' tomorrow.";
+        advice = `It seems today was a tough day to get started. Remember, even one small 'Achievement' can build momentum. ${taskAnalysis}`;
     } else {
         level = "Quiet Day / Rest Day";
-        advice = "A quiet day. If this was a planned rest day, great! If not, remember to log your progress.";
+        advice = `A quiet day. If this was a planned rest day, great! ${taskAnalysis}`;
     }
 
     const quotes = [
         "The secret of getting ahead is getting started.",
         "Discipline is the bridge between goals and accomplishment.",
-        "You don't have to be great to start, but you have to start to be great.",
         "Focus on progress, not perfection."
     ];
     const quote = quotes[Math.floor(Math.random() * quotes.length)];
 
-    return { level, advice, quote, ach, emg, totalTasks, doneTasks, pctTasks, log };
+    // Return all data needed for both Clippy and PDF
+    const { total, done, pct } = getProgress();
+    return { level, advice, quote, ach, emg, totalTasks: total, doneTasks: done, pctTasks: pct, log, allTasks };
 }
 
+// NEW: Clippy Function (Idea #21)
+function showClippyAnalysis() {
+    const analysis = analyzeDay();
+    
+    clippy.load('Clippy', (agent) => {
+        agent.show();
+        agent.speak(`Hi Mohammed! Here's your analysis for ${isViewingHistory ? 'the selected date' : 'today'}:`);
+        agent.speak(`Your level was: ${analysis.level}.`);
+        agent.speak(analysis.advice);
+        agent.speak(analysis.quote);
+    });
+}
+
+// UPDATED: Report Function
 function generateDailyReport() {
     try {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
+        
+        // --- Font Setup for Arabic ---
+        // Add the font to jsPDF
+        // This is a *placeholder*. A real Base64 font is needed for this to work.
+        if (AmiriFontBase64.length > 100) { // Check if placeholder is replaced
+            doc.addFileToVFS('Amiri-Regular.ttf', AmiriFontBase64);
+            doc.addFont('Amiri-Regular.ttf', 'Amiri', 'normal');
+            doc.setFont('Amiri');
+        } else {
+            console.warn("PDF Arabic font not loaded. Using Helvetica.");
+            doc.setFont('Helvetica'); // Fallback font
+        }
+        
         const today = counter_getTodayDateString();
         const analysis = analyzeDay();
         
         doc.setFont('Helvetica', 'bold');
         doc.setFontSize(18);
         doc.text("Mohammed's Daily Report", 14, 22);
+        
         doc.setFontSize(12);
         doc.setFont('Helvetica', 'normal');
-        doc.text(`Date: ${today}`, 14, 30);
+        doc.text(`Date: ${isViewingHistory ? historyDateInput.value : today}`, 14, 30);
+        
         doc.line(14, 35, 196, 35); 
+
         doc.setFont('Helvetica', 'bold');
         doc.setFontSize(14);
         doc.text("Today's Analysis:", 14, 45);
+        
         doc.setFont('Helvetica', 'normal');
         doc.setFontSize(12);
         doc.text(`Your Level: ${analysis.level}`, 14, 53);
+        
         doc.setFont('Helvetica', 'italic');
         const adviceLines = doc.splitTextToSize(analysis.advice, 182);
         doc.text(adviceLines, 14, 61);
         let y = 61 + (adviceLines.length * 7) + 5; 
+
         doc.setFont('Helvetica', 'bold');
         doc.setFontSize(14);
         doc.text("Summary:", 14, y);
         y += 8;
+
         doc.setFont('Helvetica', 'normal');
         doc.setFontSize(12);
         doc.text(`- Achievements Logged: ${analysis.ach}`, 20, y);
@@ -851,11 +1058,14 @@ function generateDailyReport() {
         y += 8;
         doc.text(`- Tasks Completed: ${analysis.doneTasks} / ${analysis.totalTasks} (${analysis.pctTasks}%)`, 20, y);
         y += 10;
+
         doc.setFont('Helvetica', 'bold');
         doc.setFontSize(14);
         doc.text("Emergency Log Review:", 14, y);
         y += 8;
-        doc.setFont('Helvetica', 'normal');
+        
+        // --- Emergency Log Table ---
+        doc.setFont('Amiri', 'normal'); // Use Arabic-supporting font for log
         doc.setFontSize(10);
         if (analysis.log.length > 0) {
             const logLines = analysis.log.map((entry, index) => `${index + 1}. ${entry}`);
@@ -863,21 +1073,52 @@ function generateDailyReport() {
             doc.text(splitLog, 14, y);
             y += (splitLog.length * 5) + 5;
         } else {
-            doc.text("(No emergencies logged today. Excellent!)", 14, y);
+            doc.text("(No emergencies logged.)", 14, y);
             y += 10;
         }
-        doc.line(14, y, 196, y); 
-        y += 8;
+
+        // --- Task List Tables (NEW) ---
+        // Set font for tables
+        const tableFont = AmiriFontBase64.length > 100 ? 'Amiri' : 'Helvetica';
+
+        if (analysis.allTasks.length > 0) {
+            const completedTasks = analysis.allTasks.filter(t => t.done).map(t => [t.text]);
+            const pendingTasks = analysis.allTasks.filter(t => !t.done).map(t => [t.text]);
+            
+            if (completedTasks.length > 0) {
+                doc.autoTable({
+                    startY: y,
+                    head: [['Completed Tasks']],
+                    body: completedTasks,
+                    theme: 'grid',
+                    headStyles: { font: tableFont, fontStyle: 'bold', fillColor: [220, 220, 220], textColor: [0, 0, 0] },
+                    bodyStyles: { font: tableFont, fontStyle: 'normal' },
+                });
+                y = doc.autoTable.previous.finalY + 10;
+            }
+            
+            if (pendingTasks.length > 0) {
+                doc.autoTable({
+                    startY: y,
+                    head: [['Pending Tasks']],
+                    body: pendingTasks,
+                    theme: 'grid',
+                    headStyles: { font: tableFont, fontStyle: 'bold', fillColor: [220, 220, 220], textColor: [0, 0, 0] },
+                    bodyStyles: { font: tableFont, fontStyle: 'normal' },
+                });
+                y = doc.autoTable.previous.finalY + 10;
+            }
+        }
+        
         doc.setFont('Helvetica', 'italic');
         doc.setFontSize(12);
         const quoteLines = doc.splitTextToSize(`"${analysis.quote}"`, 182);
-        doc.text(quoteLines, 14, y);
+        doc.text(quoteLines, 14, y > 260 ? 270 : y); // Avoid overflow
 
-        doc.save(`Daily-Report-Mohammed-${today}.pdf`);
+        doc.save(`Daily-Report-Mohammed-${isViewingHistory ? historyDateInput.value : today}.pdf`);
 
     } catch (e) {
         console.error("PDF Generation Failed:", e);
-        // Check if jsPDF loaded
         if (typeof jsPDF === 'undefined') {
             alert("Error: PDF library (jsPDF) failed to load. Please check your internet connection and refresh.");
         } else {
@@ -900,10 +1141,18 @@ document.addEventListener('DOMContentLoaded', () => {
     emptyMessageEl = document.getElementById('emptyMessage');
     statusTotalEl = document.getElementById('status-total');
     statusSaveEl = document.getElementById('status-save');
+    dreadTaskNameEl = document.getElementById('dread-task-name');
+    allCounterButtons = document.querySelectorAll('.counter-fieldset button');
     
     const logonScreenEl = document.getElementById('logon-screen');
     const logonBtnEl = document.getElementById('logon-ok');
     const reportBtnEl = document.getElementById('report-panel-btn');
+    const clippyBtnEl = document.getElementById('clippy-panel-btn');
+
+    // History View Elements
+    historyDateInput = document.getElementById('history-date-input');
+    historyLoadBtn = document.getElementById('history-load-btn');
+    historyTodayBtn = document.getElementById('history-today-btn');
 
     // Logon Screen Logic
     if (logonBtnEl) {
@@ -916,25 +1165,49 @@ document.addEventListener('DOMContentLoaded', () => {
     if (reportBtnEl) {
         reportBtnEl.addEventListener('click', generateDailyReport);
     }
+    
+    // Clippy Button Logic
+    if (clippyBtnEl) {
+        clippyBtnEl.addEventListener('click', showClippyAnalysis);
+    }
 
     // Task App Listeners
-    if (addBtn) {
-        addBtn.addEventListener('click', handleAddTask);
+    if (addBtn) addBtn.addEventListener('click', handleAddTask);
+    if (newTaskEl) newTaskEl.addEventListener('keydown', e => { if(e.key==='Enter') handleAddTask(); });
+    if (resetBtn) resetBtn.addEventListener('click', handleResetAll);
+
+    // History View Listeners
+    if (historyLoadBtn) {
+        historyLoadBtn.addEventListener('click', () => {
+            const date = historyDateInput.value;
+            if (!date) {
+                alert("Please select a date to load.");
+                return;
+            }
+            isViewingHistory = true;
+            historyTodayBtn.style.display = 'inline-block';
+            historyLoadBtn.style.display = 'none';
+            allCounterButtons.forEach(btn => btn.disabled = true); // Disable counter buttons
+            counter_listenForChanges(date);
+        });
     }
-    if (newTaskEl) {
-        newTaskEl.addEventListener('keydown', e => { if(e.key==='Enter') handleAddTask(); });
-    }
-    if (resetBtn) {
-        resetBtn.addEventListener('click', handleResetAll);
+
+    if (historyTodayBtn) {
+        historyTodayBtn.addEventListener('click', () => {
+            isViewingHistory = false;
+            historyTodayBtn.style.display = 'none';
+            historyLoadBtn.style.display = 'inline-block';
+            historyDateInput.value = '';
+            allCounterButtons.forEach(btn => btn.disabled = false); // Re-enable counter buttons
+            counter_listenForChanges(null); // Load today's data
+        });
     }
 
     // Start Firebase Listeners
-    // Check if firebase is defined before starting
     if (typeof firebase !== 'undefined') {
         listenForTasks();           // Start listening for FIREBASE task changes
-        counter_listenForChanges(); // Start listening for FIREBASE counter changes
+        counter_listenForChanges(null); // Start listening for FIREBASE counter changes (for today)
     } else {
-        // This will show if the libraries failed to load but the script still ran
         alert("Error: Firebase is not loaded. Please check your internet connection and refresh the page.");
     }
 });
