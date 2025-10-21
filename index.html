@@ -13,8 +13,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-
 <script src="https://unpkg.com/clippyjs@0.0.3/dist/clippy.min.js"></script>
+
 
 <style>
   /* ====== Windows 95 Theme Variables (W95 Plus) ====== */
@@ -99,7 +99,7 @@
       border-style: solid; border-width: 1px;
       border-color: var(--line-dark) var(--line-light) var(--line-light) var(--line-dark);
       padding: 10px; margin: 8px 0; background: var(--bg);
-      box-shadow: 1px 1px 0 var(--line-light) inset, -1px -1px 0 var(--line-dark) inset; 
+      box-shadow: 1px 1px 0 var(--line-light) inset, -1px -1px 0 var(--line-dark) inset;
   }
   legend {
       background: var(--bg); padding: 0 6px; font-weight: bold; color: var(--accent); margin-left: 5px;
@@ -121,7 +121,7 @@
   .btn {
     border: 1px solid var(--fg); border-right-color: var(--line-dark); border-bottom-color: var(--line-dark);
     border-top-color: var(--line-light); border-left-color: var(--line-light);
-    background: var(--bg); color: var(--fg); padding: 5px 12px; font-weight: normal; 
+    background: var(--bg); color: var(--fg); padding: 5px 12px; font-weight: normal;
     cursor: pointer; box-shadow: none; line-height: 1; font-size: 10pt; flex-shrink: 0;
   }
   .btn:active {
@@ -133,7 +133,7 @@
   .btn:hover { background: var(--subtle); }
   .muted{color:var(--fg);font-size:9pt; padding: 0 4px;}
   .toolbar {
-      display: flex; gap: 4px; 
+      display: flex; gap: 4px;
       padding: 0;
       margin-top: 8px;
   }
@@ -155,7 +155,7 @@
     display:flex; align-items:center; gap:8px; padding: 4px 8px;
     background: var(--input-fill); color: var(--fg); margin: 0;
     border-bottom: 1px solid var(--line-medium);
-    cursor: default; 
+    cursor: default;
   }
   li:hover { background: var(--subtle); }
   li.done { color: var(--line-dark); opacity: 0.9; }
@@ -170,9 +170,9 @@
   }
   input[type="checkbox"]:checked::after { content: '✓'; color: var(--fg); font-size: 10pt; line-height: 0.8; }
   input[type="checkbox"]:active { box-shadow: 1px 1px 0 var(--line-light) inset, -1px -1px 0 var(--line-dark) inset; }
-  .del{ 
-      appearance:none; border:0; background:transparent; color:var(--line-dark); font-size:10pt; 
-      cursor: pointer; padding: 0 4px; line-height:1; flex-shrink: 0; 
+  .del{
+      appearance:none; border:0; background:transparent; color:var(--line-dark); font-size:10pt;
+      cursor: pointer; padding: 0 4px; line-height:1; flex-shrink: 0;
   }
   .del:hover{color:red;}
   .linear-progress-box { margin-top: 8px; }
@@ -186,9 +186,9 @@
   }
   .bar{ height:100%; width:0; background: var(--progress-color); }
   .status-bar {
-      border-top: 1px solid var(--line-light); 
+      border-top: 1px solid var(--line-light);
       display: flex; align-items: center;
-      padding: 0 0; 
+      padding: 0 0;
       background: var(--bg);
       height: 24px;
       position: absolute;
@@ -238,13 +238,13 @@
       margin: 2px 0 2px 2px;
   }
   .main-content { padding: 8px 8px 30px 8px; }
-  
+
   /* ====== Counter Styles ====== */
   .counters-container {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
       gap: 8px;
-      padding: 0 0 8px 0; 
+      padding: 0 0 8px 0;
   }
   .counter-fieldset {
       text-align: center;
@@ -269,8 +269,13 @@
       height: 28px;
       padding: 0;
   }
+  .counter-fieldset button:disabled {
+      color: var(--line-dark);
+      text-shadow: 1px 1px var(--line-light);
+      cursor: not-allowed;
+  }
   .emergency-fieldset {
-      background-color: #CC4444; 
+      background-color: #CC4444;
       color: #FFFFFF;
   }
   .emergency-fieldset h1 {
@@ -278,9 +283,9 @@
   }
   .emergency-fieldset legend {
       color: #FFFFFF;
-      background: #CC4444; 
+      background: #CC4444;
   }
-  
+
   /* ====== HR Separator Style ====== */
   hr {
     border: 0;
@@ -305,10 +310,10 @@
       font-size: 9pt;
       background: var(--input-fill);
       color: var(--fg);
-      border: 1px solid var(--fg); 
-      border-left-color: var(--line-dark); 
+      border: 1px solid var(--fg);
+      border-left-color: var(--line-dark);
       border-top-color: var(--line-dark);
-      border-right-color: var(--line-light); 
+      border-right-color: var(--line-light);
       border-bottom-color: var(--line-light);
       box-shadow: 1px 1px 0 var(--line-dark) inset, -1px -1px 0 var(--line-light) inset;
   }
@@ -328,7 +333,17 @@
   #clippy-panel-btn {
     font-size: 1.2rem; /* Make Clippy icon slightly larger */
     line-height: 1.5;
+    padding: 0 6px; /* Adjust padding */
+    min-width: 30px; /* Smaller min width */
   }
+  #report-panel-btn {
+    padding: 0 6px; /* Adjust padding */
+  }
+  /* NEW: Reset Today Button Style */
+  #reset-today-panel-btn {
+    padding: 0 6px; /* Adjust padding */
+  }
+
 
   /* ====== Logon Screen Styles ====== */
   #logon-screen {
@@ -365,7 +380,7 @@
     width: 100px;
   }
 
-  /* NEW: Dread Button Style (Idea #11) */
+  /* ====== Dread Button Style ====== */
   .dread-btn {
       appearance: none; border: 0; background: transparent;
       font-size: 1.1rem; cursor: pointer; padding: 0 4px; line-height: 1; flex-shrink: 0;
@@ -373,7 +388,7 @@
   .dread-btn:hover { opacity: 0.6; }
   .dread-btn:active { transform: scale(0.9); }
 
-  /* NEW: Dread Analysis Style (Idea #11) */
+  /* ====== Dread Analysis Style ====== */
   .dread-analysis-panel {
       padding: 5px;
       font-size: 0.95rem;
@@ -383,25 +398,26 @@
       color: var(--accent);
   }
 
-  /* NEW: Historical View Styles (Idea #28) */
+  /* ====== Historical View Styles ====== */
   .history-controls {
     display: flex;
     gap: 8px;
+    align-items: center; /* Align items vertically */
   }
   .history-controls input[type="date"] {
     border: 1px solid var(--fg); border-left-color: var(--line-dark); border-top-color: var(--line-dark);
     border-right-color: var(--line-light); border-bottom-color: var(--line-light);
     background: var(--input-fill); color: var(--fg); padding: 4px 6px; font-size: 10pt;
-    outline: none; box-shadow: none; flex: 1;
+    outline: none; box-shadow: none; flex: 1; height: 30px; /* Match button height */
   }
   .history-controls button {
-    flex-shrink: 0;
+    flex-shrink: 0; height: 30px; /* Match input height */
   }
 
   @media (max-width: 768px) {
-      .wrap { 
-          max-width: 100%; 
-          margin: 0; 
+      .wrap {
+          max-width: 100%;
+          margin: 0;
           height: 100vh;
           box-shadow: none;
       }
@@ -434,6 +450,14 @@
       }
       .info-box p, .info-box .sunken-panel {
           font-size: 8pt;
+      }
+      /* Ensure history controls stack nicely */
+      .history-controls {
+          flex-direction: column;
+          align-items: stretch;
+      }
+      .history-controls input[type="date"] {
+          margin-bottom: 4px;
       }
   }
 </style>
@@ -473,15 +497,6 @@
       </div>
 
       <div class="main-content">
-          
-        <fieldset>
-            <legend>Historical View</legend>
-            <div class="history-controls">
-                <input type="date" id="history-date-input">
-                <button class="btn" id="history-load-btn">Load Date</button>
-                <button class="btn ghost" id="history-today-btn" style="display: none;">Back to Today</button>
-            </div>
-        </fieldset>
 
         <div class="counters-container">
             <fieldset class="counter-fieldset">
@@ -502,7 +517,7 @@
                 <button onclick="counter_increment('emergency')" class="btn">+</button>
             </fieldset>
         </div>
-        
+
         <div class="info-box" style="padding: 0; margin: 0;">
             <fieldset>
                 <legend>Today's Emergency Log</legend>
@@ -511,21 +526,22 @@
                 </div>
             </fieldset>
         </div>
-        
+
         <hr>
+
         <fieldset>
             <legend>Add New Task</legend>
             <div class="controls">
                 <label for="newTask" style="flex: 0 0 100px;">Task (Required):</label>
                 <input id="newTask" type="text" placeholder="Brief description of the task…"/>
             </div>
-            
+
             <div class="toolbar">
                 <button class="btn" id="addBtn"><i class="fas fa-plus"></i> Add Task</button>
-                <button class="btn ghost" id="resetBtn" title="Delete all tasks"><i class="fas fa-trash-alt"></i> Reset All</button>
+                <button class="btn ghost" id="resetAllBtn" title="Delete ALL tasks & Today's Counters"><i class="fas fa-trash-alt"></i> Reset All</button>
             </div>
         </fieldset>
-        
+
         <div id="v-linear" class="linear-progress-box">
           <div class="head">
             <div><span class="big" id="pct1">0%</span> <span class="muted">Overall Progress</span></div>
@@ -535,7 +551,16 @@
             <div id="bar1" class="bar"></div>
           </div>
         </div>
-        
+
+        <fieldset>
+            <legend>Historical View</legend>
+            <div class="history-controls">
+                <input type="date" id="history-date-input">
+                <button class="btn" id="history-load-btn">Load Date</button>
+                <button class="btn ghost" id="history-today-btn" style="display: none;">Back to Today</button>
+            </div>
+        </fieldset>
+
         <fieldset class="info-box" style="padding: 8px; margin-top: 15px;">
             <legend>Dread Analysis</legend>
             <div class="dread-analysis-panel">
@@ -543,16 +568,16 @@
                 <span id="dread-task-name" class="task-name">(None)</span>
             </div>
         </fieldset>
-        
+
         <div class="task-list-box">
             <ul id="list"></ul>
         </div>
-        
+
         <div id="emptyMessage" class="muted" style="text-align: center; margin-top: 8px; font-weight: bold; display: none;">
           No tasks currently. Start by adding one!
         </div>
       </div>
-      
+
       <div class="status-bar">
           <button class="start-btn">Start</button>
           <div class="separator"></div>
@@ -565,6 +590,9 @@
             </div>
             <div class="status-panel status-panel-btn" id="report-panel-btn" role="button" title="Generate Daily Report">
               <i class="fas fa-print"></i> Report
+            </div>
+            <div class="status-panel status-panel-btn" id="reset-today-panel-btn" role="button" title="Reset Today's Counters & Log">
+              <i class="fas fa-undo"></i> Reset Today
             </div>
             <div class="status-panel" id="status-total">Total: 0</div>
             <div class="status-panel" id="status-save">Ready</div>
@@ -581,41 +609,6 @@
 // =================================================================
 // 🔥 FIREBASE INITIALIZATION & CONFIG 🔥
 // =================================================================
-
-// This is a Base64 encoded font that supports Arabic (Amiri)
-// This is necessary for jsPDF to render Arabic characters correctly in the report.
-var AmiriFont = '... (Font Data has been truncated for readability, but it is in the full script) ...';
-// Note: In a real scenario, this Base64 string is thousands of lines long. 
-// For this response, I'll use a placeholder and link to a CDN for a font in the PDF generation
-// to keep the code block readable.
-// --- UPDATE: I will use a built-in font logic in jsPDF that *might* work, if not,
-// this is where the full Base64 font would go.
-// --- FINAL DECISION: I will add a simple Base64 font for jsPDF. I will find a small one.
-// --- Here is a compact Base64 for Amiri font (still large, but required for Arabic)
-var AmiriFont = "AAEAAAARAQAABAAQR0RFRgBsAAAAAAEAAAAB... (This string is huge, I will omit it for brevity but the logic will be included in generateDailyReport)";
-// --- OK, the Base64 font is too large for the response.
-// --- I will try a different approach: I'll use jsPDF's built-in 'Tahoma' and hope it works,
-// --- and add the logic to load the Amiri font from a .js file if it were hosted.
-// --- FINAL FINAL DECISION: I will add the *Amiri font JS file* from a CDN. This is the cleanest way.
-
-</script>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-<script>
-// =================================================================
-// 🔥 PDF ARABIC FONT PLACEHOLDER 🔥
-// =================================================================
-// To support Arabic in the PDF, jsPDF needs a font. 
-// This Base64 string is a *placeholder* for a real font file (like Amiri).
-// The real string is thousands of lines long.
-// For now, Arabic in the PDF may not work, but the *code structure* is ready.
-var AmiriFontBase64 = "... (Placeholder for Base64 Font File) ...";
-
-
-// =================================================================
-// 🔥 FIREBASE INITIALIZATION & CONFIG 🔥
-// =================================================================
-
 const firebaseConfig = {
   // Your config keys
   apiKey: "AIzaSyBvpcUP-DmXH82WHgm4ZLHezeBFaaxMnCE",
@@ -627,25 +620,37 @@ const firebaseConfig = {
   appId: "1:271781862481:web:dfd63b2c4b4a8d74ad2c70"
 };
 
+let db; // Declare db globally
 try {
     firebase.initializeApp(firebaseConfig);
+    db = firebase.database(); // Initialize db after app init
 } catch (e) {
     console.error("Firebase initialization failed:", e);
     alert("CRITICAL ERROR: Firebase libraries did not load. Please check your internet connection and refresh the page.");
+    // Optionally disable functionality if Firebase fails
 }
 
-const db = firebase.database();
+// =================================================================
+// 🔥 GLOBAL VARIABLES & DOM ELEMENTS 🔥
+// =================================================================
+let todayCounterRef = null;
+let currentCounters = { achievements: 0, neutral: 0, emergency: 0, emergencyLog: [] };
+let isViewingHistory = false;
+let tasks = [];
+let clippyAgent = null; // Variable to hold the loaded Clippy agent
+
+// DOM Elements (will be assigned in DOMContentLoaded)
+let listEl, newTaskEl, addBtn, resetAllBtn, emptyMessageEl, statusTotalEl, statusSaveEl;
+let historyDateInput, historyLoadBtn, historyTodayBtn;
+let dreadTaskNameEl;
+let allCounterButtons;
+let reportBtnEl, clippyBtnEl, resetTodayBtnEl;
+let logTextareaEl;
+let soundTada, soundError;
 
 // =================================================================
 // 🔥 COUNTER LOGIC (Firebase) 🔥
 // =================================================================
-
-let todayCounterRef = null;
-let currentCounters = { achievements: 0, neutral: 0, emergency: 0, emergencyLog: [] }; 
-let isViewingHistory = false; // NEW: History flag
-let historyDateInput, historyLoadBtn, historyTodayBtn; // NEW: History elements
-let allCounterButtons; // To disable buttons in history mode
-
 function counter_getTodayDateString() {
     const today = new Date();
     const year = today.getFullYear();
@@ -654,98 +659,122 @@ function counter_getTodayDateString() {
     return `${year}-${month}-${day}`;
 }
 
-// UPDATED: Now accepts a date string, or null for today
 function counter_listenForChanges(dateString) {
-    const dateToLoad = dateString || counter_getTodayDateString();
-    
-    // If we are already listening to this ref, do nothing
-    if (todayCounterRef && todayCounterRef.path.toString().endsWith(dateToLoad)) {
-        return;
-    }
+    if (!db) return; // Don't run if Firebase failed
 
-    // If we were listening to a different ref, turn it off
-    if (todayCounterRef) {
+    const dateToLoad = dateString || counter_getTodayDateString();
+    const newRefPath = 'dailyCounters/' + dateToLoad;
+
+    // Turn off previous listener if it exists and path is different
+    if (todayCounterRef && todayCounterRef.path.toString() !== newRefPath) {
+        console.log("Switching listener off for:", todayCounterRef.path.toString());
         todayCounterRef.off();
     }
 
-    todayCounterRef = db.ref('dailyCounters/' + dateToLoad);
-    
-    todayCounterRef.on('value', (snapshot) => {
-        const data = snapshot.val();
-        if (data) {
-            currentCounters = data;
-        } else {
-            // If it's a new day, set defaults. If it's history with no data, show 0.
-            currentCounters = { achievements: 0, neutral: 0, emergency: 0, emergencyLog: [] }; 
-            if (!isViewingHistory) { // Only set defaults if it's today
-                todayCounterRef.set(currentCounters).catch(e => console.error("Initial counter set failed:", e));
+    // Only attach listener if path is new or listener doesn't exist
+    if (!todayCounterRef || todayCounterRef.path.toString() !== newRefPath) {
+        console.log("Attaching listener for:", newRefPath);
+        todayCounterRef = db.ref(newRefPath);
+
+        todayCounterRef.on('value', (snapshot) => {
+            const data = snapshot.val();
+            console.log("Counter data received for", dateToLoad, ":", data);
+            if (data) {
+                currentCounters = data;
+            } else {
+                currentCounters = { achievements: 0, neutral: 0, emergency: 0, emergencyLog: [] };
+                // Only write defaults if we are on today's date and not in history view
+                if (!isViewingHistory && dateToLoad === counter_getTodayDateString()) {
+                    console.log("Setting default counters for today.");
+                    todayCounterRef.set(currentCounters).catch(e => console.error("Initial counter set failed:", e));
+                }
             }
-        }
-        
-        document.getElementById('achievements-count').innerText = currentCounters.achievements || 0;
-        document.getElementById('neutral-count').innerText = currentCounters.neutral || 0;
-        document.getElementById('emergency-count').innerText = currentCounters.emergency || 0;
-        
-        const logTextarea = document.getElementById('emergency-log');
-        const logData = currentCounters.emergencyLog || [];
-        if (logData.length > 0) {
-            logTextarea.value = logData.join('\n'); 
-        } else {
-            logTextarea.value = isViewingHistory ? '(No data for this day)' : '(No emergencies logged today)';
-        }
-        logTextarea.scrollTop = logTextarea.scrollHeight; 
-    }, (error) => {
-        console.error("Firebase Counter Read Failed. Check your Firebase Rules:", error);
-        if(statusSaveEl) updateStatus('Counter Sync Error');
-    });
+            updateCounterUI(); // Separate function to update UI
+        }, (error) => {
+            console.error(`Firebase Counter Read Failed for ${dateToLoad}. Check Rules:`, error);
+            if (statusSaveEl) updateStatus('Counter Sync Error');
+        });
+    }
 }
 
+function updateCounterUI() {
+    // Update counter numbers
+    document.getElementById('achievements-count').innerText = currentCounters.achievements || 0;
+    document.getElementById('neutral-count').innerText = currentCounters.neutral || 0;
+    document.getElementById('emergency-count').innerText = currentCounters.emergency || 0;
+
+    // Update emergency log
+    const logData = currentCounters.emergencyLog || [];
+    if (logTextareaEl) {
+        if (logData.length > 0) {
+            logTextareaEl.value = logData.join('\n');
+        } else {
+             logTextareaEl.value = isViewingHistory ? '(No data for this day)' : '(No emergencies logged today)';
+        }
+        logTextareaEl.scrollTop = logTextareaEl.scrollHeight;
+    }
+    
+    // Update button states based on history view
+    allCounterButtons.forEach(btn => btn.disabled = isViewingHistory);
+    if (historyTodayBtn) historyTodayBtn.style.display = isViewingHistory ? 'inline-block' : 'none';
+    if (historyLoadBtn) historyLoadBtn.style.display = isViewingHistory ? 'none' : 'inline-block';
+    
+    // Update legend for emergency log
+    const logLegend = document.querySelector('.info-box fieldset legend');
+    if (logLegend) {
+        logLegend.textContent = isViewingHistory ? `Emergency Log (${historyDateInput.value})` : "Today's Emergency Log";
+    }
+}
+
+
 function counter_increment(type) {
-    // NEW: Block incrementing if viewing history
+    if (!db || !todayCounterRef) return; // Don't run if Firebase failed or ref not set
     if (isViewingHistory) {
-        alert("You are in 'History View'. Please go 'Back to Today' to log new data.");
+        clippySpeak("Cannot add data in 'History View'. Go 'Back to Today'.");
         return;
     }
 
-    let finalReason = ""; 
+    let finalReason = "";
     let updates = {};
 
     if (type === 'emergency') {
-        let reasonInput = prompt("EMERGENCY: Select category or type your own:\n\n1. Social Media\n2. Phone/Calls\n3. Procrastination\n4. Other (Specify)");
-        
+        let reasonInput = prompt("EMERGENCY:\n\n1. Social Media\n2. Phone/Calls\n3. Procrastination\n4. Other (Specify)", ""); // Added default value
+        if (reasonInput === null) return; // User cancelled
+
         if (reasonInput === "1") finalReason = "Social Media";
         else if (reasonInput === "2") finalReason = "Phone/Calls";
         else if (reasonInput === "3") finalReason = "Procrastination";
-        else if (reasonInput === "4") finalReason = prompt("Specify 'Other' reason:") || "Other (Unspecified)";
-        else if (reasonInput && reasonInput.trim() !== "") finalReason = reasonInput;
-        else return; 
-        
+        else if (reasonInput === "4") finalReason = prompt("Specify 'Other' reason:", "") || "Other (Unspecified)";
+        else if (reasonInput.trim() !== "") finalReason = reasonInput.trim();
+        else { // Empty input treated as unspecified
+            finalReason = "Other (Unspecified)";
+        }
+
         const currentLog = currentCounters.emergencyLog || [];
         currentLog.push(finalReason);
         updates.emergencyLog = currentLog;
-        document.getElementById('sound-error').play(); // Play error sound
+        if (soundError) soundError.play();
     }
 
     const newCount = (currentCounters[type] || 0) + 1;
     updates[type] = newCount;
-    
-    if (todayCounterRef) {
-        todayCounterRef.update(updates).catch(e => console.error("Counter update failed:", e));
-    }
+
+    todayCounterRef.update(updates).catch(e => {
+        console.error("Counter update failed:", e);
+        updateStatus('Counter Save Error');
+    });
 
     if (type === 'achievements' && newCount === 10) {
-        alert('Congratulations! You completed 10 achievements! You deserve a prize!');
+        clippySpeak("Congratulations! 10 Achievements! You deserve a prize!");
     }
 }
+
 
 // =================================================================
 // 🔥 TASK APP LOGIC (Firebase) 🔥
 // =================================================================
 
-const tasksRef = db.ref('tasks');
-let tasks = []; 
-let listEl, newTaskEl, addBtn, resetBtn, emptyMessageEl, statusTotalEl, statusSaveEl;
-let dreadTaskNameEl; // NEW: Dread analysis element
+const tasksRef = db ? db.ref('tasks') : null; // Check if db exists
 
 function todayDate() { return new Date().toISOString().substring(0, 10); }
 
@@ -757,6 +786,7 @@ function updateStatus(message) {
 }
 
 function listenForTasks() {
+    if (!tasksRef) return; // Don't run if Firebase failed
     tasksRef.on('value', (snapshot) => {
         const rawData = snapshot.val();
         tasks = [];
@@ -767,21 +797,17 @@ function listenForTasks() {
         }
         renderList();
         updateLinearView();
-        updateDreadAnalysis(); // NEW: Update dread analysis
+        updateDreadAnalysis();
         updateStatus('Synced');
     }, (error) => {
-        console.error("Firebase Read Failed. Check your Firebase Rules:", error);
+        console.error("Firebase Task Read Failed. Check Rules:", error);
         updateStatus('Task Sync Error');
     });
 }
 
 function addTaskToDB(text) {
-    const newTask = {
-        text: text, 
-        done: false, 
-        createdDate: todayDate(),
-        dreadCount: 0 // NEW: Initialize dread count
-    };
+    if (!tasksRef) return;
+    const newTask = { text: text, done: false, createdDate: todayDate(), dreadCount: 0 };
     tasksRef.push(newTask).catch((error) => {
         console.error("Firebase Write Failed. Check Rules.", error);
         updateStatus('Write Error');
@@ -789,21 +815,18 @@ function addTaskToDB(text) {
 }
 
 function updateTaskStatus(id, isDone) {
+    if (!tasksRef) return;
     tasksRef.child(id).update({ done: isDone }).catch((error) => {
         console.error("Firebase Update Failed. Check Rules.", error);
         updateStatus('Update Error');
     });
-    // Play sound only on completion
-    if (isDone) {
-        document.getElementById('sound-tada').play(); // Play tada sound
-    }
+    if (isDone && soundTada) soundTada.play();
 }
 
-// NEW: Function to increment dread count (Idea #11)
 function incrementDreadCount(id) {
+    if (!tasksRef) return;
     const task = tasks.find(t => t.id === id);
     if (!task) return;
-    
     const newCount = (task.dreadCount || 0) + 1;
     tasksRef.child(id).update({ dreadCount: newCount }).catch((error) => {
         console.error("Firebase Dread Update Failed. Check Rules.", error);
@@ -812,6 +835,7 @@ function incrementDreadCount(id) {
 }
 
 function deleteTask(id) {
+    if (!tasksRef) return;
     tasksRef.child(id).remove().catch((error) => {
         console.error("Firebase Delete Failed. Check Rules.", error);
         updateStatus('Delete Error');
@@ -819,6 +843,7 @@ function deleteTask(id) {
 }
 
 function deleteAllTasks() {
+    if (!tasksRef) return;
     tasksRef.remove().catch((error) => {
         console.error("Firebase Clear Failed. Check Rules.", error);
         updateStatus('Clear Error');
@@ -826,18 +851,18 @@ function deleteAllTasks() {
 }
 
 function getSortedTasks() {
-    tasks.sort((a, b) => {
+    // Create a copy before sorting to avoid modifying the original array if needed elsewhere
+    return [...tasks].sort((a, b) => {
+        // Simple date comparison might be enough
         if (a.createdDate < b.createdDate) return 1;
         if (a.createdDate > b.createdDate) return -1;
         return 0;
     });
-    return tasks;
 }
 
 function renderList(){
     const sortedTasks = getSortedTasks();
-    if (!listEl) return; 
-    
+    if (!listEl) return;
     listEl.innerHTML = '';
     
     if (sortedTasks.length === 0) {
@@ -849,69 +874,84 @@ function renderList(){
     sortedTasks.forEach(t=>{
       const li = document.createElement('li');
       if (t.done) li.classList.add('done');
-      
       const cb = document.createElement('input');
       cb.type='checkbox'; cb.checked=t.done;
       cb.addEventListener('change',()=>{ updateTaskStatus(t.id, cb.checked); });
-      
       const span = document.createElement('span');
       span.className='txt'; span.textContent=t.text;
-      
-      // NEW: Dread Button
       const dreadBtn = document.createElement('button');
       dreadBtn.className = 'dread-btn';
-      dreadBtn.title = 'Mark as dreaded';
+      dreadBtn.title = `Mark as dreaded (${t.dreadCount || 0})`; // Show count on hover
       dreadBtn.innerHTML = '😰';
       dreadBtn.addEventListener('click', () => { incrementDreadCount(t.id); });
-
       const del = document.createElement('button');
       del.className='del'; del.innerHTML='<i class="fas fa-trash"></i>';
       del.addEventListener('click',()=>{ deleteTask(t.id); });
-      
-      li.appendChild(cb); 
-      li.appendChild(span); 
-      li.appendChild(dreadBtn); // Add dread button
+      li.appendChild(cb);
+      li.appendChild(span);
+      li.appendChild(dreadBtn);
       li.appendChild(del);
       listEl.appendChild(li);
     });
-    
+
     if (statusTotalEl) statusTotalEl.textContent = `Total: ${tasks.length}`;
 }
 
-// NEW: Update Dread Analysis Box (Idea #11)
 function updateDreadAnalysis() {
     if (!dreadTaskNameEl) return;
+    const pendingTasks = tasks.filter(t => !t.done);
+    if (pendingTasks.length === 0) {
+         dreadTaskNameEl.textContent = '(None)';
+         return;
+    }
+    const mostDreaded = pendingTasks.sort((a, b) => (b.dreadCount || 0) - (a.dreadCount || 0))[0];
     
-    const dreadedTask = tasks
-        .filter(t => !t.done) // Only count dread for pending tasks
-        .sort((a, b) => (b.dreadCount || 0) - (a.dreadCount || 0))[0];
-
-    if (dreadedTask && dreadedTask.dreadCount > 0) {
-        dreadTaskNameEl.textContent = dreadedTask.text;
+    if (mostDreaded && mostDreaded.dreadCount > 0) {
+        dreadTaskNameEl.textContent = `${mostDreaded.text} (${mostDreaded.dreadCount})`;
     } else {
         dreadTaskNameEl.textContent = '(None)';
     }
 }
 
 function handleAddTask(){
-    const text = (newTaskEl.value||'').trim(); 
+    const text = (newTaskEl.value||'').trim();
     if(!text) {
-        alert("Task description is required.");
+        clippySpeak("Please enter a task description first!");
         return;
     }
-    addTaskToDB(text); 
-    newTaskEl.value=''; 
+    addTaskToDB(text);
+    newTaskEl.value='';
 }
 
 function handleResetAll(){
-    if(!confirm('Are you sure you want to delete ALL tasks?\n\nThis will ALSO reset today\'s counters and emergency log.')) return;
-    deleteAllTasks(); 
-    if (todayCounterRef && !isViewingHistory) { // Only reset if on "today"
+    if(!confirm('ARE YOU SURE?\n\nThis will delete ALL tasks (permanently!)\nAND reset today\'s counters and log.')) return;
+    deleteAllTasks();
+    if (todayCounterRef && !isViewingHistory) {
         todayCounterRef.remove().catch(e => console.error("Counter reset failed:", e));
     } else if (isViewingHistory) {
-        alert("Note: Counters for this historical date were not reset. Only tasks were cleared.");
+         clippySpeak("Tasks cleared, but historical counters remain untouched.");
     }
 }
+
+// NEW: Reset Today Function
+function handleResetTodayCounters() {
+    if (isViewingHistory) {
+        clippySpeak("Cannot reset historical data. Go 'Back to Today' first.");
+        return;
+    }
+    if (!confirm('Reset Today\'s Counters?\n\nThis will reset Achievements, Neutral, Emergency counts and the Emergency Log for today ONLY.\nTasks will NOT be affected.')) return;
+    
+    if (todayCounterRef) {
+         // Instead of remove, set back to defaults to keep the node
+         const defaultCounters = { achievements: 0, neutral: 0, emergency: 0, emergencyLog: [] };
+         todayCounterRef.set(defaultCounters).catch(e => {
+            console.error("Counter reset failed:", e);
+            updateStatus('Reset Error');
+         });
+         clippySpeak("Today's counters have been reset.");
+    }
+}
+
 
 function getProgress(){
     const total = tasks.length;
@@ -926,12 +966,12 @@ function updateLinearView(){
     const pctEl = document.getElementById('pct1');
     const doneEl= document.getElementById('done1');
     const totalEl= document.getElementById('total1');
-    
-    if(bar){ bar.style.width = pct + '%'; }
+
+    if(bar) bar.style.width = pct + '%';
     if(pctEl) pctEl.textContent = pct + '%';
     if(doneEl) doneEl.textContent = done;
     if(totalEl) totalEl.textContent = total;
-    
+
     const pb = document.querySelector('#v-linear .progress[role="progressbar"]');
     if(pb) pb.setAttribute('aria-valuenow', pct);
 }
@@ -939,30 +979,27 @@ function updateLinearView(){
 // =================================================================
 // 🔥 Report & Clippy Logic 🔥
 // =================================================================
-
 function analyzeDay() {
-    // Use 'currentCounters' as it holds today's or historical data
-    const counters = currentCounters; 
-    const allTasks = tasks; // Tasks are always "live"
+    const counters = currentCounters;
+    const allTasks = tasks;
 
     const ach = counters.achievements || 0;
     const emg = counters.emergency || 0;
     const log = counters.emergencyLog || [];
-    
-    // Task analysis is only relevant for "today"
     let taskAnalysis = "";
-    if (!isViewingHistory) {
-        const totalTasks = allTasks.length;
-        const doneTasks = allTasks.filter(t => t.done).length;
-        taskAnalysis = `You also completed ${doneTasks} out of ${totalTasks} tasks.`;
-    }
-
     let level = "";
     let advice = "";
 
+    // Task analysis only relevant if not viewing history
+    const { total, done, pct } = getProgress();
+    if (!isViewingHistory) {
+         taskAnalysis = `You also completed ${done} out of ${total} tasks today (${pct}%).`;
+    }
+
+
     if (ach >= 10 && emg < 3) {
         level = "Excellent Focus";
-        advice = `Incredible performance! You hit your achievement goal with minimal distractions. ${taskAnalysis} Keep this momentum!`;
+        advice = `Incredible performance! You hit your achievement goal with minimal distractions. ${taskAnalysis} This is a model day. Keep this momentum!`;
     } else if (ach >= 5 && emg < ach) {
         level = "Productive Day";
         advice = `A solid, productive day. You balanced work and distractions well. ${taskAnalysis} Great job!`;
@@ -984,67 +1021,75 @@ function analyzeDay() {
     ];
     const quote = quotes[Math.floor(Math.random() * quotes.length)];
 
-    // Return all data needed for both Clippy and PDF
-    const { total, done, pct } = getProgress();
     return { level, advice, quote, ach, emg, totalTasks: total, doneTasks: done, pctTasks: pct, log, allTasks };
 }
 
-// NEW: Clippy Function (Idea #21)
-function showClippyAnalysis() {
-    const analysis = analyzeDay();
-    
-    clippy.load('Clippy', (agent) => {
-        agent.show();
-        agent.speak(`Hi Mohammed! Here's your analysis for ${isViewingHistory ? 'the selected date' : 'today'}:`);
-        agent.speak(`Your level was: ${analysis.level}.`);
-        agent.speak(analysis.advice);
-        agent.speak(analysis.quote);
-    });
+function clippySpeak(message) {
+    if (clippyAgent) {
+        clippyAgent.speak(message);
+    } else {
+        // Fallback if clippy isn't loaded yet or failed
+        console.log("Clippy fallback:", message);
+        // alert(message); // Use alert as a simple fallback if needed
+    }
 }
 
-// UPDATED: Report Function
+function showClippyAnalysis() {
+    if (!clippyAgent) {
+        console.warn("Clippy not loaded yet.");
+        alert("Clippy is still loading, please wait a moment and try again.");
+        return;
+    }
+    const analysis = analyzeDay();
+    clippyAgent.stop(); // Stop previous actions
+    clippyAgent.show();
+    clippyAgent.speak(`Hi Mohammed! Here's your analysis for ${isViewingHistory ? `date ${historyDateInput.value}` : 'today'}:`);
+    clippyAgent.speak(`Level: ${analysis.level}.`);
+    clippyAgent.speak(analysis.advice);
+    clippyAgent.speak(`Quote for you: ${analysis.quote}`);
+    clippyAgent.animate(); // Play a random animation
+}
+
+
 function generateDailyReport() {
     try {
+        // Check if jsPDF and autotable are loaded
+        if (typeof jsPDF === 'undefined' || typeof jsPDF.autoTable === 'undefined') {
+             clippySpeak("PDF libraries are missing. Cannot generate report. Check internet?");
+             console.error("jsPDF or jsPDF-AutoTable not loaded!");
+             return;
+        }
+
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        
-        // --- Font Setup for Arabic ---
-        // Add the font to jsPDF
-        // This is a *placeholder*. A real Base64 font is needed for this to work.
-        if (AmiriFontBase64.length > 100) { // Check if placeholder is replaced
-            doc.addFileToVFS('Amiri-Regular.ttf', AmiriFontBase64);
-            doc.addFont('Amiri-Regular.ttf', 'Amiri', 'normal');
-            doc.setFont('Amiri');
-        } else {
-            console.warn("PDF Arabic font not loaded. Using Helvetica.");
-            doc.setFont('Helvetica'); // Fallback font
-        }
-        
-        const today = counter_getTodayDateString();
+        const dateStr = isViewingHistory ? historyDateInput.value : counter_getTodayDateString();
         const analysis = analyzeDay();
-        
+
+        // Use standard Helvetica font - Arabic support removed due to complexity
+        doc.setFont('Helvetica', 'normal');
+
         doc.setFont('Helvetica', 'bold');
         doc.setFontSize(18);
         doc.text("Mohammed's Daily Report", 14, 22);
-        
+
         doc.setFontSize(12);
         doc.setFont('Helvetica', 'normal');
-        doc.text(`Date: ${isViewingHistory ? historyDateInput.value : today}`, 14, 30);
-        
-        doc.line(14, 35, 196, 35); 
+        doc.text(`Date: ${dateStr}`, 14, 30);
+
+        doc.line(14, 35, 196, 35);
 
         doc.setFont('Helvetica', 'bold');
         doc.setFontSize(14);
-        doc.text("Today's Analysis:", 14, 45);
-        
+        doc.text("Analysis:", 14, 45);
+
         doc.setFont('Helvetica', 'normal');
         doc.setFontSize(12);
-        doc.text(`Your Level: ${analysis.level}`, 14, 53);
-        
+        doc.text(`Level: ${analysis.level}`, 14, 53);
+
         doc.setFont('Helvetica', 'italic');
-        const adviceLines = doc.splitTextToSize(analysis.advice, 182);
+        const adviceLines = doc.splitTextToSize(analysis.advice, 182); // Max width 196 - 14 margin
         doc.text(adviceLines, 14, 61);
-        let y = 61 + (adviceLines.length * 7) + 5; 
+        let y = 61 + (adviceLines.length * 7) + 5;
 
         doc.setFont('Helvetica', 'bold');
         doc.setFontSize(14);
@@ -1053,106 +1098,128 @@ function generateDailyReport() {
 
         doc.setFont('Helvetica', 'normal');
         doc.setFontSize(12);
-        doc.text(`- Achievements Logged: ${analysis.ach}`, 20, y);
-        doc.text(`- Emergencies Logged: ${analysis.emg}`, 100, y);
+        doc.text(`- Achievements: ${analysis.ach}`, 20, y);
+        doc.text(`- Emergencies: ${analysis.emg}`, 100, y);
         y += 8;
         doc.text(`- Tasks Completed: ${analysis.doneTasks} / ${analysis.totalTasks} (${analysis.pctTasks}%)`, 20, y);
         y += 10;
 
         doc.setFont('Helvetica', 'bold');
         doc.setFontSize(14);
-        doc.text("Emergency Log Review:", 14, y);
+        doc.text("Emergency Log:", 14, y);
         y += 8;
-        
-        // --- Emergency Log Table ---
-        doc.setFont('Amiri', 'normal'); // Use Arabic-supporting font for log
+
+        doc.setFont('Helvetica', 'normal');
         doc.setFontSize(10);
         if (analysis.log.length > 0) {
             const logLines = analysis.log.map((entry, index) => `${index + 1}. ${entry}`);
-            const splitLog = doc.splitTextToSize(logLines.join('\n'), 182);
-            doc.text(splitLog, 14, y);
-            y += (splitLog.length * 5) + 5;
+            // Use splitTextToSize for basic wrapping if autotable isn't needed here
+             const splitLog = doc.splitTextToSize(logLines.join('\n'), 182);
+             doc.text(splitLog, 14, y);
+             y += (splitLog.length * 5) + 5; // Adjust Y based on lines
         } else {
             doc.text("(No emergencies logged.)", 14, y);
             y += 10;
         }
 
-        // --- Task List Tables (NEW) ---
-        // Set font for tables
-        const tableFont = AmiriFontBase64.length > 100 ? 'Amiri' : 'Helvetica';
-
+        // Task List Tables
         if (analysis.allTasks.length > 0) {
             const completedTasks = analysis.allTasks.filter(t => t.done).map(t => [t.text]);
             const pendingTasks = analysis.allTasks.filter(t => !t.done).map(t => [t.text]);
-            
+
+            const tableOptions = {
+                 startY: y,
+                 theme: 'grid',
+                 headStyles: { font: 'Helvetica', fontStyle: 'bold', fillColor: [220, 220, 220], textColor: [0, 0, 0] },
+                 bodyStyles: { font: 'Helvetica', fontStyle: 'normal', cellPadding: 2 },
+                 columnStyles: { 0: { cellWidth: 'auto' } }, // Adjust column width automatically
+                 didDrawPage: function(data) {
+                    // Update y for next table or element if page breaks occur
+                    y = data.cursor.y;
+                 }
+            };
+
             if (completedTasks.length > 0) {
                 doc.autoTable({
-                    startY: y,
+                    ...tableOptions,
                     head: [['Completed Tasks']],
                     body: completedTasks,
-                    theme: 'grid',
-                    headStyles: { font: tableFont, fontStyle: 'bold', fillColor: [220, 220, 220], textColor: [0, 0, 0] },
-                    bodyStyles: { font: tableFont, fontStyle: 'normal' },
                 });
-                y = doc.autoTable.previous.finalY + 10;
+                y = doc.autoTable.previous.finalY + 10; // Get Y position after table
             }
-            
+
             if (pendingTasks.length > 0) {
+                 // Adjust startY for the second table
+                 tableOptions.startY = y;
                 doc.autoTable({
-                    startY: y,
+                    ...tableOptions,
                     head: [['Pending Tasks']],
                     body: pendingTasks,
-                    theme: 'grid',
-                    headStyles: { font: tableFont, fontStyle: 'bold', fillColor: [220, 220, 220], textColor: [0, 0, 0] },
-                    bodyStyles: { font: tableFont, fontStyle: 'normal' },
                 });
                 y = doc.autoTable.previous.finalY + 10;
             }
         }
-        
+
+        // Check if Y is near page bottom before adding quote
+        if (y > 260) {
+           doc.addPage();
+           y = 20; // Reset Y for new page
+        }
+
         doc.setFont('Helvetica', 'italic');
         doc.setFontSize(12);
         const quoteLines = doc.splitTextToSize(`"${analysis.quote}"`, 182);
-        doc.text(quoteLines, 14, y > 260 ? 270 : y); // Avoid overflow
+        doc.text(quoteLines, 14, y);
 
-        doc.save(`Daily-Report-Mohammed-${isViewingHistory ? historyDateInput.value : today}.pdf`);
+        doc.save(`Daily-Report-Mohammed-${dateStr}.pdf`);
+        clippySpeak("Your PDF report has been generated!");
 
     } catch (e) {
         console.error("PDF Generation Failed:", e);
-        if (typeof jsPDF === 'undefined') {
-            alert("Error: PDF library (jsPDF) failed to load. Please check your internet connection and refresh.");
-        } else {
-            alert("An unknown error occurred during PDF generation.");
-        }
+        clippySpeak("Oops! Something went wrong generating the PDF report. Check the console?");
     }
 }
 
 
 // =================================================================
-// 🔥 INIT (Start all listeners) 🔥
+// 🔥 INIT (Assign Elements & Attach Listeners) 🔥
 // =================================================================
 document.addEventListener('DOMContentLoaded', () => {
-    
-    // Assign all element variables INSIDE this listener
+
+    // Assign DOM Elements
     listEl = document.getElementById('list');
     newTaskEl = document.getElementById('newTask');
     addBtn = document.getElementById('addBtn');
-    resetBtn = document.getElementById('resetBtn');
+    resetAllBtn = document.getElementById('resetAllBtn'); // Corrected ID
     emptyMessageEl = document.getElementById('emptyMessage');
     statusTotalEl = document.getElementById('status-total');
     statusSaveEl = document.getElementById('status-save');
     dreadTaskNameEl = document.getElementById('dread-task-name');
     allCounterButtons = document.querySelectorAll('.counter-fieldset button');
-    
+    logTextareaEl = document.getElementById('emergency-log');
+    soundTada = document.getElementById('sound-tada');
+    soundError = document.getElementById('sound-error');
+
     const logonScreenEl = document.getElementById('logon-screen');
     const logonBtnEl = document.getElementById('logon-ok');
-    const reportBtnEl = document.getElementById('report-panel-btn');
-    const clippyBtnEl = document.getElementById('clippy-panel-btn');
+    reportBtnEl = document.getElementById('report-panel-btn');
+    clippyBtnEl = document.getElementById('clippy-panel-btn');
+    resetTodayBtnEl = document.getElementById('reset-today-panel-btn'); // Corrected ID
 
-    // History View Elements
     historyDateInput = document.getElementById('history-date-input');
     historyLoadBtn = document.getElementById('history-load-btn');
     historyTodayBtn = document.getElementById('history-today-btn');
+
+    // Load Clippy Agent
+    clippy.load('Clippy', (agent) => {
+        clippyAgent = agent;
+        console.log("Clippy loaded successfully!");
+    }, (error) => {
+         console.error("Clippy failed to load:", error);
+         // Optionally disable clippy button if load fails
+         if (clippyBtnEl) clippyBtnEl.disabled = true;
+    });
+
 
     // Logon Screen Logic
     if (logonBtnEl) {
@@ -1165,50 +1232,54 @@ document.addEventListener('DOMContentLoaded', () => {
     if (reportBtnEl) {
         reportBtnEl.addEventListener('click', generateDailyReport);
     }
-    
+
     // Clippy Button Logic
     if (clippyBtnEl) {
         clippyBtnEl.addEventListener('click', showClippyAnalysis);
     }
 
+    // Reset Today Button Logic
+    if (resetTodayBtnEl) {
+        resetTodayBtnEl.addEventListener('click', handleResetTodayCounters);
+    }
+
     // Task App Listeners
     if (addBtn) addBtn.addEventListener('click', handleAddTask);
     if (newTaskEl) newTaskEl.addEventListener('keydown', e => { if(e.key==='Enter') handleAddTask(); });
-    if (resetBtn) resetBtn.addEventListener('click', handleResetAll);
+    if (resetAllBtn) resetAllBtn.addEventListener('click', handleResetAll); // Corrected Variable
 
     // History View Listeners
     if (historyLoadBtn) {
         historyLoadBtn.addEventListener('click', () => {
             const date = historyDateInput.value;
             if (!date) {
-                alert("Please select a date to load.");
+                clippySpeak("Please select a date first.");
                 return;
             }
             isViewingHistory = true;
-            historyTodayBtn.style.display = 'inline-block';
-            historyLoadBtn.style.display = 'none';
-            allCounterButtons.forEach(btn => btn.disabled = true); // Disable counter buttons
+            updateCounterUI(); // Update UI immediately to show button changes
             counter_listenForChanges(date);
+            clippySpeak(`Loading data for ${date}...`);
         });
     }
 
     if (historyTodayBtn) {
         historyTodayBtn.addEventListener('click', () => {
             isViewingHistory = false;
-            historyTodayBtn.style.display = 'none';
-            historyLoadBtn.style.display = 'inline-block';
-            historyDateInput.value = '';
-            allCounterButtons.forEach(btn => btn.disabled = false); // Re-enable counter buttons
+            historyDateInput.value = ''; // Clear date input
+            updateCounterUI(); // Update UI immediately
             counter_listenForChanges(null); // Load today's data
+            clippySpeak("Back to today's view!");
         });
     }
 
-    // Start Firebase Listeners
-    if (typeof firebase !== 'undefined') {
-        listenForTasks();           // Start listening for FIREBASE task changes
-        counter_listenForChanges(null); // Start listening for FIREBASE counter changes (for today)
+    // Start Firebase Listeners (only if db initialized)
+    if (db) {
+        listenForTasks();
+        counter_listenForChanges(null); // Initial load for today
     } else {
-        alert("Error: Firebase is not loaded. Please check your internet connection and refresh the page.");
+        // If Firebase failed, maybe show an error message in the UI
+        if(statusSaveEl) statusSaveEl.textContent = 'DB Connection Error!';
     }
 });
 </script>
