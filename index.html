@@ -604,7 +604,6 @@
   <audio id="sound-tada" src="https://www.myinstants.com/media/sounds/tada.mp3" preload="auto"></audio>
   <audio id="sound-error" src="https://www.myinstants.com/media/sounds/windows-xp-error.mp3" preload="auto"></audio>
 
-
 <script>
 // =================================================================
 // 🔥 FIREBASE INITIALIZATION & CONFIG 🔥
@@ -622,12 +621,19 @@ const firebaseConfig = {
 
 let db; // Declare db globally
 try {
-    firebase.initializeApp(firebaseConfig);
+    // Check if Firebase is already initialized
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
     db = firebase.database(); // Initialize db after app init
 } catch (e) {
     console.error("Firebase initialization failed:", e);
-    alert("CRITICAL ERROR: Firebase libraries did not load. Please check your internet connection and refresh the page.");
-    // Optionally disable functionality if Firebase fails
+    // Display error to user in a less disruptive way
+    document.addEventListener('DOMContentLoaded', () => {
+        const statusSaveEl = document.getElementById('status-save');
+        if (statusSaveEl) statusSaveEl.textContent = 'DB Init Error!';
+        // Consider hiding the main app or showing a specific error message
+    });
 }
 
 // =================================================================
@@ -660,50 +666,61 @@ function counter_getTodayDateString() {
 }
 
 function counter_listenForChanges(dateString) {
-    if (!db) return; // Don't run if Firebase failed
+    if (!db) {
+        console.warn("DB not initialized, cannot listen for counter changes.");
+        return;
+    }
 
     const dateToLoad = dateString || counter_getTodayDateString();
     const newRefPath = 'dailyCounters/' + dateToLoad;
 
     // Turn off previous listener if it exists and path is different
-    if (todayCounterRef && todayCounterRef.path.toString() !== newRefPath) {
-        console.log("Switching listener off for:", todayCounterRef.path.toString());
-        todayCounterRef.off();
+    if (todayCounterRef && todayCounterRef.toString().includes(db.ref(newRefPath).toString())) {
+        console.log("Already listening to:", newRefPath);
+        return; // Already listening to this path
+    }
+    if (todayCounterRef) {
+        console.log("Turning off listener for:", todayCounterRef.toString());
+        todayCounterRef.off('value'); // Make sure to specify 'value'
+        todayCounterRef = null; // Reset ref
     }
 
-    // Only attach listener if path is new or listener doesn't exist
-    if (!todayCounterRef || todayCounterRef.path.toString() !== newRefPath) {
-        console.log("Attaching listener for:", newRefPath);
-        todayCounterRef = db.ref(newRefPath);
 
-        todayCounterRef.on('value', (snapshot) => {
-            const data = snapshot.val();
-            console.log("Counter data received for", dateToLoad, ":", data);
-            if (data) {
-                currentCounters = data;
-            } else {
-                currentCounters = { achievements: 0, neutral: 0, emergency: 0, emergencyLog: [] };
-                // Only write defaults if we are on today's date and not in history view
-                if (!isViewingHistory && dateToLoad === counter_getTodayDateString()) {
-                    console.log("Setting default counters for today.");
-                    todayCounterRef.set(currentCounters).catch(e => console.error("Initial counter set failed:", e));
-                }
+    console.log("Attaching listener for:", newRefPath);
+    todayCounterRef = db.ref(newRefPath);
+
+    todayCounterRef.on('value', (snapshot) => {
+        const data = snapshot.val();
+        console.log("Counter data received for", dateToLoad, ":", data);
+        if (data) {
+            currentCounters = data;
+        } else {
+            currentCounters = { achievements: 0, neutral: 0, emergency: 0, emergencyLog: [] };
+            if (!isViewingHistory && dateToLoad === counter_getTodayDateString()) {
+                console.log("Setting default counters for today.");
+                // Use setWithPriority or just set if no priority needed
+                todayCounterRef.set(currentCounters).catch(e => console.error("Initial counter set failed:", e));
             }
-            updateCounterUI(); // Separate function to update UI
-        }, (error) => {
-            console.error(`Firebase Counter Read Failed for ${dateToLoad}. Check Rules:`, error);
-            if (statusSaveEl) updateStatus('Counter Sync Error');
-        });
-    }
+        }
+        updateCounterUI();
+    }, (error) => {
+        console.error(`Firebase Counter Read Failed for ${dateToLoad}. Check Rules:`, error);
+        if (statusSaveEl) updateStatus('Counter Sync Error');
+    });
 }
 
-function updateCounterUI() {
-    // Update counter numbers
-    document.getElementById('achievements-count').innerText = currentCounters.achievements || 0;
-    document.getElementById('neutral-count').innerText = currentCounters.neutral || 0;
-    document.getElementById('emergency-count').innerText = currentCounters.emergency || 0;
 
-    // Update emergency log
+function updateCounterUI() {
+    // Update counter numbers safely
+    const achEl = document.getElementById('achievements-count');
+    const neuEl = document.getElementById('neutral-count');
+    const emgEl = document.getElementById('emergency-count');
+    if (achEl) achEl.innerText = currentCounters.achievements || 0;
+    if (neuEl) neuEl.innerText = currentCounters.neutral || 0;
+    if (emgEl) emgEl.innerText = currentCounters.emergency || 0;
+
+
+    // Update emergency log safely
     const logData = currentCounters.emergencyLog || [];
     if (logTextareaEl) {
         if (logData.length > 0) {
@@ -713,22 +730,27 @@ function updateCounterUI() {
         }
         logTextareaEl.scrollTop = logTextareaEl.scrollHeight;
     }
-    
+
     // Update button states based on history view
-    allCounterButtons.forEach(btn => btn.disabled = isViewingHistory);
+    if (allCounterButtons) {
+        allCounterButtons.forEach(btn => btn.disabled = isViewingHistory);
+    }
     if (historyTodayBtn) historyTodayBtn.style.display = isViewingHistory ? 'inline-block' : 'none';
     if (historyLoadBtn) historyLoadBtn.style.display = isViewingHistory ? 'none' : 'inline-block';
-    
+
     // Update legend for emergency log
     const logLegend = document.querySelector('.info-box fieldset legend');
     if (logLegend) {
-        logLegend.textContent = isViewingHistory ? `Emergency Log (${historyDateInput.value})` : "Today's Emergency Log";
+        logLegend.textContent = isViewingHistory && historyDateInput ? `Emergency Log (${historyDateInput.value})` : "Today's Emergency Log";
     }
 }
 
 
 function counter_increment(type) {
-    if (!db || !todayCounterRef) return; // Don't run if Firebase failed or ref not set
+    if (!db || !todayCounterRef) {
+        console.warn("Cannot increment counter, DB or ref not ready.");
+        return;
+    }
     if (isViewingHistory) {
         clippySpeak("Cannot add data in 'History View'. Go 'Back to Today'.");
         return;
@@ -738,32 +760,39 @@ function counter_increment(type) {
     let updates = {};
 
     if (type === 'emergency') {
-        let reasonInput = prompt("EMERGENCY:\n\n1. Social Media\n2. Phone/Calls\n3. Procrastination\n4. Other (Specify)", ""); // Added default value
-        if (reasonInput === null) return; // User cancelled
+        let reasonInput = prompt("EMERGENCY:\n\n1. Social Media\n2. Phone/Calls\n3. Procrastination\n4. Other (Specify)", "");
+        if (reasonInput === null) return;
 
         if (reasonInput === "1") finalReason = "Social Media";
         else if (reasonInput === "2") finalReason = "Phone/Calls";
         else if (reasonInput === "3") finalReason = "Procrastination";
         else if (reasonInput === "4") finalReason = prompt("Specify 'Other' reason:", "") || "Other (Unspecified)";
         else if (reasonInput.trim() !== "") finalReason = reasonInput.trim();
-        else { // Empty input treated as unspecified
+        else {
             finalReason = "Other (Unspecified)";
         }
 
         const currentLog = currentCounters.emergencyLog || [];
         currentLog.push(finalReason);
         updates.emergencyLog = currentLog;
-        if (soundError) soundError.play();
+        if (soundError) soundError.play().catch(e => console.warn("Audio play failed:", e));
     }
 
-    const newCount = (currentCounters[type] || 0) + 1;
-    updates[type] = newCount;
-
-    todayCounterRef.update(updates).catch(e => {
-        console.error("Counter update failed:", e);
-        updateStatus('Counter Save Error');
+    // Use transaction for reliable increments, especially if multiple users might access (unlikely here, but good practice)
+    todayCounterRef.child(type).transaction((currentCount) => {
+        return (currentCount || 0) + 1;
     });
 
+    // Update emergency log separately if needed
+    if (updates.emergencyLog) {
+         todayCounterRef.update({ emergencyLog: updates.emergencyLog }).catch(e => {
+            console.error("Emergency log update failed:", e);
+            updateStatus('Log Save Error');
+        });
+    }
+
+    // Check achievement goal based on the *expected* new count
+    const newCount = (currentCounters[type] || 0) + 1;
     if (type === 'achievements' && newCount === 10) {
         clippySpeak("Congratulations! 10 Achievements! You deserve a prize!");
     }
@@ -774,19 +803,22 @@ function counter_increment(type) {
 // 🔥 TASK APP LOGIC (Firebase) 🔥
 // =================================================================
 
-const tasksRef = db ? db.ref('tasks') : null; // Check if db exists
+const tasksRef = db ? db.ref('tasks') : null;
 
 function todayDate() { return new Date().toISOString().substring(0, 10); }
 
 function updateStatus(message) {
     if (statusSaveEl) {
         statusSaveEl.textContent = message;
-        setTimeout(() => { statusSaveEl.textContent = 'Ready'; }, 2000);
+        setTimeout(() => { if (statusSaveEl) statusSaveEl.textContent = 'Ready'; }, 2000);
     }
 }
 
 function listenForTasks() {
-    if (!tasksRef) return; // Don't run if Firebase failed
+    if (!tasksRef) {
+         console.warn("DB not initialized, cannot listen for task changes.");
+         return;
+    }
     tasksRef.on('value', (snapshot) => {
         const rawData = snapshot.val();
         tasks = [];
@@ -820,19 +852,17 @@ function updateTaskStatus(id, isDone) {
         console.error("Firebase Update Failed. Check Rules.", error);
         updateStatus('Update Error');
     });
-    if (isDone && soundTada) soundTada.play();
+    if (isDone && soundTada) soundTada.play().catch(e => console.warn("Audio play failed:", e));
 }
 
 function incrementDreadCount(id) {
     if (!tasksRef) return;
-    const task = tasks.find(t => t.id === id);
-    if (!task) return;
-    const newCount = (task.dreadCount || 0) + 1;
-    tasksRef.child(id).update({ dreadCount: newCount }).catch((error) => {
-        console.error("Firebase Dread Update Failed. Check Rules.", error);
-        updateStatus('Dread Update Error');
+    // Use transaction for dread count
+    tasksRef.child(id).child('dreadCount').transaction((currentCount) => {
+        return (currentCount || 0) + 1;
     });
 }
+
 
 function deleteTask(id) {
     if (!tasksRef) return;
@@ -851,20 +881,15 @@ function deleteAllTasks() {
 }
 
 function getSortedTasks() {
-    // Create a copy before sorting to avoid modifying the original array if needed elsewhere
-    return [...tasks].sort((a, b) => {
-        // Simple date comparison might be enough
-        if (a.createdDate < b.createdDate) return 1;
-        if (a.createdDate > b.createdDate) return -1;
-        return 0;
-    });
+    return [...tasks].sort((a, b) => (b.createdDate || "").localeCompare(a.createdDate || ""));
 }
+
 
 function renderList(){
     const sortedTasks = getSortedTasks();
     if (!listEl) return;
     listEl.innerHTML = '';
-    
+
     if (sortedTasks.length === 0) {
         if (emptyMessageEl) emptyMessageEl.style.display = 'block';
     } else {
@@ -881,7 +906,7 @@ function renderList(){
       span.className='txt'; span.textContent=t.text;
       const dreadBtn = document.createElement('button');
       dreadBtn.className = 'dread-btn';
-      dreadBtn.title = `Mark as dreaded (${t.dreadCount || 0})`; // Show count on hover
+      dreadBtn.title = `Mark as dreaded (${t.dreadCount || 0})`;
       dreadBtn.innerHTML = '😰';
       dreadBtn.addEventListener('click', () => { incrementDreadCount(t.id); });
       const del = document.createElement('button');
@@ -904,14 +929,20 @@ function updateDreadAnalysis() {
          dreadTaskNameEl.textContent = '(None)';
          return;
     }
-    const mostDreaded = pendingTasks.sort((a, b) => (b.dreadCount || 0) - (a.dreadCount || 0))[0];
-    
+    // Sort by dreadCount descending, then by creation date descending as tie-breaker
+    const mostDreaded = pendingTasks.sort((a, b) => {
+        const dreadDiff = (b.dreadCount || 0) - (a.dreadCount || 0);
+        if (dreadDiff !== 0) return dreadDiff;
+        return (b.createdDate || "").localeCompare(a.createdDate || "");
+    })[0];
+
     if (mostDreaded && mostDreaded.dreadCount > 0) {
         dreadTaskNameEl.textContent = `${mostDreaded.text} (${mostDreaded.dreadCount})`;
     } else {
         dreadTaskNameEl.textContent = '(None)';
     }
 }
+
 
 function handleAddTask(){
     const text = (newTaskEl.value||'').trim();
@@ -927,28 +958,31 @@ function handleResetAll(){
     if(!confirm('ARE YOU SURE?\n\nThis will delete ALL tasks (permanently!)\nAND reset today\'s counters and log.')) return;
     deleteAllTasks();
     if (todayCounterRef && !isViewingHistory) {
-        todayCounterRef.remove().catch(e => console.error("Counter reset failed:", e));
+         // Use set instead of remove for consistency with handleResetTodayCounters
+         const defaultCounters = { achievements: 0, neutral: 0, emergency: 0, emergencyLog: [] };
+         todayCounterRef.set(defaultCounters).catch(e => console.error("Counter reset failed:", e));
+         clippySpeak("All tasks and today's counters have been reset.");
     } else if (isViewingHistory) {
          clippySpeak("Tasks cleared, but historical counters remain untouched.");
     }
 }
 
-// NEW: Reset Today Function
 function handleResetTodayCounters() {
     if (isViewingHistory) {
         clippySpeak("Cannot reset historical data. Go 'Back to Today' first.");
         return;
     }
     if (!confirm('Reset Today\'s Counters?\n\nThis will reset Achievements, Neutral, Emergency counts and the Emergency Log for today ONLY.\nTasks will NOT be affected.')) return;
-    
+
     if (todayCounterRef) {
-         // Instead of remove, set back to defaults to keep the node
          const defaultCounters = { achievements: 0, neutral: 0, emergency: 0, emergencyLog: [] };
-         todayCounterRef.set(defaultCounters).catch(e => {
+         todayCounterRef.set(defaultCounters).then(() => {
+             clippySpeak("Today's counters have been reset.");
+             updateStatus("Counters Reset");
+         }).catch(e => {
             console.error("Counter reset failed:", e);
             updateStatus('Reset Error');
          });
-         clippySpeak("Today's counters have been reset.");
     }
 }
 
@@ -990,12 +1024,10 @@ function analyzeDay() {
     let level = "";
     let advice = "";
 
-    // Task analysis only relevant if not viewing history
     const { total, done, pct } = getProgress();
     if (!isViewingHistory) {
          taskAnalysis = `You also completed ${done} out of ${total} tasks today (${pct}%).`;
     }
-
 
     if (ach >= 10 && emg < 3) {
         level = "Excellent Focus";
@@ -1024,15 +1056,19 @@ function analyzeDay() {
     return { level, advice, quote, ach, emg, totalTasks: total, doneTasks: done, pctTasks: pct, log, allTasks };
 }
 
-function clippySpeak(message) {
-    if (clippyAgent) {
-        clippyAgent.speak(message);
+function clippySpeak(message, hold = false) {
+    // Only speak if agent is loaded and not currently speaking
+    if (clippyAgent && !clippyAgent.busy()) {
+        clippyAgent.speak(message, hold);
+    } else if (clippyAgent && clippyAgent.busy()){
+        console.log("Clippy busy, queuing message:", message);
+        // Basic queueing: try again shortly
+        setTimeout(() => clippySpeak(message, hold), 500);
     } else {
-        // Fallback if clippy isn't loaded yet or failed
-        console.log("Clippy fallback:", message);
-        // alert(message); // Use alert as a simple fallback if needed
+        console.log("Clippy fallback (agent not ready):", message);
     }
 }
+
 
 function showClippyAnalysis() {
     if (!clippyAgent) {
@@ -1043,29 +1079,29 @@ function showClippyAnalysis() {
     const analysis = analyzeDay();
     clippyAgent.stop(); // Stop previous actions
     clippyAgent.show();
-    clippyAgent.speak(`Hi Mohammed! Here's your analysis for ${isViewingHistory ? `date ${historyDateInput.value}` : 'today'}:`);
-    clippyAgent.speak(`Level: ${analysis.level}.`);
-    clippyAgent.speak(analysis.advice);
-    clippyAgent.speak(`Quote for you: ${analysis.quote}`);
-    clippyAgent.animate(); // Play a random animation
+    clippySpeak(`Hi Mohammed! Analysis for ${isViewingHistory && historyDateInput ? `date ${historyDateInput.value}` : 'today'}:`);
+    clippySpeak(`Level: ${analysis.level}.`, true); // Hold while speaking
+    clippySpeak(analysis.advice, true);
+    clippySpeak(`Quote for you: ${analysis.quote}`);
+    clippyAgent.animate();
 }
 
 
 function generateDailyReport() {
     try {
-        // Check if jsPDF and autotable are loaded
-        if (typeof jsPDF === 'undefined' || typeof jsPDF.autoTable === 'undefined') {
+        if (typeof jspdf === 'undefined' || typeof jspdf.jsPDF === 'undefined' || typeof jspdf.plugin === 'undefined' || typeof jspdf.plugin.autotable === 'undefined') {
              clippySpeak("PDF libraries are missing. Cannot generate report. Check internet?");
              console.error("jsPDF or jsPDF-AutoTable not loaded!");
+             alert("Error: PDF Generation Failed (Libraries Missing). Check console and internet connection.");
              return;
         }
 
-        const { jsPDF } = window.jspdf;
+        const { jsPDF } = jspdf; // Correct way to access jsPDF constructor
         const doc = new jsPDF();
-        const dateStr = isViewingHistory ? historyDateInput.value : counter_getTodayDateString();
+        const dateStr = isViewingHistory && historyDateInput ? historyDateInput.value : counter_getTodayDateString();
         const analysis = analyzeDay();
 
-        // Use standard Helvetica font - Arabic support removed due to complexity
+        // Use standard Helvetica font
         doc.setFont('Helvetica', 'normal');
 
         doc.setFont('Helvetica', 'bold');
@@ -1087,9 +1123,12 @@ function generateDailyReport() {
         doc.text(`Level: ${analysis.level}`, 14, 53);
 
         doc.setFont('Helvetica', 'italic');
-        const adviceLines = doc.splitTextToSize(analysis.advice, 182); // Max width 196 - 14 margin
+        const adviceLines = doc.splitTextToSize(analysis.advice, 182);
         doc.text(adviceLines, 14, 61);
         let y = 61 + (adviceLines.length * 7) + 5;
+
+        // Ensure Y doesn't go off page before Summary
+        if (y > 270) { doc.addPage(); y = 20; }
 
         doc.setFont('Helvetica', 'bold');
         doc.setFontSize(14);
@@ -1104,6 +1143,9 @@ function generateDailyReport() {
         doc.text(`- Tasks Completed: ${analysis.doneTasks} / ${analysis.totalTasks} (${analysis.pctTasks}%)`, 20, y);
         y += 10;
 
+        // Ensure Y doesn't go off page before Log
+        if (y > 270) { doc.addPage(); y = 20; }
+
         doc.setFont('Helvetica', 'bold');
         doc.setFontSize(14);
         doc.text("Emergency Log:", 14, y);
@@ -1113,11 +1155,13 @@ function generateDailyReport() {
         doc.setFontSize(10);
         if (analysis.log.length > 0) {
             const logLines = analysis.log.map((entry, index) => `${index + 1}. ${entry}`);
-            // Use splitTextToSize for basic wrapping if autotable isn't needed here
              const splitLog = doc.splitTextToSize(logLines.join('\n'), 182);
+             // Check if splitLog will fit on current page
+             if (y + (splitLog.length * 5) > 280) { doc.addPage(); y = 20;}
              doc.text(splitLog, 14, y);
-             y += (splitLog.length * 5) + 5; // Adjust Y based on lines
+             y += (splitLog.length * 5) + 5;
         } else {
+            if (y > 270) { doc.addPage(); y = 20; }
             doc.text("(No emergencies logged.)", 14, y);
             y += 10;
         }
@@ -1130,41 +1174,28 @@ function generateDailyReport() {
             const tableOptions = {
                  startY: y,
                  theme: 'grid',
-                 headStyles: { font: 'Helvetica', fontStyle: 'bold', fillColor: [220, 220, 220], textColor: [0, 0, 0] },
-                 bodyStyles: { font: 'Helvetica', fontStyle: 'normal', cellPadding: 2 },
-                 columnStyles: { 0: { cellWidth: 'auto' } }, // Adjust column width automatically
-                 didDrawPage: function(data) {
-                    // Update y for next table or element if page breaks occur
-                    y = data.cursor.y;
-                 }
+                 headStyles: { font: 'Helvetica', fontStyle: 'bold', fillColor: [220, 220, 220], textColor: [0, 0, 0], fontSize: 10 },
+                 bodyStyles: { font: 'Helvetica', fontStyle: 'normal', fontSize: 9 },
+                 columnStyles: { 0: { cellWidth: 'auto' } },
+                 margin: { left: 14, right: 14 }, // Add margins
+                 didDrawPage: function(data) { y = data.cursor.y; } // Update y after page break
             };
 
             if (completedTasks.length > 0) {
-                doc.autoTable({
-                    ...tableOptions,
-                    head: [['Completed Tasks']],
-                    body: completedTasks,
-                });
-                y = doc.autoTable.previous.finalY + 10; // Get Y position after table
+                 if (y > 260) { doc.addPage(); y = 20; tableOptions.startY = y; } // Check page break before table
+                 doc.autoTable({ ...tableOptions, head: [['Completed Tasks']], body: completedTasks });
+                 y = doc.autoTable.previous.finalY + 10;
             }
 
             if (pendingTasks.length > 0) {
-                 // Adjust startY for the second table
-                 tableOptions.startY = y;
-                doc.autoTable({
-                    ...tableOptions,
-                    head: [['Pending Tasks']],
-                    body: pendingTasks,
-                });
-                y = doc.autoTable.previous.finalY + 10;
+                 if (y > 260) { doc.addPage(); y = 20; tableOptions.startY = y; } // Check page break before table
+                 tableOptions.startY = y; // Update startY for the second table
+                 doc.autoTable({ ...tableOptions, head: [['Pending Tasks']], body: pendingTasks });
+                 y = doc.autoTable.previous.finalY + 10;
             }
         }
 
-        // Check if Y is near page bottom before adding quote
-        if (y > 260) {
-           doc.addPage();
-           y = 20; // Reset Y for new page
-        }
+        if (y > 270) { doc.addPage(); y = 20; } // Check page break before quote
 
         doc.setFont('Helvetica', 'italic');
         doc.setFontSize(12);
@@ -1177,6 +1208,7 @@ function generateDailyReport() {
     } catch (e) {
         console.error("PDF Generation Failed:", e);
         clippySpeak("Oops! Something went wrong generating the PDF report. Check the console?");
+        alert("PDF Generation Failed. See console for details.");
     }
 }
 
@@ -1186,11 +1218,11 @@ function generateDailyReport() {
 // =================================================================
 document.addEventListener('DOMContentLoaded', () => {
 
-    // Assign DOM Elements
+    // Assign DOM Elements Safely
     listEl = document.getElementById('list');
     newTaskEl = document.getElementById('newTask');
     addBtn = document.getElementById('addBtn');
-    resetAllBtn = document.getElementById('resetAllBtn'); // Corrected ID
+    resetAllBtn = document.getElementById('resetAllBtn');
     emptyMessageEl = document.getElementById('emptyMessage');
     statusTotalEl = document.getElementById('status-total');
     statusSaveEl = document.getElementById('status-save');
@@ -1204,21 +1236,31 @@ document.addEventListener('DOMContentLoaded', () => {
     const logonBtnEl = document.getElementById('logon-ok');
     reportBtnEl = document.getElementById('report-panel-btn');
     clippyBtnEl = document.getElementById('clippy-panel-btn');
-    resetTodayBtnEl = document.getElementById('reset-today-panel-btn'); // Corrected ID
+    resetTodayBtnEl = document.getElementById('reset-today-panel-btn');
 
     historyDateInput = document.getElementById('history-date-input');
     historyLoadBtn = document.getElementById('history-load-btn');
     historyTodayBtn = document.getElementById('history-today-btn');
 
     // Load Clippy Agent
-    clippy.load('Clippy', (agent) => {
-        clippyAgent = agent;
-        console.log("Clippy loaded successfully!");
-    }, (error) => {
-         console.error("Clippy failed to load:", error);
-         // Optionally disable clippy button if load fails
-         if (clippyBtnEl) clippyBtnEl.disabled = true;
-    });
+    if (typeof clippy !== 'undefined') {
+        clippy.load('Clippy', (agent) => {
+            clippyAgent = agent;
+            console.log("Clippy loaded successfully!");
+            // Attach listener only after agent is loaded
+            if (clippyBtnEl) {
+                clippyBtnEl.addEventListener('click', showClippyAnalysis);
+            } else {
+                 console.warn("Clippy button not found.");
+            }
+        }, (error) => {
+             console.error("Clippy failed to load:", error);
+             if (clippyBtnEl) clippyBtnEl.disabled = true; // Disable if load fails
+        });
+    } else {
+        console.error("Clippy library not found!");
+        if (clippyBtnEl) clippyBtnEl.disabled = true; // Disable if library missing
+    }
 
 
     // Logon Screen Logic
@@ -1226,27 +1268,22 @@ document.addEventListener('DOMContentLoaded', () => {
         logonBtnEl.addEventListener('click', () => {
             if (logonScreenEl) logonScreenEl.style.display = 'none';
         });
-    }
+    } else { console.warn("Logon button not found."); }
 
     // Report Button Logic
     if (reportBtnEl) {
         reportBtnEl.addEventListener('click', generateDailyReport);
-    }
-
-    // Clippy Button Logic
-    if (clippyBtnEl) {
-        clippyBtnEl.addEventListener('click', showClippyAnalysis);
-    }
+    } else { console.warn("Report button not found."); }
 
     // Reset Today Button Logic
     if (resetTodayBtnEl) {
         resetTodayBtnEl.addEventListener('click', handleResetTodayCounters);
-    }
+    } else { console.warn("Reset Today button not found."); }
 
     // Task App Listeners
-    if (addBtn) addBtn.addEventListener('click', handleAddTask);
-    if (newTaskEl) newTaskEl.addEventListener('keydown', e => { if(e.key==='Enter') handleAddTask(); });
-    if (resetAllBtn) resetAllBtn.addEventListener('click', handleResetAll); // Corrected Variable
+    if (addBtn) addBtn.addEventListener('click', handleAddTask); else { console.warn("Add Task button not found."); }
+    if (newTaskEl) newTaskEl.addEventListener('keydown', e => { if(e.key==='Enter') handleAddTask(); }); else { console.warn("New task input not found."); }
+    if (resetAllBtn) resetAllBtn.addEventListener('click', handleResetAll); else { console.warn("Reset All button not found."); }
 
     // History View Listeners
     if (historyLoadBtn) {
@@ -1257,29 +1294,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
             isViewingHistory = true;
-            updateCounterUI(); // Update UI immediately to show button changes
+            updateCounterUI();
             counter_listenForChanges(date);
             clippySpeak(`Loading data for ${date}...`);
         });
-    }
+    } else { console.warn("History Load button not found."); }
 
     if (historyTodayBtn) {
         historyTodayBtn.addEventListener('click', () => {
             isViewingHistory = false;
             historyDateInput.value = ''; // Clear date input
-            updateCounterUI(); // Update UI immediately
+            updateCounterUI();
             counter_listenForChanges(null); // Load today's data
             clippySpeak("Back to today's view!");
         });
-    }
+    } else { console.warn("History Today button not found."); }
 
     // Start Firebase Listeners (only if db initialized)
     if (db) {
         listenForTasks();
         counter_listenForChanges(null); // Initial load for today
     } else {
-        // If Firebase failed, maybe show an error message in the UI
+        // Firebase failed, update status bar
         if(statusSaveEl) statusSaveEl.textContent = 'DB Connection Error!';
+        console.error("Firebase DB object not initialized. Cannot start listeners.");
     }
 });
 </script>
