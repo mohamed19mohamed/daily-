@@ -16,7 +16,7 @@
 
 
 <style>
-  /* Styles remain largely the same, minor adjustments if needed */
+  /* Styles remain the same as the previous version... */
   :root{--bg:#c0c0c0;--fg:#000000;--accent:#000080;--accent-fg:#ffffff;--line-dark:#808080;--line-medium:#a0a0a0;--line-light:#ffffff;--input-fill:#ffffff;--font:'Tahoma', 'Arial', sans-serif;--progress-color:#008040;--subtle: #d0d0d0;--taskbar-green: #008080;}
   *{box-sizing:border-box;font-family: var(--font);font-size: 10pt;transition: none !important;}
   html,body{margin:0; background:var(--taskbar-green);}
@@ -185,7 +185,7 @@
             </div>
         </fieldset>
 
-        <div id="progress-bar-container" class="linear-progress-box">
+         <div id="progress-bar-container" class="linear-progress-box">
           <div class="head">
             <div><span class="big" id="pct1">0%</span> <span class="muted">Overall Progress</span></div>
             <div class="muted"><span id="done1">0</span>/<span id="total1">0</span> Tasks</div>
@@ -212,7 +212,7 @@
             </div>
         </fieldset>
 
-        <fieldset id="task-list-fieldset">
+         <fieldset id="task-list-fieldset">
              <legend id="task-list-legend">Current Tasks</legend>
              <div class="task-list-box">
                  <ul id="list"></ul>
@@ -265,6 +265,7 @@ const firebaseConfig = {
 };
 
 let db = null;
+let firebaseInitialized = false; // Flag to track initialization
 try {
     if (!firebase.apps.length) {
         firebase.initializeApp(firebaseConfig);
@@ -274,13 +275,11 @@ try {
         console.log("Firebase already initialized.");
     }
     db = firebase.database();
+    firebaseInitialized = true; // Set flag on success
 } catch (e) {
     console.error("Firebase initialization failed:", e);
-    document.addEventListener('DOMContentLoaded', () => {
-        const statusSaveEl = document.getElementById('status-save');
-        if (statusSaveEl) statusSaveEl.textContent = 'DB Init Error!';
-        alert("CRITICAL ERROR: Could not connect to the database. Please check your internet connection and Firebase configuration.");
-    });
+    firebaseInitialized = false; // Ensure flag is false on error
+    // Error handling moved to DOMContentLoaded
 }
 
 // =================================================================
@@ -298,16 +297,16 @@ let historyDateInput, historyLoadBtn, historyTodayBtn;
 let dreadTaskNameEl;
 let allCounterButtons;
 let reportBtnEl, clippyBtnEl, resetTodayBtnEl;
-let logTextareaEl, emergencyLogLegendEl; // Added legend element
+let logTextareaEl, emergencyLogLegendEl;
 let soundTada, soundError;
 let logonScreenEl, logonBtnEl;
-let addTaskFieldset, progressBarContainer, dreadAnalysisFieldset, taskListLegendEl; // Elements to show/hide
+let addTaskFieldset, progressBarContainer, dreadAnalysisFieldset, taskListLegendEl;
+
 
 // =================================================================
-// 🔥 COUNTER LOGIC (Firebase) 🔥
+// 🔥 HELPER FUNCTIONS (UTILS) 🔥
 // =================================================================
-// ... (counter_getTodayDateString remains the same)
-function counter_getTodayDateString() {
+function getTodayDateString() {
     const today = new Date();
     const year = today.getFullYear();
     const month = String(today.getMonth() + 1).padStart(2, '0');
@@ -315,56 +314,82 @@ function counter_getTodayDateString() {
     return `${year}-${month}-${day}`;
 }
 
-
-function counter_listenForChanges(dateString) {
-    if (!db) {
-        console.warn("DB not initialized, cannot listen for counter changes.");
-        return;
+function updateStatus(message) {
+    if (statusSaveEl) {
+        statusSaveEl.textContent = message;
+        const isError = /error|fail|missing/i.test(message);
+        if (!isError) {
+             setTimeout(() => { if (statusSaveEl && statusSaveEl.textContent === message) statusSaveEl.textContent = 'Ready'; }, 2500);
+        }
     }
+}
 
-    const dateToLoad = dateString || counter_getTodayDateString();
+function clippySpeak(message, hold = false) {
+    if (clippyAgent) {
+        clippyAgent.speak(message, hold);
+    } else {
+        console.log("Clippy fallback (agent not ready):", message);
+         // Optionally use alert as fallback ONLY if Clippy fails completely
+         // alert(message);
+    }
+}
+
+// Check if PDF libraries are truly ready
+function checkPdfLibraries() {
+    const ready = typeof window.jspdf !== 'undefined' &&
+                  typeof window.jspdf.jsPDF === 'function' &&
+                  typeof window.jspdf.plugin !== 'undefined' &&
+                  typeof window.jspdf.plugin.autotable === 'function';
+    if (!ready) {
+        console.error("jsPDF or jsPDF-AutoTable not fully loaded!");
+        clippySpeak("PDF libraries are missing or still loading. Cannot generate report. Check internet connection and maybe wait a bit?");
+        updateStatus("PDF Lib Error");
+        alert("Error: PDF Generation Failed (Libraries Not Ready).\n\nPlease ensure you are connected to the internet and try refreshing the page (Ctrl+Shift+R). Wait a few seconds after the page loads before trying again.");
+    }
+    return ready;
+}
+
+
+// =================================================================
+// 🔥 COUNTER LOGIC (Firebase) 🔥
+// =================================================================
+// ... (counter_listenForChanges, updateCounterUI, counter_increment - largely unchanged) ...
+function counter_listenForChanges(dateString) {
+    if (!db) { console.warn("DB not ready for counter listen."); return; }
+    const dateToLoad = dateString || getTodayDateString(); // Use helper
     const newRefPath = 'dailyCounters/' + dateToLoad;
-    const newRef = db.ref(newRefPath); // Create ref object once
+    const newRef = db.ref(newRefPath);
 
-    // Turn off previous listener if it exists and path is different
     if (todayCounterRef && todayCounterRef.toString() !== newRef.toString()) {
         console.log("Turning off listener for:", todayCounterRef.toString());
         todayCounterRef.off('value');
         todayCounterRef = null;
     }
 
-    // Only attach listener if ref is null (meaning it was off or never started)
     if (!todayCounterRef) {
         console.log("Attaching listener for:", newRefPath);
-        todayCounterRef = newRef; // Assign the new ref
-
+        todayCounterRef = newRef;
         todayCounterRef.on('value', (snapshot) => {
             const data = snapshot.val();
             console.log("Counter data received for", dateToLoad, ":", data);
-            if (data) {
-                currentCounters = { ...data, emergencyLog: data.emergencyLog || [] };
-            } else {
-                currentCounters = { achievements: 0, neutral: 0, emergency: 0, emergencyLog: [] };
-                if (!isViewingHistory && dateToLoad === counter_getTodayDateString()) {
-                    console.log("Setting default counters for today.");
-                    todayCounterRef.set(currentCounters).catch(e => console.error("Initial counter set failed:", e));
-                }
+            currentCounters = data ? { ...data, emergencyLog: data.emergencyLog || [] }
+                                   : { achievements: 0, neutral: 0, emergency: 0, emergencyLog: [] };
+            if (!data && !isViewingHistory && dateToLoad === getTodayDateString()) {
+                console.log("Setting default counters for today.");
+                todayCounterRef.set(currentCounters).catch(e => console.error("Initial counter set failed:", e));
             }
-            updateCounterUI(); // Update UI after data is processed
+            updateCounterUI();
         }, (error) => {
             console.error(`Firebase Counter Read Failed for ${dateToLoad}. Check Rules:`, error);
-            if (statusSaveEl) updateStatus('Counter Sync Error');
-            // Reset to default on error? Or show error state?
+            updateStatus('Counter Sync Error');
             currentCounters = { achievements: 0, neutral: 0, emergency: 0, emergencyLog: [] };
             updateCounterUI();
         });
     } else {
-         console.log("Already listening to:", newRefPath);
-         // Force UI update even if listener exists, in case initial load failed or state is inconsistent
+         console.log("Already listening to counters:", newRefPath);
          updateCounterUI();
     }
 }
-
 
 function updateCounterUI() {
     const achEl = document.getElementById('achievements-count');
@@ -376,17 +401,12 @@ function updateCounterUI() {
 
     const logData = currentCounters.emergencyLog || [];
     if (logTextareaEl) {
-        if (logData.length > 0) {
-            logTextareaEl.value = logData.join('\n');
-        } else {
-             logTextareaEl.value = isViewingHistory ? '(No data for this day)' : '(No emergencies logged today)';
-        }
+        logTextareaEl.value = logData.length > 0 ? logData.join('\n')
+                           : (isViewingHistory ? '(No data for this day)' : '(No emergencies logged today)');
         logTextareaEl.scrollTop = logTextareaEl.scrollHeight;
     }
 
-    if (allCounterButtons) {
-        allCounterButtons.forEach(btn => btn.disabled = isViewingHistory);
-    }
+    if (allCounterButtons) allCounterButtons.forEach(btn => btn.disabled = isViewingHistory);
     if (historyTodayBtn) historyTodayBtn.style.display = isViewingHistory ? 'inline-block' : 'none';
     if (historyLoadBtn) historyLoadBtn.style.display = isViewingHistory ? 'none' : 'inline-block';
 
@@ -394,77 +414,47 @@ function updateCounterUI() {
         emergencyLogLegendEl.textContent = isViewingHistory && historyDateInput ? `Emergency Log (${historyDateInput.value})` : "Today's Emergency Log";
     }
 
-    // Show/Hide elements based on history view
     const showTodayElements = !isViewingHistory;
     if (addTaskFieldset) addTaskFieldset.style.display = showTodayElements ? '' : 'none';
     if (progressBarContainer) progressBarContainer.style.display = showTodayElements ? '' : 'none';
     if (dreadAnalysisFieldset) dreadAnalysisFieldset.style.display = showTodayElements ? '' : 'none';
     if (taskListLegendEl) taskListLegendEl.textContent = showTodayElements ? "Current Tasks" : (historyDateInput ? `Tasks Created On (${historyDateInput.value})` : "Tasks");
-
 }
 
-// ... (counter_increment remains the same)
 function counter_increment(type) {
-    if (!db || !todayCounterRef) {
-        console.warn("Cannot increment counter, DB or ref not ready.");
-        clippySpeak("Database connection error. Cannot save count.");
-        return;
-    }
-    if (isViewingHistory) {
-        clippySpeak("Cannot add data in 'History View'. Go 'Back to Today'.");
-        return;
-    }
+    if (!db || !todayCounterRef) { console.warn("Cannot increment: DB/Ref missing."); clippySpeak("DB connection error."); return; }
+    if (isViewingHistory) { clippySpeak("Cannot add data in 'History View'."); return; }
 
     let finalReason = "";
-    let updates = {}; // Object to hold updates
+    let updates = {};
 
     if (type === 'emergency') {
         let reasonInput = prompt("EMERGENCY:\n\n1. Social Media\n2. Phone/Calls\n3. Procrastination\n4. Other (Specify)", "");
-        if (reasonInput === null) return; // User cancelled
+        if (reasonInput === null) return;
+        finalReason = reasonInput === "1" ? "Social Media"
+                    : reasonInput === "2" ? "Phone/Calls"
+                    : reasonInput === "3" ? "Procrastination"
+                    : reasonInput === "4" ? (prompt("Specify 'Other' reason:", "") || "Other (Unspecified)")
+                    : reasonInput.trim() || "Other (Unspecified)";
 
-        if (reasonInput === "1") finalReason = "Social Media";
-        else if (reasonInput === "2") finalReason = "Phone/Calls";
-        else if (reasonInput === "3") finalReason = "Procrastination";
-        else if (reasonInput === "4") finalReason = prompt("Specify 'Other' reason:", "") || "Other (Unspecified)";
-        else if (reasonInput.trim() !== "") finalReason = reasonInput.trim();
-        else {
-            finalReason = "Other (Unspecified)";
-        }
-
-        // Get the current log safely, even if it's null/undefined initially
         const currentLog = Array.isArray(currentCounters.emergencyLog) ? [...currentCounters.emergencyLog] : [];
         currentLog.push(finalReason);
-        updates.emergencyLog = currentLog; // Prepare log update
+        updates.emergencyLog = currentLog;
         if (soundError) soundError.play().catch(e => console.warn("Audio play failed:", e));
     }
 
-    // Prepare count update using transaction for reliability
-    todayCounterRef.child(type).transaction((currentCount) => {
-        return (currentCount || 0) + 1;
-    }, (error, committed, snapshot) => {
-        if (error) {
-            console.error('Counter transaction failed abnormally!', error);
-            updateStatus('Counter Save Error');
-        } else if (!committed) {
-            console.warn('Counter transaction not committed (concurrent modification?).');
-             clippySpeak("Hmm, someone else might be updating at the same time. Try again?");
-        } else {
-            console.log('Counter transaction committed.');
-            // Check achievement goal AFTER successful commit
-            const newCount = snapshot.val(); // Get the actual new count
-            if (type === 'achievements' && newCount === 10) {
-                 clippySpeak("Congratulations! 10 Achievements! You deserve a prize!");
-            }
+    todayCounterRef.child(type).transaction((currentCount) => (currentCount || 0) + 1,
+        (error, committed, snapshot) => {
+            if (error) { console.error('Counter transaction failed!', error); updateStatus('Counter Save Error'); }
+            else if (committed) {
+                console.log('Counter transaction committed.');
+                if (type === 'achievements' && snapshot.val() === 10) { clippySpeak("Congratulations! 10 Achievements!"); }
+            } else { console.warn('Counter transaction not committed.'); }
         }
-    });
+    );
 
-
-    // Update emergency log separately IF it was modified
     if (updates.emergencyLog) {
-         todayCounterRef.update({ emergencyLog: updates.emergencyLog }).catch(e => {
-            console.error("Emergency log update failed:", e);
-            updateStatus('Log Save Error');
-        });
+         todayCounterRef.update({ emergencyLog: updates.emergencyLog }).catch(e => { console.error("Log update failed:", e); updateStatus('Log Save Error'); });
     }
 }
 
@@ -475,39 +465,28 @@ function counter_increment(type) {
 
 const tasksRef = db ? db.ref('tasks') : null;
 
-// ... (todayDate remains the same)
-function todayDate() { return new Date().toISOString().substring(0, 10); }
-
-function updateStatus(message) {
-    if (statusSaveEl) {
-        statusSaveEl.textContent = message;
-        const isError = /error|fail/i.test(message); // Broader error check
-        if (!isError) {
-             setTimeout(() => { if (statusSaveEl && statusSaveEl.textContent === message) statusSaveEl.textContent = 'Ready'; }, 2000);
-        }
-    }
-}
-
-
+// ... (listenForTasks, addTaskToDB, updateTaskStatus, incrementDreadCount, deleteTask, deleteAllTasks - largely unchanged but added DB check) ...
 function listenForTasks() {
-    if (!tasksRef) {
-         console.warn("DB not initialized, cannot listen for task changes.");
-         return;
-    }
+    if (!tasksRef) { console.warn("DB not ready for task listen."); return; }
     tasksRef.on('value', (snapshot) => {
         const rawData = snapshot.val();
-        tasks = []; // Reset global tasks array
+        tasks = [];
         if (rawData) {
             for (let id in rawData) {
                 tasks.push({ ...rawData[id], id: id, dreadCount: rawData[id].dreadCount || 0 });
             }
         }
-        // IMPORTANT: Only render/update if NOT viewing history
+        // Conditional rendering based on history view
         if (!isViewingHistory) {
-            renderList(); // Render full list
-            updateLinearView();
-            updateDreadAnalysis();
+             renderList(); // Render all tasks
+        } else if (historyDateInput && historyDateInput.value) {
+            // If in history view, re-filter and render just in case task data changed
+             const filteredTasks = tasks.filter(task => task.createdDate === historyDateInput.value);
+             renderList(filteredTasks);
         }
+        // Always update progress/analysis based on full task list
+        updateLinearView();
+        updateDreadAnalysis();
         updateStatus('Synced');
     }, (error) => {
         console.error("Firebase Task Read Failed. Check Rules:", error);
@@ -516,57 +495,45 @@ function listenForTasks() {
 }
 
 function addTaskToDB(text) {
-    if (!tasksRef) return;
-    const newTask = { text: text, done: false, createdDate: todayDate(), dreadCount: 0 };
-    tasksRef.push(newTask).catch((error) => {
-        console.error("Firebase Write Failed. Check Rules.", error);
-        updateStatus('Write Error');
-    });
+    if (!tasksRef) { updateStatus("DB Error"); return; }
+    const newTask = { text: text, done: false, createdDate: getTodayDateString(), dreadCount: 0 }; // Use helper
+    tasksRef.push(newTask).catch((error) => { console.error("Firebase Write Failed:", error); updateStatus('Write Error'); });
 }
 
 function updateTaskStatus(id, isDone) {
-    if (!tasksRef) return;
-    tasksRef.child(id).update({ done: isDone }).catch((error) => {
-        console.error("Firebase Update Failed. Check Rules.", error);
-        updateStatus('Update Error');
-    });
+    if (!tasksRef) { updateStatus("DB Error"); return; }
+    tasksRef.child(id).update({ done: isDone }).catch((error) => { console.error("Firebase Update Failed:", error); updateStatus('Update Error'); });
     if (isDone && soundTada) soundTada.play().catch(e => console.warn("Audio play failed:", e));
 }
 
 function incrementDreadCount(id) {
-    if (!tasksRef) return;
-    tasksRef.child(id).child('dreadCount').transaction((currentCount) => {
-        return (currentCount || 0) + 1;
-    });
+    if (!tasksRef) { updateStatus("DB Error"); return; }
+    tasksRef.child(id).child('dreadCount').transaction((currentCount) => (currentCount || 0) + 1);
 }
 
-
 function deleteTask(id) {
-    if (!tasksRef) return;
-    tasksRef.child(id).remove().catch((error) => {
-        console.error("Firebase Delete Failed. Check Rules.", error);
-        updateStatus('Delete Error');
-    });
+    if (!tasksRef) { updateStatus("DB Error"); return; }
+    tasksRef.child(id).remove().catch((error) => { console.error("Firebase Delete Failed:", error); updateStatus('Delete Error'); });
 }
 
 function deleteAllTasks() {
-    if (!tasksRef) return;
-    tasksRef.remove().catch((error) => {
-        console.error("Firebase Clear Failed. Check Rules.", error);
-        updateStatus('Clear Error');
-    });
+    if (!tasksRef) { updateStatus("DB Error"); return; }
+    tasksRef.remove().catch((error) => { console.error("Firebase Clear Failed:", error); updateStatus('Clear Error'); });
 }
 
-// UPDATED: renderList now accepts optional tasks array
-// And handles disabling controls in history view
+// ... (getSortedTasks, renderList, updateDreadAnalysis, handleAddTask, handleResetAll, handleResetTodayCounters, getProgress, updateLinearView - largely unchanged, check renderList for history disabling logic) ...
+function getSortedTasks(tasksArray = tasks) { // Accept array to sort
+    return [...tasksArray].sort((a, b) => (b.createdDate || "").localeCompare(a.createdDate || ""));
+}
+
 function renderList(tasksToRender) {
     const displayTasks = tasksToRender || tasks; // Use filtered list if provided, else global
-    const sortedTasks = [...displayTasks].sort((a, b) => (b.createdDate || "").localeCompare(a.createdDate || ""));
+    const sortedTasks = getSortedTasks(displayTasks); // Sort the correct list
 
     if (!listEl) return;
     listEl.innerHTML = '';
 
-    const isInHistory = isViewingHistory; // Cache history status for this render
+    const isInHistory = isViewingHistory; // Cache history status
 
     if (sortedTasks.length === 0) {
         if (emptyMessageEl) {
@@ -584,7 +551,7 @@ function renderList(tasksToRender) {
         const cb = document.createElement('input');
         cb.type = 'checkbox';
         cb.checked = t.done;
-        cb.disabled = isInHistory; // Disable checkbox in history
+        cb.disabled = isInHistory; // Disable controls in history
         if (!isInHistory) {
             cb.addEventListener('change', () => { updateTaskStatus(t.id, cb.checked); });
         }
@@ -597,16 +564,15 @@ function renderList(tasksToRender) {
         dreadBtn.className = 'dread-btn';
         dreadBtn.title = `Mark as dreaded (${t.dreadCount || 0})`;
         dreadBtn.innerHTML = '😰';
-        dreadBtn.disabled = isInHistory; // Disable dread button in history
+        dreadBtn.disabled = isInHistory;
         if (!isInHistory) {
              dreadBtn.addEventListener('click', () => { incrementDreadCount(t.id); });
         }
 
-
         const del = document.createElement('button');
         del.className = 'del';
         del.innerHTML = '<i class="fas fa-trash"></i>';
-        del.disabled = isInHistory; // Disable delete button in history
+        del.disabled = isInHistory;
         if (!isInHistory) {
              del.addEventListener('click', () => { deleteTask(t.id); });
         }
@@ -618,301 +584,163 @@ function renderList(tasksToRender) {
         listEl.appendChild(li);
     });
 
-    // Update total count based on the *full* task list, not the filtered one
+    // Always update total based on *all* tasks
     if (statusTotalEl) statusTotalEl.textContent = `Total: ${tasks.length}`;
 }
 
-
 function updateDreadAnalysis() {
     if (!dreadTaskNameEl) return;
-    // Always analyze the *current* full list of pending tasks
     const pendingTasks = tasks.filter(t => !t.done);
-    if (pendingTasks.length === 0) {
-         dreadTaskNameEl.textContent = '(None)';
-         return;
-    }
+    if (pendingTasks.length === 0) { dreadTaskNameEl.textContent = '(None)'; return; }
     const mostDreaded = pendingTasks.sort((a, b) => {
         const dreadDiff = (b.dreadCount || 0) - (a.dreadCount || 0);
-        if (dreadDiff !== 0) return dreadDiff;
-        return (b.createdDate || "").localeCompare(a.createdDate || "");
+        return dreadDiff !== 0 ? dreadDiff : (b.createdDate || "").localeCompare(a.createdDate || "");
     })[0];
-
-    if (mostDreaded && mostDreaded.dreadCount > 0) {
-        dreadTaskNameEl.textContent = `${mostDreaded.text} (${mostDreaded.dreadCount})`;
-    } else {
-        dreadTaskNameEl.textContent = '(None)';
-    }
+    dreadTaskNameEl.textContent = (mostDreaded && mostDreaded.dreadCount > 0) ? `${mostDreaded.text} (${mostDreaded.dreadCount})` : '(None)';
 }
 
-
 function handleAddTask(){
-     if (isViewingHistory) return; // Should be disabled, but double-check
+     if (isViewingHistory) return;
     const text = (newTaskEl.value||'').trim();
-    if(!text) {
-        clippySpeak("Please enter a task description first!");
-        return;
-    }
+    if(!text) { clippySpeak("Please enter a task description!"); return; }
     addTaskToDB(text);
     newTaskEl.value='';
     newTaskEl.focus();
 }
 
 function handleResetAll(){
-    if(!confirm('ARE YOU SURE?\n\nThis will delete ALL tasks (permanently!)\nAND reset today\'s counters and log.')) return;
+    if(!confirm('ARE YOU SURE?\n\nDelete ALL tasks permanently?\nReset today\'s counters and log?')) return;
     deleteAllTasks();
     if (todayCounterRef && !isViewingHistory) {
          const defaultCounters = { achievements: 0, neutral: 0, emergency: 0, emergencyLog: [] };
-         todayCounterRef.set(defaultCounters).then(() => {
-             clippySpeak("All tasks and today's counters have been reset.");
-             updateStatus("All Reset");
-         }).catch(e => console.error("Counter reset failed:", e));
-    } else if (isViewingHistory) {
-         clippySpeak("Tasks cleared, but historical counters remain untouched.");
-         // Optionally, go back to today view after resetting tasks in history?
-         // handleBackToToday(); // Uncomment if desired
-    }
+         todayCounterRef.set(defaultCounters).then(() => { clippySpeak("All tasks & today's counters reset."); updateStatus("All Reset"); })
+                      .catch(e => console.error("Counter reset failed:", e));
+    } else if (isViewingHistory) { clippySpeak("Tasks cleared. Historical counters remain."); }
 }
 
 function handleResetTodayCounters() {
-    if (isViewingHistory) {
-        clippySpeak("Cannot reset historical data. Go 'Back to Today' first.");
-        return;
-    }
-    if (!confirm('Reset Today\'s Counters?\n\nThis will reset Achievements, Neutral, Emergency counts and the Emergency Log for today ONLY.\nTasks will NOT be affected.')) return;
-
+    if (isViewingHistory) { clippySpeak("Cannot reset historical data."); return; }
+    if (!confirm('Reset Today\'s Counters & Log?\n(Tasks NOT affected)')) return;
     if (todayCounterRef) {
          const defaultCounters = { achievements: 0, neutral: 0, emergency: 0, emergencyLog: [] };
-         todayCounterRef.set(defaultCounters).then(() => {
-             clippySpeak("Today's counters have been reset.");
-             updateStatus("Counters Reset");
-         }).catch(e => {
-            console.error("Counter reset failed:", e);
-            updateStatus('Reset Error');
-         });
+         todayCounterRef.set(defaultCounters).then(() => { clippySpeak("Today's counters reset."); updateStatus("Counters Reset"); })
+                      .catch(e => { console.error("Counter reset failed:", e); updateStatus('Reset Error'); });
     }
 }
 
-
 function getProgress(){
-    // Always calculate progress based on the *full* task list
-    const total = tasks.length;
-    const done  = tasks.filter(t=>t.done).length;
-    const pct   = total ? Math.round((done/total)*100) : 0;
+    const total = tasks.length; const done = tasks.filter(t=>t.done).length;
+    const pct = total ? Math.round((done/total)*100) : 0;
     return {total, done, pct};
 }
 
 function updateLinearView(){
     const {total,done,pct} = getProgress();
-    const bar = document.getElementById('bar1');
-    const pctEl = document.getElementById('pct1');
-    const doneEl= document.getElementById('done1');
-    const totalEl= document.getElementById('total1');
-
-    if(bar) bar.style.width = pct + '%';
-    if(pctEl) pctEl.textContent = pct + '%';
-    if(doneEl) doneEl.textContent = done;
-    if(totalEl) totalEl.textContent = total;
-
+    const bar = document.getElementById('bar1'); const pctEl = document.getElementById('pct1');
+    const doneEl= document.getElementById('done1'); const totalEl= document.getElementById('total1');
+    if(bar) bar.style.width = pct + '%'; if(pctEl) pctEl.textContent = pct + '%';
+    if(doneEl) doneEl.textContent = done; if(totalEl) totalEl.textContent = total;
     const pb = document.querySelector('#v-linear .progress[role="progressbar"]');
     if(pb) pb.setAttribute('aria-valuenow', pct);
 }
+
 
 // =================================================================
 // 🔥 Report & Clippy Logic 🔥
 // =================================================================
 // ... (analyzeDay remains the same)
 function analyzeDay() {
-    const counters = currentCounters;
-    const allTasks = tasks;
-
-    const ach = counters.achievements || 0;
-    const emg = counters.emergency || 0;
-    const log = counters.emergencyLog || [];
-    let taskAnalysis = "";
-    let level = "";
-    let advice = "";
-
-    const { total, done, pct } = getProgress(); // Use current progress
-    if (!isViewingHistory) {
-         taskAnalysis = `You also completed ${done} out of ${total} tasks today (${pct}%).`;
-    }
-
-
-    if (ach >= 10 && emg < 3) {
-        level = "Excellent Focus";
-        advice = `Incredible performance! You hit your achievement goal with minimal distractions. ${taskAnalysis} This is a model day. Keep this momentum!`;
-    } else if (ach >= 5 && emg < ach) {
-        level = "Productive Day";
-        advice = `A solid, productive day. You balanced work and distractions well. ${taskAnalysis} Great job!`;
-    } else if (ach > 0 && emg >= ach) {
-        level = "Distracted Day";
-        advice = `You got some work done, but distractions took the lead. Review the 'Emergency Log' to see the pattern. ${taskAnalysis} Tomorrow is a new start.`;
-    } else if (ach === 0 && emg > 0) {
-        level = "High Evasion Day";
-        advice = `It seems today was a tough day to get started. Remember, even one small 'Achievement' can build momentum. ${taskAnalysis}`;
-    } else {
-        level = "Quiet Day / Rest Day";
-        advice = `A quiet day. If this was a planned rest day, great! ${taskAnalysis}`;
-    }
-
-    const quotes = [
-        "The secret of getting ahead is getting started.",
-        "Discipline is the bridge between goals and accomplishment.",
-        "Focus on progress, not perfection."
-    ];
+    const counters = currentCounters; const allTasks = tasks;
+    const ach = counters.achievements || 0; const emg = counters.emergency || 0;
+    const log = counters.emergencyLog || []; let taskAnalysis = "";
+    let level = ""; let advice = "";
+    const { total, done, pct } = getProgress();
+    if (!isViewingHistory) { taskAnalysis = `You also completed ${done}/${total} tasks today (${pct}%).`; }
+    if (ach >= 10 && emg < 3) { level = "Excellent Focus"; advice = `Incredible performance! ${taskAnalysis} Keep this momentum!`; }
+    else if (ach >= 5 && emg < ach) { level = "Productive Day"; advice = `Solid work, balanced well. ${taskAnalysis} Great job!`; }
+    else if (ach > 0 && emg >= ach) { level = "Distracted Day"; advice = `Distractions led today. Review the log. ${taskAnalysis} New start tomorrow.`; }
+    else if (ach === 0 && emg > 0) { level = "High Evasion Day"; advice = `Tough start. One achievement can break the cycle. ${taskAnalysis}`; }
+    else { level = "Quiet/Rest Day"; advice = `A quiet day. Planned rest? ${taskAnalysis}`; }
+    const quotes = ["Get started.", "Discipline bridges goals & accomplishment.", "Focus on progress."];
     const quote = quotes[Math.floor(Math.random() * quotes.length)];
-
     return { level, advice, quote, ach, emg, totalTasks: total, doneTasks: done, pctTasks: pct, log, allTasks };
-}
-
-// ... (clippySpeak remains the same)
-function clippySpeak(message, hold = false) {
-    if (clippyAgent) {
-        clippyAgent.speak(message, hold);
-    } else {
-        console.log("Clippy fallback (agent not ready):", message);
-    }
 }
 
 // ... (showClippyAnalysis remains the same)
 function showClippyAnalysis() {
-    if (typeof clippy === 'undefined') {
-         alert("Clippy library failed to load. Check internet connection.");
-         return;
-    }
-    if (!clippyAgent) {
-        console.warn("Clippy agent not loaded yet.");
-        alert("Clippy is still loading, please wait a moment and try again.");
-        return;
-    }
+    if (typeof clippy === 'undefined') { alert("Clippy library failed to load."); return; }
+    if (!clippyAgent) { alert("Clippy is still loading..."); return; }
     const analysis = analyzeDay();
-    clippyAgent.stop();
-    clippyAgent.show();
+    clippyAgent.stop(); clippyAgent.show();
     clippySpeak(`Hi Mohammed! Analysis for ${isViewingHistory && historyDateInput ? `date ${historyDateInput.value}` : 'today'}:`);
     clippySpeak(`Level: ${analysis.level}.`);
     clippySpeak(analysis.advice);
-    clippySpeak(`Quote for you: ${analysis.quote}`);
+    clippySpeak(`Quote: ${analysis.quote}`);
     clippyAgent.animate();
 }
 
-// ... (generateDailyReport remains the same, using Helvetica fallback)
+// UPDATED generateDailyReport with refined library check
 function generateDailyReport() {
-    try {
-        if (typeof window.jspdf === 'undefined' || !window.jspdf.jsPDF || typeof window.jspdf.plugin === 'undefined' || typeof window.jspdf.plugin.autotable === 'undefined') {
-             clippySpeak("PDF libraries are missing. Cannot generate report. Check internet?");
-             console.error("jsPDF or jsPDF-AutoTable not loaded! Check network tab in developer tools.");
-             alert("Error: PDF Generation Failed (Libraries Missing).\n\nPlease ensure you are connected to the internet and try refreshing the page (Ctrl+Shift+R). If the problem persists, check the browser console for errors.");
-             return;
-        }
+    // Check libraries *immediately* before trying to use them
+    if (!checkPdfLibraries()) {
+        return; // Exit if check fails (error message shown in check function)
+    }
 
+    try {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        const dateStr = isViewingHistory && historyDateInput ? historyDateInput.value : counter_getTodayDateString();
+        const dateStr = isViewingHistory && historyDateInput ? historyDateInput.value : getTodayDateString();
         const analysis = analyzeDay();
 
-        // Use standard Helvetica font
-        doc.setFont('Helvetica', 'normal');
+        doc.setFont('Helvetica', 'normal'); // Default font
 
-        doc.setFont('Helvetica', 'bold');
-        doc.setFontSize(18);
-        doc.text("Mohammed's Daily Report", 14, 22);
-
-        doc.setFontSize(12);
-        doc.setFont('Helvetica', 'normal');
-        doc.text(`Date: ${dateStr}`, 14, 30);
-
+        doc.setFont('Helvetica', 'bold'); doc.setFontSize(18); doc.text("Mohammed's Daily Report", 14, 22);
+        doc.setFontSize(12); doc.setFont('Helvetica', 'normal'); doc.text(`Date: ${dateStr}`, 14, 30);
         doc.line(14, 35, 196, 35);
-
-        doc.setFont('Helvetica', 'bold');
-        doc.setFontSize(14);
-        doc.text("Analysis:", 14, 45);
-
-        doc.setFont('Helvetica', 'normal');
-        doc.setFontSize(12);
-        doc.text(`Level: ${analysis.level}`, 14, 53);
-
+        doc.setFont('Helvetica', 'bold'); doc.setFontSize(14); doc.text("Analysis:", 14, 45);
+        doc.setFont('Helvetica', 'normal'); doc.setFontSize(12); doc.text(`Level: ${analysis.level}`, 14, 53);
         doc.setFont('Helvetica', 'italic');
         const adviceLines = doc.splitTextToSize(analysis.advice, 182);
         doc.text(adviceLines, 14, 61);
         let y = 61 + (adviceLines.length * 7) + 5;
 
         if (y > 270) { doc.addPage(); y = 20; }
-
-        doc.setFont('Helvetica', 'bold');
-        doc.setFontSize(14);
-        doc.text("Summary:", 14, y);
-        y += 8;
-
-        doc.setFont('Helvetica', 'normal');
-        doc.setFontSize(12);
-        doc.text(`- Achievements: ${analysis.ach}`, 20, y);
-        doc.text(`- Emergencies: ${analysis.emg}`, 100, y);
-        y += 8;
-        doc.text(`- Tasks Completed: ${analysis.doneTasks} / ${analysis.totalTasks} (${analysis.pctTasks}%)`, 20, y);
-        y += 10;
+        doc.setFont('Helvetica', 'bold'); doc.setFontSize(14); doc.text("Summary:", 14, y); y += 8;
+        doc.setFont('Helvetica', 'normal'); doc.setFontSize(12);
+        doc.text(`- Achievements: ${analysis.ach}`, 20, y); doc.text(`- Emergencies: ${analysis.emg}`, 100, y); y += 8;
+        doc.text(`- Tasks Completed: ${analysis.doneTasks} / ${analysis.totalTasks} (${analysis.pctTasks}%)`, 20, y); y += 10;
 
         if (y > 270) { doc.addPage(); y = 20; }
-
-        doc.setFont('Helvetica', 'bold');
-        doc.setFontSize(14);
-        doc.text("Emergency Log:", 14, y);
-        y += 8;
-
-        doc.setFont('Helvetica', 'normal');
-        doc.setFontSize(10);
+        doc.setFont('Helvetica', 'bold'); doc.setFontSize(14); doc.text("Emergency Log:", 14, y); y += 8;
+        doc.setFont('Helvetica', 'normal'); doc.setFontSize(10);
         if (analysis.log && analysis.log.length > 0) {
             const logLines = analysis.log.map((entry, index) => `${index + 1}. ${entry}`);
              const splitLog = doc.splitTextToSize(logLines.join('\n'), 182);
              if (y + (splitLog.length * 5) > 280) { doc.addPage(); y = 20;}
-             // Use text with options for potential Arabic display (if system supports it)
-             doc.text(splitLog, 14, y, { lang: 'ar' });
+             doc.text(splitLog, 14, y, { lang: 'ar' }); // Attempt basic Arabic rendering
              y += (splitLog.length * 5) + 5;
         } else {
             if (y > 270) { doc.addPage(); y = 20; }
-            doc.text("(No emergencies logged.)", 14, y);
-            y += 10;
+            doc.text("(No emergencies logged.)", 14, y); y += 10;
         }
 
-        // Task List Tables
         if (analysis.allTasks.length > 0) {
             const completedTasks = analysis.allTasks.filter(t => t.done).map(t => [t.text]);
             const pendingTasks = analysis.allTasks.filter(t => !t.done).map(t => [t.text]);
-
-            const tableOptions = {
-                 startY: y,
-                 theme: 'grid',
-                 headStyles: { font: 'Helvetica', fontStyle: 'bold', fillColor: [220, 220, 220], textColor: [0, 0, 0], fontSize: 10 },
-                 // Body styles require font that *might* support Arabic if present on user system
-                 bodyStyles: { font: 'Helvetica', fontStyle: 'normal', fontSize: 9, cellPadding: 2 },
-                 columnStyles: { 0: { cellWidth: 'auto' } },
-                 margin: { left: 14, right: 14 },
-                 didDrawPage: function(data) { y = data.cursor.y + 10; }
-            };
-
-             const drawTable = (headText, bodyData) => {
+            const tableOptions = { startY: y, theme: 'grid', headStyles: { font: 'Helvetica', fontStyle: 'bold', fillColor: [220, 220, 220], textColor: [0, 0, 0], fontSize: 10 }, bodyStyles: { font: 'Helvetica', fontStyle: 'normal', fontSize: 9, cellPadding: 2 }, columnStyles: { 0: { cellWidth: 'auto' } }, margin: { left: 14, right: 14 }, didDrawPage: function(data) { y = data.cursor.y + 10; } };
+            const drawTable = (headText, bodyData) => {
                  const estimatedHeight = (bodyData.length + 1) * 7 + 10;
-                 if (y + estimatedHeight > 280) {
-                     doc.addPage();
-                     y = 20;
-                 }
+                 if (y + estimatedHeight > 280) { doc.addPage(); y = 20; }
                  tableOptions.startY = y;
                  doc.autoTable({ ...tableOptions, head: [[headText]], body: bodyData });
                  y = doc.autoTable.previous.finalY + 10;
              };
-
-            if (completedTasks.length > 0) {
-                 drawTable('Completed Tasks', completedTasks);
-            }
-
-            if (pendingTasks.length > 0) {
-                 drawTable('Pending Tasks', pendingTasks);
-            }
+            if (completedTasks.length > 0) { drawTable('Completed Tasks', completedTasks); }
+            if (pendingTasks.length > 0) { drawTable('Pending Tasks', pendingTasks); }
         }
 
         if (y > 270) { doc.addPage(); y = 20; }
-
-        doc.setFont('Helvetica', 'italic');
-        doc.setFontSize(12);
+        doc.setFont('Helvetica', 'italic'); doc.setFontSize(12);
         const quoteLines = doc.splitTextToSize(`"${analysis.quote}"`, 182);
         doc.text(quoteLines, 14, y);
 
@@ -920,11 +748,12 @@ function generateDailyReport() {
         clippySpeak("Your PDF report has been generated!");
 
     } catch (e) {
-        console.error("PDF Generation Failed:", e);
+        console.error("PDF Generation Failed during execution:", e);
         clippySpeak("Oops! Something went wrong generating the PDF report. Check the console?");
         alert("PDF Generation Failed. See console for details.");
     }
 }
+
 
 // =================================================================
 // 🔥 INIT (Assign Elements & Attach Listeners) 🔥
@@ -942,13 +771,13 @@ document.addEventListener('DOMContentLoaded', () => {
     dreadTaskNameEl = document.getElementById('dread-task-name');
     allCounterButtons = document.querySelectorAll('.counter-fieldset button');
     logTextareaEl = document.getElementById('emergency-log');
-    emergencyLogLegendEl = document.getElementById('emergency-log-legend'); // Assign legend
+    emergencyLogLegendEl = document.getElementById('emergency-log-legend');
     soundTada = document.getElementById('sound-tada');
     soundError = document.getElementById('sound-error');
     addTaskFieldset = document.getElementById('add-task-fieldset');
-    progressBarContainer = document.getElementById('progress-bar-container'); // Need to add this ID in HTML
+    progressBarContainer = document.getElementById('progress-bar-container');
     dreadAnalysisFieldset = document.getElementById('dread-analysis-fieldset');
-    taskListLegendEl = document.getElementById('task-list-legend'); // Need to add this ID in HTML
+    taskListLegendEl = document.getElementById('task-list-legend');
 
     logonScreenEl = document.getElementById('logon-screen');
     logonBtnEl = document.getElementById('logon-ok');
@@ -960,27 +789,19 @@ document.addEventListener('DOMContentLoaded', () => {
     historyLoadBtn = document.getElementById('history-load-btn');
     historyTodayBtn = document.getElementById('history-today-btn');
 
-     // Add IDs to elements that need show/hide
-     const progressBarDiv = document.getElementById('v-linear');
-     if (progressBarDiv) progressBarDiv.id = 'progress-bar-container'; // Assign if found
-     progressBarContainer = document.getElementById('progress-bar-container'); // Re-assign after potentially adding ID
-
-     const taskListFieldset = document.getElementById('task-list-fieldset'); // Find fieldset
-     const taskListLegend = taskListFieldset ? taskListFieldset.querySelector('legend') : null;
-     if(taskListLegend && !taskListLegend.id) taskListLegend.id = 'task-list-legend'; // Assign ID if not present
-     taskListLegendEl = document.getElementById('task-list-legend'); // Re-assign
+    // Add IDs if missing (redundant but safe)
+    const progressBarDiv = document.getElementById('v-linear'); if (progressBarDiv && !progressBarDiv.id) progressBarDiv.id = 'progress-bar-container'; progressBarContainer = document.getElementById('progress-bar-container');
+    const taskListFieldset = document.getElementById('task-list-fieldset'); const taskListLegend = taskListFieldset ? taskListFieldset.querySelector('legend') : null; if(taskListLegend && !taskListLegend.id) taskListLegend.id = 'task-list-legend'; taskListLegendEl = document.getElementById('task-list-legend');
 
 
-    // Load Clippy Agent
+    // Load Clippy Agent (check library existence first)
     if (typeof clippy !== 'undefined') {
         clippy.load('Clippy', (agent) => {
             clippyAgent = agent;
             console.log("Clippy loaded successfully!");
             if (clippyBtnEl) {
-                clippyBtnEl.disabled = false; // Enable button on load
+                clippyBtnEl.disabled = false;
                 clippyBtnEl.addEventListener('click', showClippyAnalysis);
-            } else {
-                 console.warn("Clippy button not found during agent load.");
             }
         }, (error) => {
              console.error("Clippy failed to load:", error);
@@ -991,67 +812,49 @@ document.addEventListener('DOMContentLoaded', () => {
         if (clippyBtnEl) clippyBtnEl.disabled = true;
     }
 
-
-    // Logon Screen Logic
-    if (logonBtnEl) {
-        logonBtnEl.addEventListener('click', () => {
-            if (logonScreenEl) logonScreenEl.style.display = 'none';
-        });
-    } else { console.warn("Logon button not found."); }
-
-    // Report Button Logic
-    if (reportBtnEl) {
-        reportBtnEl.addEventListener('click', generateDailyReport);
-    } else { console.warn("Report button not found."); }
-
-    // Reset Today Button Logic
-    if (resetTodayBtnEl) {
-        resetTodayBtnEl.addEventListener('click', handleResetTodayCounters);
-    } else { console.warn("Reset Today button not found."); }
-
-    // Task App Listeners
-    if (addBtn) addBtn.addEventListener('click', handleAddTask); else { console.warn("Add Task button not found."); }
-    if (newTaskEl) newTaskEl.addEventListener('keydown', e => { if(e.key==='Enter') handleAddTask(); }); else { console.warn("New task input not found."); }
-    if (resetAllBtn) resetAllBtn.addEventListener('click', handleResetAll); else { console.warn("Reset All button not found."); }
-
-    // History View Listeners
+    // Attach Event Listeners Safely
+    if (logonBtnEl) { logonBtnEl.addEventListener('click', () => { if (logonScreenEl) logonScreenEl.style.display = 'none'; }); } else { console.warn("Logon button missing."); }
+    if (reportBtnEl) { reportBtnEl.addEventListener('click', generateDailyReport); } else { console.warn("Report button missing."); }
+    if (resetTodayBtnEl) { resetTodayBtnEl.addEventListener('click', handleResetTodayCounters); } else { console.warn("Reset Today button missing."); }
+    if (addBtn) { addBtn.addEventListener('click', handleAddTask); } else { console.warn("Add Task button missing."); }
+    if (newTaskEl) { newTaskEl.addEventListener('keydown', e => { if(e.key==='Enter') handleAddTask(); }); } else { console.warn("New task input missing."); }
+    if (resetAllBtn) { resetAllBtn.addEventListener('click', handleResetAll); } else { console.warn("Reset All button missing."); }
     if (historyLoadBtn && historyDateInput) {
         historyLoadBtn.addEventListener('click', () => {
             const date = historyDateInput.value;
-            if (!date) {
-                clippySpeak("Please select a date first.");
-                return;
-            }
+            if (!date) { clippySpeak("Please select a date first."); return; }
             isViewingHistory = true;
-            // Filter tasks for the selected date
             const filteredTasks = tasks.filter(task => task.createdDate === date);
-            renderList(filteredTasks); // Render only historical tasks
-            counter_listenForChanges(date); // Load counters and triggers updateCounterUI
+            renderList(filteredTasks); // Render filtered tasks first
+            counter_listenForChanges(date); // Then load counters (triggers updateCounterUI)
             clippySpeak(`Loading data for ${date}...`);
         });
-    } else { console.warn("History Load button or date input not found."); }
+    } else { console.warn("History Load button or date input missing."); }
 
     if (historyTodayBtn) {
         historyTodayBtn.addEventListener('click', () => {
             isViewingHistory = false;
             historyDateInput.value = '';
-            renderList(); // Render all current tasks
-            counter_listenForChanges(null); // Load today's data and triggers updateCounterUI
+            renderList(); // Render full task list
+            counter_listenForChanges(null); // Load today's data (triggers updateCounterUI)
             clippySpeak("Back to today's view!");
         });
-    } else { console.warn("History Today button not found."); }
+    } else { console.warn("History Today button missing."); }
 
-    // Start Firebase Listeners (only if db initialized)
-    if (db) {
-        listenForTasks(); // Listens for ALL tasks
-        counter_listenForChanges(null); // Initial load for today's counters
+    // Start Firebase Listeners (only if db initialized successfully)
+    if (firebaseInitialized && db) {
+        listenForTasks();
+        counter_listenForChanges(null); // Initial load for today
+        updateStatus("Ready"); // Set initial status
     } else {
-        if(statusSaveEl) statusSaveEl.textContent = 'DB Connection Error!';
-        console.error("Firebase DB object not initialized. Cannot start listeners.");
-        // Disable UI elements reliant on DB
+        // Firebase failed, update status bar and disable UI
+        updateStatus('DB Connection Error!');
+        console.error("Firebase DB object not initialized. App functionality limited.");
          const elementsToDisable = [addBtn, resetAllBtn, reportBtnEl, clippyBtnEl, resetTodayBtnEl, historyLoadBtn, newTaskEl];
          elementsToDisable.forEach(el => { if (el) el.disabled = true; });
          if (allCounterButtons) allCounterButtons.forEach(btn => btn.disabled = true);
+         // Show a message in the task list area
+         if(listEl) listEl.innerHTML = '<li><span class="txt" style="color: red; font-weight: bold;">Database Connection Failed. Please check internet and refresh.</span></li>';
     }
 });
 </script>
