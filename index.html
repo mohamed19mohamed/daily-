@@ -6,7 +6,6 @@
 <title>mohammed tasks</title>
 <meta name="theme-color" content="#c0c0c0">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
-
 <link rel="stylesheet" href="https://unpkg.com/clippyjs@0.0.3/dist/clippy.css" media="all">
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -17,449 +16,93 @@
 
 
 <style>
-  /* ====== Windows 95 Theme Variables (W95 Plus) ====== */
-  :root{
-    --bg:#c0c0c0;
-    --fg:#000000;
-    --accent:#000080;
-    --accent-fg:#ffffff;
-    --line-dark:#808080;
-    --line-medium:#a0a0a0;
-    --line-light:#ffffff;
-    --input-fill:#ffffff;
-    --font:'Tahoma', 'Arial', sans-serif;
-    --progress-color:#008040;
-    --subtle: #d0d0d0;
-    --taskbar-green: #008080;
-  }
-  /* ====== Base W95 Styling ====== */
-  *{
-    box-sizing:border-box;
-    font-family: var(--font);
-    font-size: 10pt;
-    transition: none !important;
-  }
-  html,body{
-    margin:0; background:var(--taskbar-green);
-  }
-  .wrap{
-    max-width:400px;
-    margin: 40px auto;
-    padding:0;
-    background: var(--bg);
-    box-shadow: 6px 6px 0 var(--line-dark);
-    position: relative;
-  }
-  .window {
-      border-style: solid;
-      border-width: 1px;
-      border-color: var(--fg) var(--line-light) var(--line-light) var(--fg);
-      padding: 2px;
-      background: var(--bg);
-  }
-  .window-inner {
-      border-style: solid;
-      border-width: 1px;
-      border-color: var(--line-dark) var(--line-light) var(--line-light) var(--line-dark);
-      padding: 1px;
-      background: var(--bg);
-  }
-  .title-bar {
-    background: var(--accent);
-    color: var(--accent-fg);
-    padding: 3px 6px;
-    font-size: 11pt;
-    font-weight: bold;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid var(--fg);
-    background: linear-gradient(90deg, var(--accent) 0%, #1084d8 100%);
-  }
+  /* Styles remain largely the same, minor adjustments if needed */
+  :root{--bg:#c0c0c0;--fg:#000000;--accent:#000080;--accent-fg:#ffffff;--line-dark:#808080;--line-medium:#a0a0a0;--line-light:#ffffff;--input-fill:#ffffff;--font:'Tahoma', 'Arial', sans-serif;--progress-color:#008040;--subtle: #d0d0d0;--taskbar-green: #008080;}
+  *{box-sizing:border-box;font-family: var(--font);font-size: 10pt;transition: none !important;}
+  html,body{margin:0; background:var(--taskbar-green);}
+  .wrap{max-width:400px;margin: 40px auto;padding:0;background: var(--bg);box-shadow: 6px 6px 0 var(--line-dark);position: relative;}
+  .window {border-style: solid;border-width: 1px;border-color: var(--fg) var(--line-light) var(--line-light) var(--fg);padding: 2px;background: var(--bg);}
+  .window-inner {border-style: solid;border-width: 1px;border-color: var(--line-dark) var(--line-light) var(--line-light) var(--line-dark);padding: 1px;background: var(--bg);}
+  .title-bar {background: var(--accent);color: var(--accent-fg);padding: 3px 6px;font-size: 11pt;font-weight: bold;display: flex;justify-content: space-between;align-items: center;border-bottom: 1px solid var(--fg);background: linear-gradient(90deg, var(--accent) 0%, #1084d8 100%);}
   .title-bar-text { flex: 1; padding-left: 8px; display: flex; align-items: center; gap: 6px; }
-  .title-bar-controls button {
-      background: var(--bg);
-      border: 1px solid var(--fg);
-      border-right-color: var(--line-dark);
-      border-bottom-color: var(--line-dark);
-      border-top-color: var(--line-light);
-      border-left-color: var(--line-light);
-      width: 18px; height: 18px; font-size: 10pt; padding: 0; line-height: 1;
-      cursor: default; font-weight: bold;
-  }
-  .title-bar-controls button:active {
-      border-left-color: var(--line-dark);
-      border-top-color: var(--line-dark);
-      border-right-color: var(--line-light);
-      border-bottom-color: var(--line-light);
-      padding: 1px 0 0 1px;
-  }
+  .title-bar-controls button {background: var(--bg);border: 1px solid var(--fg);border-right-color: var(--line-dark);border-bottom-color: var(--line-dark);border-top-color: var(--line-light);border-left-color: var(--line-light);width: 18px; height: 18px; font-size: 10pt; padding: 0; line-height: 1;cursor: default; font-weight: bold;}
+  .title-bar-controls button:active {border-left-color: var(--line-dark);border-top-color: var(--line-dark);border-right-color: var(--line-light);border-bottom-color: var(--line-light);padding: 1px 0 0 1px;}
   .main-content { padding: 8px; }
-  fieldset {
-      border-style: solid; border-width: 1px;
-      border-color: var(--line-dark) var(--line-light) var(--line-light) var(--line-dark);
-      padding: 10px; margin: 8px 0; background: var(--bg);
-      box-shadow: 1px 1px 0 var(--line-light) inset, -1px -1px 0 var(--line-dark) inset;
-  }
-  legend {
-      background: var(--bg); padding: 0 6px; font-weight: bold; color: var(--accent); margin-left: 5px;
-  }
-  .controls{
-    display:flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 8px;
-  }
-  input[type="text"] {
-    border: 1px solid var(--fg); border-left-color: var(--line-dark); border-top-color: var(--line-dark);
-    border-right-color: var(--line-light); border-bottom-color: var(--line-light);
-    background: var(--input-fill); color: var(--fg); padding: 4px 6px; font-size: 10pt;
-    outline: none; box-shadow: none; flex: 1; min-width: 120px;
-  }
-  /* Updated focus style for all interactive elements */
-  input:focus, .btn:focus, .del:focus, input[type="checkbox"]:focus, textarea:focus, input[type="date"]:focus {
-      outline: 1px dashed var(--fg);
-      outline-offset: -2px;
-  }
-  .btn {
-    border: 1px solid var(--fg); border-right-color: var(--line-dark); border-bottom-color: var(--line-dark);
-    border-top-color: var(--line-light); border-left-color: var(--line-light);
-    background: var(--bg); color: var(--fg); padding: 5px 12px; font-weight: normal;
-    cursor: pointer; box-shadow: none; line-height: 1; font-size: 10pt; flex-shrink: 0;
-  }
-  .btn:active {
-    border: 1px solid var(--fg); border-left-color: var(--line-dark); border-top-color: var(--line-dark);
-    border-right-color: var(--line-light); border-bottom-color: var(--line-light);
-    padding: 6px 12px 4px 12px;
-  }
+  fieldset {border-style: solid; border-width: 1px;border-color: var(--line-dark) var(--line-light) var(--line-light) var(--line-dark);padding: 10px; margin: 8px 0; background: var(--bg);box-shadow: 1px 1px 0 var(--line-light) inset, -1px -1px 0 var(--line-dark) inset;}
+  legend {background: var(--bg); padding: 0 6px; font-weight: bold; color: var(--accent); margin-left: 5px;}
+  .controls{display:flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 8px;}
+  input[type="text"] {border: 1px solid var(--fg); border-left-color: var(--line-dark); border-top-color: var(--line-dark);border-right-color: var(--line-light); border-bottom-color: var(--line-light);background: var(--input-fill); color: var(--fg); padding: 4px 6px; font-size: 10pt;outline: none; box-shadow: none; flex: 1; min-width: 120px;}
+  input:focus, .btn:focus, .del:focus, input[type="checkbox"]:focus, textarea:focus, input[type="date"]:focus {outline: 1px dashed var(--fg);outline-offset: -2px;}
+  .btn {border: 1px solid var(--fg); border-right-color: var(--line-dark); border-bottom-color: var(--line-dark);border-top-color: var(--line-light); border-left-color: var(--line-light);background: var(--bg); color: var(--fg); padding: 5px 12px; font-weight: normal;cursor: pointer; box-shadow: none; line-height: 1; font-size: 10pt; flex-shrink: 0;}
+  .btn:active {border: 1px solid var(--fg); border-left-color: var(--line-dark); border-top-color: var(--line-dark);border-right-color: var(--line-light); border-bottom-color: var(--line-light);padding: 6px 12px 4px 12px;}
   .btn.ghost { background: var(--bg); box-shadow: none; }
   .btn:hover { background: var(--subtle); }
+  .btn:disabled { color: var(--line-dark); text-shadow: 1px 1px var(--line-light); cursor: not-allowed;} /* Style disabled buttons */
   .muted{color:var(--fg);font-size:9pt; padding: 0 4px;}
-  .toolbar {
-      display: flex; gap: 4px;
-      padding: 0;
-      margin-top: 8px;
-  }
-  .toolbar button {
-      border: 1px solid var(--fg); border-right-color: var(--line-dark); border-bottom-color: var(--line-dark);
-      border-top-color: var(--line-light); border-left-color: var(--line-light);
-      padding: 4px 8px;
-      flex: 1;
-  }
+  .toolbar {display: flex; gap: 4px;padding: 0;margin-top: 8px;}
+  .toolbar button {border: 1px solid var(--fg); border-right-color: var(--line-dark); border-bottom-color: var(--line-dark);border-top-color: var(--line-light); border-left-color: var(--line-light);padding: 4px 8px;flex: 1;}
   .toolbar button:active { padding: 5px 8px 3px 8px; }
-  .task-list-box {
-      border: 1px solid var(--fg); border-left-color: var(--line-dark); border-top-color: var(--line-dark);
-      border-right-color: var(--line-light); border-bottom-color: var(--line-light);
-      background: var(--input-fill); padding: 0; min-height: 100px; margin-top: 8px;
-      box-shadow: 1px 1px 0 var(--line-dark) inset, -1px -1px 0 var(--line-light) inset;
-  }
+  .task-list-box {border: 1px solid var(--fg); border-left-color: var(--line-dark); border-top-color: var(--line-dark);border-right-color: var(--line-light); border-bottom-color: var(--line-light);background: var(--input-fill); padding: 0; min-height: 100px; margin-top: 8px;box-shadow: 1px 1px 0 var(--line-dark) inset, -1px -1px 0 var(--line-light) inset;}
   ul{list-style:none;padding:0;margin:0}
-  li{
-    display:flex; align-items:center; gap:8px; padding: 4px 8px;
-    background: var(--input-fill); color: var(--fg); margin: 0;
-    border-bottom: 1px solid var(--line-medium);
-    cursor: default;
-  }
+  li{display:flex; align-items:center; gap:8px; padding: 4px 8px;background: var(--input-fill); color: var(--fg); margin: 0;border-bottom: 1px solid var(--line-medium);cursor: default;}
   li:hover { background: var(--subtle); }
   li.done { color: var(--line-dark); opacity: 0.9; }
   li.done .txt { text-decoration: line-through; }
   .txt{flex:1; line-height:1.4; font-size: 10pt; min-width: 0;}
-  input[type="checkbox"]{
-    appearance: none; width: 13px; height: 13px;
-    border: 1px solid var(--fg); background: var(--input-fill);
-    box-shadow: 1px 1px 0 var(--line-dark) inset, -1px -1px 0 var(--line-light) inset;
-    margin: 0; padding: 0; display: grid; place-items: center; flex-shrink: 0;
-    cursor: pointer;
-  }
+  input[type="checkbox"]{appearance: none; width: 13px; height: 13px;border: 1px solid var(--fg); background: var(--input-fill);box-shadow: 1px 1px 0 var(--line-dark) inset, -1px -1px 0 var(--line-light) inset;margin: 0; padding: 0; display: grid; place-items: center; flex-shrink: 0;cursor: pointer;}
   input[type="checkbox"]:checked::after { content: '✓'; color: var(--fg); font-size: 10pt; line-height: 0.8; }
   input[type="checkbox"]:active { box-shadow: 1px 1px 0 var(--line-light) inset, -1px -1px 0 var(--line-dark) inset; }
-  .del{
-      appearance:none; border:0; background:transparent; color:var(--line-dark); font-size:10pt;
-      cursor: pointer; padding: 0 4px; line-height:1; flex-shrink: 0;
-  }
+  input[type="checkbox"]:disabled { background: var(--subtle); box-shadow: none; cursor: not-allowed; } /* Style disabled checkbox */
+  input[type="checkbox"]:disabled::after { color: var(--line-dark); }
+  .del{appearance:none; border:0; background:transparent; color:var(--line-dark); font-size:10pt;cursor: pointer; padding: 0 4px; line-height:1; flex-shrink: 0;}
   .del:hover{color:red;}
+  .del:disabled { color: var(--line-medium); cursor: not-allowed; } /* Style disabled delete */
   .linear-progress-box { margin-top: 8px; }
   .head{display:flex;justify-content:space-between;align-items:center;margin:0 0 4px 0}
   .big{font-weight:bold; font-size: 11pt;}
-  .progress{
-    height:14px; background: var(--line-dark);
-    border: 1px solid var(--fg); border-left-color: var(--line-dark); border-top-color: var(--line-dark);
-    border-right-color: var(--line-light); border-bottom-color: var(--line-light);
-    overflow:hidden; padding: 2px;
-  }
+  .progress{height:14px; background: var(--line-dark);border: 1px solid var(--fg); border-left-color: var(--line-dark); border-top-color: var(--line-dark);border-right-color: var(--line-light); border-bottom-color: var(--line-light);overflow:hidden; padding: 2px;}
   .bar{ height:100%; width:0; background: var(--progress-color); }
-  .status-bar {
-      border-top: 1px solid var(--line-light);
-      display: flex; align-items: center;
-      padding: 0 0;
-      background: var(--bg);
-      height: 24px;
-      position: absolute;
-      bottom: -2px;
-      left: 2px;
-      right: 2px;
-      width: calc(100% - 4px);
-  }
-  .start-btn {
-      background: var(--bg);
-      border: 1px solid var(--fg); border-right-color: var(--line-dark); border-bottom-color: var(--line-dark);
-      border-top-color: var(--line-light); border-left-color: var(--line-light);
-      font-weight: bold;
-      padding: 1px 6px 0 6px;
-      margin-right: 2px;
-      height: 100%;
-      line-height: 1.8;
-      font-size: 11pt;
-      color: var(--fg);
-      cursor: pointer;
-      box-shadow: none;
-      flex-shrink: 0;
-  }
-  .start-btn:active {
-      border: 1px solid var(--fg); border-left-color: var(--line-dark); border-top-color: var(--line-dark);
-      border-right-color: var(--line-light); border-bottom-color: var(--line-light);
-      padding: 2px 6px 0 7px;
-  }
-  .separator {
-      height: 100%;
-      width: 2px;
-      background: var(--bg);
-      border-left: 1px solid var(--line-light);
-      border-right: 1px solid var(--line-dark);
-      margin: 0 2px;
-  }
-  .status-panel-group {
-      display: flex;
-      margin-left: auto;
-      align-items: center;
-      height: 100%;
-  }
-  .status-panel {
-      border: 1px solid var(--line-dark); border-left-color: var(--line-light); border-top-color: var(--line-light);
-      padding: 0 8px; line-height: 2.1; font-size: 9pt; flex-shrink: 0; min-width: 60px;
-      height: calc(100% - 4px);
-      margin: 2px 0 2px 2px;
-  }
+  .status-bar {border-top: 1px solid var(--line-light);display: flex; align-items: center;padding: 0 0;background: var(--bg);height: 24px;position: absolute;bottom: -2px;left: 2px;right: 2px;width: calc(100% - 4px);}
+  .start-btn {background: var(--bg);border: 1px solid var(--fg); border-right-color: var(--line-dark); border-bottom-color: var(--line-dark);border-top-color: var(--line-light); border-left-color: var(--line-light);font-weight: bold;padding: 1px 6px 0 6px;margin-right: 2px;height: 100%;line-height: 1.8;font-size: 11pt;color: var(--fg);cursor: pointer;box-shadow: none;flex-shrink: 0;}
+  .start-btn:active {border: 1px solid var(--fg); border-left-color: var(--line-dark); border-top-color: var(--line-dark);border-right-color: var(--line-light); border-bottom-color: var(--line-light);padding: 2px 6px 0 7px;}
+  .separator {height: 100%;width: 2px;background: var(--bg);border-left: 1px solid var(--line-light);border-right: 1px solid var(--line-dark);margin: 0 2px;}
+  .status-panel-group {display: flex;margin-left: auto;align-items: center;height: 100%;}
+  .status-panel {border: 1px solid var(--line-dark); border-left-color: var(--line-light); border-top-color: var(--line-light);padding: 0 8px; line-height: 2.1; font-size: 9pt; flex-shrink: 0; min-width: 60px;height: calc(100% - 4px);margin: 2px 0 2px 2px;}
   .main-content { padding: 8px 8px 30px 8px; }
-
-  /* ====== Counter Styles ====== */
-  .counters-container {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 8px;
-      padding: 0 0 8px 0;
-  }
-  .counter-fieldset {
-      text-align: center;
-      padding: 8px 5px 5px 5px;
-  }
-  .counter-fieldset legend {
-      font-weight: bold;
-      padding: 0 4px;
-      font-size: 9pt;
-  }
-  .counter-fieldset h1 {
-      font-size: 2.2rem;
-      margin: 0 0 5px 0;
-      font-weight: bold;
-      color: #000;
-      line-height: 1;
-  }
-  .counter-fieldset button {
-      font-size: 1.1rem;
-      font-weight: bold;
-      width: 100%;
-      height: 28px;
-      padding: 0;
-  }
-  .counter-fieldset button:disabled {
-      color: var(--line-dark);
-      text-shadow: 1px 1px var(--line-light);
-      cursor: not-allowed;
-  }
-  .emergency-fieldset {
-      background-color: #CC4444;
-      color: #FFFFFF;
-  }
-  .emergency-fieldset h1 {
-      color: #FFFFFF;
-  }
-  .emergency-fieldset legend {
-      color: #FFFFFF;
-      background: #CC4444;
-  }
-
-  /* ====== HR Separator Style ====== */
-  hr {
-    border: 0;
-    border-top: 1px solid var(--line-dark);
-    border-bottom: 1px solid var(--line-light);
-    margin: 15px 0;
-  }
-
-  /* ====== Emergency Analysis Styles ====== */
-  .info-box fieldset {
-      margin-top: 0;
-      padding: 8px;
-  }
-  .info-box legend {
-      font-size: 9pt;
-      margin-left: 2px;
-  }
-  #emergency-log {
-      width: 100%;
-      box-sizing: border-box;
-      font-family: var(--font);
-      font-size: 9pt;
-      background: var(--input-fill);
-      color: var(--fg);
-      border: 1px solid var(--fg);
-      border-left-color: var(--line-dark);
-      border-top-color: var(--line-dark);
-      border-right-color: var(--line-light);
-      border-bottom-color: var(--line-light);
-      box-shadow: 1px 1px 0 var(--line-dark) inset, -1px -1px 0 var(--line-light) inset;
-  }
-
-  /* ====== Report & Clippy Button Styles ====== */
-  .status-panel-btn {
-    cursor: pointer;
-    border: 1px solid var(--line-light);
-    border-right-color: var(--line-dark);
-    border-bottom-color: var(--line-dark);
-  }
-  .status-panel-btn:active {
-    border: 1px solid var(--line-dark);
-    border-right-color: var(--line-light);
-    border-bottom-color: var(--line-light);
-  }
-  #clippy-panel-btn {
-    font-size: 1.2rem; /* Make Clippy icon slightly larger */
-    line-height: 1.5;
-    padding: 0 6px; /* Adjust padding */
-    min-width: 30px; /* Smaller min width */
-  }
-  #report-panel-btn {
-    padding: 0 6px; /* Adjust padding */
-  }
-  /* NEW: Reset Today Button Style */
-  #reset-today-panel-btn {
-    padding: 0 6px; /* Adjust padding */
-  }
-
-
-  /* ====== Logon Screen Styles ====== */
-  #logon-screen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: var(--taskbar-green);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-  }
-  #logon-window {
-    width: 350px;
-    padding-bottom: 10px;
-  }
-  #logon-content {
-    padding: 20px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-  }
-  #logon-content i {
-    font-size: 48px;
-    color: var(--accent);
-  }
-  #logon-buttons {
-    text-align: center;
-    padding: 0 20px;
-  }
-  #logon-ok {
-    width: 100px;
-  }
-
-  /* ====== Dread Button Style ====== */
-  .dread-btn {
-      appearance: none; border: 0; background: transparent;
-      font-size: 1.1rem; cursor: pointer; padding: 0 4px; line-height: 1; flex-shrink: 0;
-  }
+  .counters-container {display: grid;grid-template-columns: 1fr 1fr 1fr;gap: 8px;padding: 0 0 8px 0;}
+  .counter-fieldset {text-align: center;padding: 8px 5px 5px 5px;}
+  .counter-fieldset legend {font-weight: bold;padding: 0 4px;font-size: 9pt;}
+  .counter-fieldset h1 {font-size: 2.2rem;margin: 0 0 5px 0;font-weight: bold;color: #000;line-height: 1;}
+  .counter-fieldset button {font-size: 1.1rem;font-weight: bold;width: 100%;height: 28px;padding: 0;}
+  .counter-fieldset button:disabled {color: var(--line-dark);text-shadow: 1px 1px var(--line-light);cursor: not-allowed;}
+  .emergency-fieldset {background-color: #CC4444;color: #FFFFFF;}
+  .emergency-fieldset h1 {color: #FFFFFF;}
+  .emergency-fieldset legend {color: #FFFFFF;background: #CC4444;}
+  hr {border: 0;border-top: 1px solid var(--line-dark);border-bottom: 1px solid var(--line-light);margin: 15px 0;}
+  .info-box fieldset {margin-top: 0;padding: 8px;}
+  .info-box legend {font-size: 9pt;margin-left: 2px;}
+  #emergency-log {width: 100%;box-sizing: border-box;font-family: var(--font);font-size: 9pt;background: var(--input-fill);color: var(--fg);border: 1px solid var(--fg);border-left-color: var(--line-dark);border-top-color: var(--line-dark);border-right-color: var(--line-light);border-bottom-color: var(--line-light);box-shadow: 1px 1px 0 var(--line-dark) inset, -1px -1px 0 var(--line-light) inset;}
+  .status-panel-btn {cursor: pointer;border: 1px solid var(--line-light);border-right-color: var(--line-dark);border-bottom-color: var(--line-dark);}
+  .status-panel-btn:active {border: 1px solid var(--line-dark);border-right-color: var(--line-light);border-bottom-color: var(--line-light);}
+  #clippy-panel-btn {font-size: 1.2rem;line-height: 1.5;padding: 0 6px;min-width: 30px;}
+  #report-panel-btn {padding: 0 6px;}
+  #reset-today-panel-btn {padding: 0 6px;}
+  #logon-screen {position: fixed;top: 0;left: 0;width: 100%;height: 100%;background: var(--taskbar-green);display: flex;justify-content: center;align-items: center;z-index: 1000;}
+  #logon-window {width: 350px;padding-bottom: 10px;}
+  #logon-content {padding: 20px;display: flex;align-items: center;gap: 15px;}
+  #logon-content i {font-size: 48px;color: var(--accent);}
+  #logon-buttons {text-align: center;padding: 0 20px;}
+  #logon-ok {width: 100px;}
+  .dread-btn {appearance: none; border: 0; background: transparent;font-size: 1.1rem; cursor: pointer; padding: 0 4px; line-height: 1; flex-shrink: 0;}
   .dread-btn:hover { opacity: 0.6; }
   .dread-btn:active { transform: scale(0.9); }
-
-  /* ====== Dread Analysis Style ====== */
-  .dread-analysis-panel {
-      padding: 5px;
-      font-size: 0.95rem;
-  }
-  .dread-analysis-panel .task-name {
-      font-weight: bold;
-      color: var(--accent);
-  }
-
-  /* ====== Historical View Styles ====== */
-  .history-controls {
-    display: flex;
-    gap: 8px;
-    align-items: center; /* Align items vertically */
-  }
-  .history-controls input[type="date"] {
-    border: 1px solid var(--fg); border-left-color: var(--line-dark); border-top-color: var(--line-dark);
-    border-right-color: var(--line-light); border-bottom-color: var(--line-light);
-    background: var(--input-fill); color: var(--fg); padding: 4px 6px; font-size: 10pt;
-    outline: none; box-shadow: none; flex: 1; height: 30px; /* Match button height */
-  }
-  .history-controls button {
-    flex-shrink: 0; height: 30px; /* Match input height */
-  }
-
-  @media (max-width: 768px) {
-      .wrap {
-          max-width: 100%;
-          margin: 0;
-          height: 100vh;
-          box-shadow: none;
-      }
-      .main-content { padding: 4px 4px 30px 4px; }
-      .controls { flex-direction: column; align-items: stretch; gap: 4px; }
-      .controls > * { width: 100%; }
-      .controls label { flex: none; width: 100%; padding-bottom: 2px; }
-      .toolbar button { flex: 1; }
-      .task-list-box { min-height: 200px; }
-      li { padding: 6px 8px; }
-      .status-bar { width: 100%; left: 0; right: 0; bottom: 0; position: fixed; }
-      .status-panel-group { margin-left: auto; }
-
-      .counters-container {
-        gap: 4px;
-        padding: 4px 0 4px 0;
-      }
-      .counter-fieldset {
-        padding: 6px 4px 4px 4px;
-      }
-      .counter-fieldset h1 {
-        font-size: 1.8rem;
-      }
-      .counter-fieldset button {
-        height: 24px;
-        font-size: 1rem;
-      }
-      .counter-fieldset legend {
-          font-size: 8pt;
-      }
-      .info-box p, .info-box .sunken-panel {
-          font-size: 8pt;
-      }
-      /* Ensure history controls stack nicely */
-      .history-controls {
-          flex-direction: column;
-          align-items: stretch;
-      }
-      .history-controls input[type="date"] {
-          margin-bottom: 4px;
-      }
-  }
+  .dread-btn:disabled { cursor: not-allowed; opacity: 0.5; } /* Style disabled dread button */
+  .dread-analysis-panel {padding: 5px;font-size: 0.95rem;}
+  .dread-analysis-panel .task-name {font-weight: bold;color: var(--accent);}
+  .history-controls {display: flex;gap: 8px;align-items: center;}
+  .history-controls input[type="date"] {border: 1px solid var(--fg); border-left-color: var(--line-dark); border-top-color: var(--line-dark);border-right-color: var(--line-light); border-bottom-color: var(--line-light);background: var(--input-fill); color: var(--fg); padding: 4px 6px; font-size: 10pt;outline: none; box-shadow: none; flex: 1; height: 30px;}
+  .history-controls button {flex-shrink: 0; height: 30px;}
+  @media (max-width: 768px) {.wrap {max-width: 100%;margin: 0;height: 100vh;box-shadow: none;}.main-content { padding: 4px 4px 30px 4px; }.controls { flex-direction: column; align-items: stretch; gap: 4px; }.controls > * { width: 100%; }.controls label { flex: none; width: 100%; padding-bottom: 2px; }.toolbar button { flex: 1; }.task-list-box { min-height: 200px; }li { padding: 6px 8px; }.status-bar { width: 100%; left: 0; right: 0; bottom: 0; position: fixed; }.status-panel-group { margin-left: auto; }.counters-container {gap: 4px;padding: 4px 0 4px 0;}.counter-fieldset {padding: 6px 4px 4px 4px;}.counter-fieldset h1 {font-size: 1.8rem;}.counter-fieldset button {height: 24px;font-size: 1rem;}.counter-fieldset legend {font-size: 8pt;}.info-box p, .info-box .sunken-panel {font-size: 8pt;}.history-controls {flex-direction: column;align-items: stretch;}.history-controls input[type="date"] {margin-bottom: 4px;}}
 </style>
 </head>
 <body dir="ltr">
@@ -520,7 +163,7 @@
 
         <div class="info-box" style="padding: 0; margin: 0;">
             <fieldset>
-                <legend>Today's Emergency Log</legend>
+                <legend id="emergency-log-legend">Today's Emergency Log</legend>
                 <div style="padding: 5px;">
                     <textarea id="emergency-log" readonly rows="3"></textarea>
                 </div>
@@ -529,7 +172,7 @@
 
         <hr>
 
-        <fieldset>
+        <fieldset id="add-task-fieldset">
             <legend>Add New Task</legend>
             <div class="controls">
                 <label for="newTask" style="flex: 0 0 100px;">Task (Required):</label>
@@ -542,7 +185,7 @@
             </div>
         </fieldset>
 
-        <div id="v-linear" class="linear-progress-box">
+        <div id="progress-bar-container" class="linear-progress-box">
           <div class="head">
             <div><span class="big" id="pct1">0%</span> <span class="muted">Overall Progress</span></div>
             <div class="muted"><span id="done1">0</span>/<span id="total1">0</span> Tasks</div>
@@ -561,7 +204,7 @@
             </div>
         </fieldset>
 
-        <fieldset class="info-box" style="padding: 8px; margin-top: 15px;">
+        <fieldset id="dread-analysis-fieldset" class="info-box" style="padding: 8px; margin-top: 15px;">
             <legend>Dread Analysis</legend>
             <div class="dread-analysis-panel">
                 <span>Most Evaded Task:</span>
@@ -569,13 +212,16 @@
             </div>
         </fieldset>
 
-        <div class="task-list-box">
-            <ul id="list"></ul>
-        </div>
+        <fieldset id="task-list-fieldset">
+             <legend id="task-list-legend">Current Tasks</legend>
+             <div class="task-list-box">
+                 <ul id="list"></ul>
+             </div>
+             <div id="emptyMessage" class="muted" style="text-align: center; margin-top: 8px; font-weight: bold; display: none;">
+                 No tasks currently. Start by adding one!
+             </div>
+         </fieldset>
 
-        <div id="emptyMessage" class="muted" style="text-align: center; margin-top: 8px; font-weight: bold; display: none;">
-          No tasks currently. Start by adding one!
-        </div>
       </div>
 
       <div class="status-bar">
@@ -609,7 +255,6 @@
 // 🔥 FIREBASE INITIALIZATION & CONFIG 🔥
 // =================================================================
 const firebaseConfig = {
-  // Your config keys
   apiKey: "AIzaSyBvpcUP-DmXH82WHgm4ZLHezeBFaaxMnCE",
   authDomain: "mohammedtasksapp.firebaseapp.com",
   databaseURL: "https://mohammedtasksapp-default-rtdb.asia-southeast1.firebasedatabase.app",
@@ -619,20 +264,22 @@ const firebaseConfig = {
   appId: "1:271781862481:web:dfd63b2c4b4a8d74ad2c70"
 };
 
-let db; // Declare db globally
+let db = null;
 try {
-    // Check if Firebase is already initialized
     if (!firebase.apps.length) {
         firebase.initializeApp(firebaseConfig);
+        console.log("Firebase initialized successfully.");
+    } else {
+        firebase.app();
+        console.log("Firebase already initialized.");
     }
-    db = firebase.database(); // Initialize db after app init
+    db = firebase.database();
 } catch (e) {
     console.error("Firebase initialization failed:", e);
-    // Display error to user in a less disruptive way
     document.addEventListener('DOMContentLoaded', () => {
         const statusSaveEl = document.getElementById('status-save');
         if (statusSaveEl) statusSaveEl.textContent = 'DB Init Error!';
-        // Consider hiding the main app or showing a specific error message
+        alert("CRITICAL ERROR: Could not connect to the database. Please check your internet connection and Firebase configuration.");
     });
 }
 
@@ -643,20 +290,23 @@ let todayCounterRef = null;
 let currentCounters = { achievements: 0, neutral: 0, emergency: 0, emergencyLog: [] };
 let isViewingHistory = false;
 let tasks = [];
-let clippyAgent = null; // Variable to hold the loaded Clippy agent
+let clippyAgent = null;
 
-// DOM Elements (will be assigned in DOMContentLoaded)
+// DOM Elements
 let listEl, newTaskEl, addBtn, resetAllBtn, emptyMessageEl, statusTotalEl, statusSaveEl;
 let historyDateInput, historyLoadBtn, historyTodayBtn;
 let dreadTaskNameEl;
 let allCounterButtons;
 let reportBtnEl, clippyBtnEl, resetTodayBtnEl;
-let logTextareaEl;
+let logTextareaEl, emergencyLogLegendEl; // Added legend element
 let soundTada, soundError;
+let logonScreenEl, logonBtnEl;
+let addTaskFieldset, progressBarContainer, dreadAnalysisFieldset, taskListLegendEl; // Elements to show/hide
 
 // =================================================================
 // 🔥 COUNTER LOGIC (Firebase) 🔥
 // =================================================================
+// ... (counter_getTodayDateString remains the same)
 function counter_getTodayDateString() {
     const today = new Date();
     const year = today.getFullYear();
@@ -664,6 +314,7 @@ function counter_getTodayDateString() {
     const day = String(today.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
 }
+
 
 function counter_listenForChanges(dateString) {
     if (!db) {
@@ -673,45 +324,49 @@ function counter_listenForChanges(dateString) {
 
     const dateToLoad = dateString || counter_getTodayDateString();
     const newRefPath = 'dailyCounters/' + dateToLoad;
+    const newRef = db.ref(newRefPath); // Create ref object once
 
     // Turn off previous listener if it exists and path is different
-    if (todayCounterRef && todayCounterRef.toString().includes(db.ref(newRefPath).toString())) {
-        console.log("Already listening to:", newRefPath);
-        return; // Already listening to this path
-    }
-    if (todayCounterRef) {
+    if (todayCounterRef && todayCounterRef.toString() !== newRef.toString()) {
         console.log("Turning off listener for:", todayCounterRef.toString());
-        todayCounterRef.off('value'); // Make sure to specify 'value'
-        todayCounterRef = null; // Reset ref
+        todayCounterRef.off('value');
+        todayCounterRef = null;
     }
 
+    // Only attach listener if ref is null (meaning it was off or never started)
+    if (!todayCounterRef) {
+        console.log("Attaching listener for:", newRefPath);
+        todayCounterRef = newRef; // Assign the new ref
 
-    console.log("Attaching listener for:", newRefPath);
-    todayCounterRef = db.ref(newRefPath);
-
-    todayCounterRef.on('value', (snapshot) => {
-        const data = snapshot.val();
-        console.log("Counter data received for", dateToLoad, ":", data);
-        if (data) {
-            currentCounters = data;
-        } else {
-            currentCounters = { achievements: 0, neutral: 0, emergency: 0, emergencyLog: [] };
-            if (!isViewingHistory && dateToLoad === counter_getTodayDateString()) {
-                console.log("Setting default counters for today.");
-                // Use setWithPriority or just set if no priority needed
-                todayCounterRef.set(currentCounters).catch(e => console.error("Initial counter set failed:", e));
+        todayCounterRef.on('value', (snapshot) => {
+            const data = snapshot.val();
+            console.log("Counter data received for", dateToLoad, ":", data);
+            if (data) {
+                currentCounters = { ...data, emergencyLog: data.emergencyLog || [] };
+            } else {
+                currentCounters = { achievements: 0, neutral: 0, emergency: 0, emergencyLog: [] };
+                if (!isViewingHistory && dateToLoad === counter_getTodayDateString()) {
+                    console.log("Setting default counters for today.");
+                    todayCounterRef.set(currentCounters).catch(e => console.error("Initial counter set failed:", e));
+                }
             }
-        }
-        updateCounterUI();
-    }, (error) => {
-        console.error(`Firebase Counter Read Failed for ${dateToLoad}. Check Rules:`, error);
-        if (statusSaveEl) updateStatus('Counter Sync Error');
-    });
+            updateCounterUI(); // Update UI after data is processed
+        }, (error) => {
+            console.error(`Firebase Counter Read Failed for ${dateToLoad}. Check Rules:`, error);
+            if (statusSaveEl) updateStatus('Counter Sync Error');
+            // Reset to default on error? Or show error state?
+            currentCounters = { achievements: 0, neutral: 0, emergency: 0, emergencyLog: [] };
+            updateCounterUI();
+        });
+    } else {
+         console.log("Already listening to:", newRefPath);
+         // Force UI update even if listener exists, in case initial load failed or state is inconsistent
+         updateCounterUI();
+    }
 }
 
 
 function updateCounterUI() {
-    // Update counter numbers safely
     const achEl = document.getElementById('achievements-count');
     const neuEl = document.getElementById('neutral-count');
     const emgEl = document.getElementById('emergency-count');
@@ -719,8 +374,6 @@ function updateCounterUI() {
     if (neuEl) neuEl.innerText = currentCounters.neutral || 0;
     if (emgEl) emgEl.innerText = currentCounters.emergency || 0;
 
-
-    // Update emergency log safely
     const logData = currentCounters.emergencyLog || [];
     if (logTextareaEl) {
         if (logData.length > 0) {
@@ -731,24 +384,30 @@ function updateCounterUI() {
         logTextareaEl.scrollTop = logTextareaEl.scrollHeight;
     }
 
-    // Update button states based on history view
     if (allCounterButtons) {
         allCounterButtons.forEach(btn => btn.disabled = isViewingHistory);
     }
     if (historyTodayBtn) historyTodayBtn.style.display = isViewingHistory ? 'inline-block' : 'none';
     if (historyLoadBtn) historyLoadBtn.style.display = isViewingHistory ? 'none' : 'inline-block';
 
-    // Update legend for emergency log
-    const logLegend = document.querySelector('.info-box fieldset legend');
-    if (logLegend) {
-        logLegend.textContent = isViewingHistory && historyDateInput ? `Emergency Log (${historyDateInput.value})` : "Today's Emergency Log";
+    if (emergencyLogLegendEl) {
+        emergencyLogLegendEl.textContent = isViewingHistory && historyDateInput ? `Emergency Log (${historyDateInput.value})` : "Today's Emergency Log";
     }
+
+    // Show/Hide elements based on history view
+    const showTodayElements = !isViewingHistory;
+    if (addTaskFieldset) addTaskFieldset.style.display = showTodayElements ? '' : 'none';
+    if (progressBarContainer) progressBarContainer.style.display = showTodayElements ? '' : 'none';
+    if (dreadAnalysisFieldset) dreadAnalysisFieldset.style.display = showTodayElements ? '' : 'none';
+    if (taskListLegendEl) taskListLegendEl.textContent = showTodayElements ? "Current Tasks" : (historyDateInput ? `Tasks Created On (${historyDateInput.value})` : "Tasks");
+
 }
 
-
+// ... (counter_increment remains the same)
 function counter_increment(type) {
     if (!db || !todayCounterRef) {
         console.warn("Cannot increment counter, DB or ref not ready.");
+        clippySpeak("Database connection error. Cannot save count.");
         return;
     }
     if (isViewingHistory) {
@@ -757,11 +416,11 @@ function counter_increment(type) {
     }
 
     let finalReason = "";
-    let updates = {};
+    let updates = {}; // Object to hold updates
 
     if (type === 'emergency') {
         let reasonInput = prompt("EMERGENCY:\n\n1. Social Media\n2. Phone/Calls\n3. Procrastination\n4. Other (Specify)", "");
-        if (reasonInput === null) return;
+        if (reasonInput === null) return; // User cancelled
 
         if (reasonInput === "1") finalReason = "Social Media";
         else if (reasonInput === "2") finalReason = "Phone/Calls";
@@ -772,29 +431,40 @@ function counter_increment(type) {
             finalReason = "Other (Unspecified)";
         }
 
-        const currentLog = currentCounters.emergencyLog || [];
+        // Get the current log safely, even if it's null/undefined initially
+        const currentLog = Array.isArray(currentCounters.emergencyLog) ? [...currentCounters.emergencyLog] : [];
         currentLog.push(finalReason);
-        updates.emergencyLog = currentLog;
+        updates.emergencyLog = currentLog; // Prepare log update
         if (soundError) soundError.play().catch(e => console.warn("Audio play failed:", e));
     }
 
-    // Use transaction for reliable increments, especially if multiple users might access (unlikely here, but good practice)
+    // Prepare count update using transaction for reliability
     todayCounterRef.child(type).transaction((currentCount) => {
         return (currentCount || 0) + 1;
+    }, (error, committed, snapshot) => {
+        if (error) {
+            console.error('Counter transaction failed abnormally!', error);
+            updateStatus('Counter Save Error');
+        } else if (!committed) {
+            console.warn('Counter transaction not committed (concurrent modification?).');
+             clippySpeak("Hmm, someone else might be updating at the same time. Try again?");
+        } else {
+            console.log('Counter transaction committed.');
+            // Check achievement goal AFTER successful commit
+            const newCount = snapshot.val(); // Get the actual new count
+            if (type === 'achievements' && newCount === 10) {
+                 clippySpeak("Congratulations! 10 Achievements! You deserve a prize!");
+            }
+        }
     });
 
-    // Update emergency log separately if needed
+
+    // Update emergency log separately IF it was modified
     if (updates.emergencyLog) {
          todayCounterRef.update({ emergencyLog: updates.emergencyLog }).catch(e => {
             console.error("Emergency log update failed:", e);
             updateStatus('Log Save Error');
         });
-    }
-
-    // Check achievement goal based on the *expected* new count
-    const newCount = (currentCounters[type] || 0) + 1;
-    if (type === 'achievements' && newCount === 10) {
-        clippySpeak("Congratulations! 10 Achievements! You deserve a prize!");
     }
 }
 
@@ -805,14 +475,19 @@ function counter_increment(type) {
 
 const tasksRef = db ? db.ref('tasks') : null;
 
+// ... (todayDate remains the same)
 function todayDate() { return new Date().toISOString().substring(0, 10); }
 
 function updateStatus(message) {
     if (statusSaveEl) {
         statusSaveEl.textContent = message;
-        setTimeout(() => { if (statusSaveEl) statusSaveEl.textContent = 'Ready'; }, 2000);
+        const isError = /error|fail/i.test(message); // Broader error check
+        if (!isError) {
+             setTimeout(() => { if (statusSaveEl && statusSaveEl.textContent === message) statusSaveEl.textContent = 'Ready'; }, 2000);
+        }
     }
 }
+
 
 function listenForTasks() {
     if (!tasksRef) {
@@ -821,15 +496,18 @@ function listenForTasks() {
     }
     tasksRef.on('value', (snapshot) => {
         const rawData = snapshot.val();
-        tasks = [];
+        tasks = []; // Reset global tasks array
         if (rawData) {
             for (let id in rawData) {
-                tasks.push({ ...rawData[id], id: id });
+                tasks.push({ ...rawData[id], id: id, dreadCount: rawData[id].dreadCount || 0 });
             }
         }
-        renderList();
-        updateLinearView();
-        updateDreadAnalysis();
+        // IMPORTANT: Only render/update if NOT viewing history
+        if (!isViewingHistory) {
+            renderList(); // Render full list
+            updateLinearView();
+            updateDreadAnalysis();
+        }
         updateStatus('Synced');
     }, (error) => {
         console.error("Firebase Task Read Failed. Check Rules:", error);
@@ -857,7 +535,6 @@ function updateTaskStatus(id, isDone) {
 
 function incrementDreadCount(id) {
     if (!tasksRef) return;
-    // Use transaction for dread count
     tasksRef.child(id).child('dreadCount').transaction((currentCount) => {
         return (currentCount || 0) + 1;
     });
@@ -880,56 +557,80 @@ function deleteAllTasks() {
     });
 }
 
-function getSortedTasks() {
-    return [...tasks].sort((a, b) => (b.createdDate || "").localeCompare(a.createdDate || ""));
-}
+// UPDATED: renderList now accepts optional tasks array
+// And handles disabling controls in history view
+function renderList(tasksToRender) {
+    const displayTasks = tasksToRender || tasks; // Use filtered list if provided, else global
+    const sortedTasks = [...displayTasks].sort((a, b) => (b.createdDate || "").localeCompare(a.createdDate || ""));
 
-
-function renderList(){
-    const sortedTasks = getSortedTasks();
     if (!listEl) return;
     listEl.innerHTML = '';
 
+    const isInHistory = isViewingHistory; // Cache history status for this render
+
     if (sortedTasks.length === 0) {
-        if (emptyMessageEl) emptyMessageEl.style.display = 'block';
+        if (emptyMessageEl) {
+             emptyMessageEl.textContent = isInHistory ? "No tasks created on this date." : "No tasks currently. Start by adding one!";
+             emptyMessageEl.style.display = 'block';
+        }
     } else {
         if (emptyMessageEl) emptyMessageEl.style.display = 'none';
     }
 
-    sortedTasks.forEach(t=>{
-      const li = document.createElement('li');
-      if (t.done) li.classList.add('done');
-      const cb = document.createElement('input');
-      cb.type='checkbox'; cb.checked=t.done;
-      cb.addEventListener('change',()=>{ updateTaskStatus(t.id, cb.checked); });
-      const span = document.createElement('span');
-      span.className='txt'; span.textContent=t.text;
-      const dreadBtn = document.createElement('button');
-      dreadBtn.className = 'dread-btn';
-      dreadBtn.title = `Mark as dreaded (${t.dreadCount || 0})`;
-      dreadBtn.innerHTML = '😰';
-      dreadBtn.addEventListener('click', () => { incrementDreadCount(t.id); });
-      const del = document.createElement('button');
-      del.className='del'; del.innerHTML='<i class="fas fa-trash"></i>';
-      del.addEventListener('click',()=>{ deleteTask(t.id); });
-      li.appendChild(cb);
-      li.appendChild(span);
-      li.appendChild(dreadBtn);
-      li.appendChild(del);
-      listEl.appendChild(li);
+    sortedTasks.forEach(t => {
+        const li = document.createElement('li');
+        if (t.done) li.classList.add('done');
+
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.checked = t.done;
+        cb.disabled = isInHistory; // Disable checkbox in history
+        if (!isInHistory) {
+            cb.addEventListener('change', () => { updateTaskStatus(t.id, cb.checked); });
+        }
+
+        const span = document.createElement('span');
+        span.className = 'txt';
+        span.textContent = t.text;
+
+        const dreadBtn = document.createElement('button');
+        dreadBtn.className = 'dread-btn';
+        dreadBtn.title = `Mark as dreaded (${t.dreadCount || 0})`;
+        dreadBtn.innerHTML = '😰';
+        dreadBtn.disabled = isInHistory; // Disable dread button in history
+        if (!isInHistory) {
+             dreadBtn.addEventListener('click', () => { incrementDreadCount(t.id); });
+        }
+
+
+        const del = document.createElement('button');
+        del.className = 'del';
+        del.innerHTML = '<i class="fas fa-trash"></i>';
+        del.disabled = isInHistory; // Disable delete button in history
+        if (!isInHistory) {
+             del.addEventListener('click', () => { deleteTask(t.id); });
+        }
+
+        li.appendChild(cb);
+        li.appendChild(span);
+        li.appendChild(dreadBtn);
+        li.appendChild(del);
+        listEl.appendChild(li);
     });
 
+    // Update total count based on the *full* task list, not the filtered one
     if (statusTotalEl) statusTotalEl.textContent = `Total: ${tasks.length}`;
 }
 
+
 function updateDreadAnalysis() {
     if (!dreadTaskNameEl) return;
+    // Always analyze the *current* full list of pending tasks
     const pendingTasks = tasks.filter(t => !t.done);
     if (pendingTasks.length === 0) {
          dreadTaskNameEl.textContent = '(None)';
          return;
     }
-    // Sort by dreadCount descending, then by creation date descending as tie-breaker
     const mostDreaded = pendingTasks.sort((a, b) => {
         const dreadDiff = (b.dreadCount || 0) - (a.dreadCount || 0);
         if (dreadDiff !== 0) return dreadDiff;
@@ -945,6 +646,7 @@ function updateDreadAnalysis() {
 
 
 function handleAddTask(){
+     if (isViewingHistory) return; // Should be disabled, but double-check
     const text = (newTaskEl.value||'').trim();
     if(!text) {
         clippySpeak("Please enter a task description first!");
@@ -952,18 +654,22 @@ function handleAddTask(){
     }
     addTaskToDB(text);
     newTaskEl.value='';
+    newTaskEl.focus();
 }
 
 function handleResetAll(){
     if(!confirm('ARE YOU SURE?\n\nThis will delete ALL tasks (permanently!)\nAND reset today\'s counters and log.')) return;
     deleteAllTasks();
     if (todayCounterRef && !isViewingHistory) {
-         // Use set instead of remove for consistency with handleResetTodayCounters
          const defaultCounters = { achievements: 0, neutral: 0, emergency: 0, emergencyLog: [] };
-         todayCounterRef.set(defaultCounters).catch(e => console.error("Counter reset failed:", e));
-         clippySpeak("All tasks and today's counters have been reset.");
+         todayCounterRef.set(defaultCounters).then(() => {
+             clippySpeak("All tasks and today's counters have been reset.");
+             updateStatus("All Reset");
+         }).catch(e => console.error("Counter reset failed:", e));
     } else if (isViewingHistory) {
          clippySpeak("Tasks cleared, but historical counters remain untouched.");
+         // Optionally, go back to today view after resetting tasks in history?
+         // handleBackToToday(); // Uncomment if desired
     }
 }
 
@@ -988,6 +694,7 @@ function handleResetTodayCounters() {
 
 
 function getProgress(){
+    // Always calculate progress based on the *full* task list
     const total = tasks.length;
     const done  = tasks.filter(t=>t.done).length;
     const pct   = total ? Math.round((done/total)*100) : 0;
@@ -1013,6 +720,7 @@ function updateLinearView(){
 // =================================================================
 // 🔥 Report & Clippy Logic 🔥
 // =================================================================
+// ... (analyzeDay remains the same)
 function analyzeDay() {
     const counters = currentCounters;
     const allTasks = tasks;
@@ -1024,10 +732,11 @@ function analyzeDay() {
     let level = "";
     let advice = "";
 
-    const { total, done, pct } = getProgress();
+    const { total, done, pct } = getProgress(); // Use current progress
     if (!isViewingHistory) {
          taskAnalysis = `You also completed ${done} out of ${total} tasks today (${pct}%).`;
     }
+
 
     if (ach >= 10 && emg < 3) {
         level = "Excellent Focus";
@@ -1056,47 +765,47 @@ function analyzeDay() {
     return { level, advice, quote, ach, emg, totalTasks: total, doneTasks: done, pctTasks: pct, log, allTasks };
 }
 
+// ... (clippySpeak remains the same)
 function clippySpeak(message, hold = false) {
-    // Only speak if agent is loaded and not currently speaking
-    if (clippyAgent && !clippyAgent.busy()) {
+    if (clippyAgent) {
         clippyAgent.speak(message, hold);
-    } else if (clippyAgent && clippyAgent.busy()){
-        console.log("Clippy busy, queuing message:", message);
-        // Basic queueing: try again shortly
-        setTimeout(() => clippySpeak(message, hold), 500);
     } else {
         console.log("Clippy fallback (agent not ready):", message);
     }
 }
 
-
+// ... (showClippyAnalysis remains the same)
 function showClippyAnalysis() {
+    if (typeof clippy === 'undefined') {
+         alert("Clippy library failed to load. Check internet connection.");
+         return;
+    }
     if (!clippyAgent) {
-        console.warn("Clippy not loaded yet.");
+        console.warn("Clippy agent not loaded yet.");
         alert("Clippy is still loading, please wait a moment and try again.");
         return;
     }
     const analysis = analyzeDay();
-    clippyAgent.stop(); // Stop previous actions
+    clippyAgent.stop();
     clippyAgent.show();
     clippySpeak(`Hi Mohammed! Analysis for ${isViewingHistory && historyDateInput ? `date ${historyDateInput.value}` : 'today'}:`);
-    clippySpeak(`Level: ${analysis.level}.`, true); // Hold while speaking
-    clippySpeak(analysis.advice, true);
+    clippySpeak(`Level: ${analysis.level}.`);
+    clippySpeak(analysis.advice);
     clippySpeak(`Quote for you: ${analysis.quote}`);
     clippyAgent.animate();
 }
 
-
+// ... (generateDailyReport remains the same, using Helvetica fallback)
 function generateDailyReport() {
     try {
-        if (typeof jspdf === 'undefined' || typeof jspdf.jsPDF === 'undefined' || typeof jspdf.plugin === 'undefined' || typeof jspdf.plugin.autotable === 'undefined') {
+        if (typeof window.jspdf === 'undefined' || !window.jspdf.jsPDF || typeof window.jspdf.plugin === 'undefined' || typeof window.jspdf.plugin.autotable === 'undefined') {
              clippySpeak("PDF libraries are missing. Cannot generate report. Check internet?");
-             console.error("jsPDF or jsPDF-AutoTable not loaded!");
-             alert("Error: PDF Generation Failed (Libraries Missing). Check console and internet connection.");
+             console.error("jsPDF or jsPDF-AutoTable not loaded! Check network tab in developer tools.");
+             alert("Error: PDF Generation Failed (Libraries Missing).\n\nPlease ensure you are connected to the internet and try refreshing the page (Ctrl+Shift+R). If the problem persists, check the browser console for errors.");
              return;
         }
 
-        const { jsPDF } = jspdf; // Correct way to access jsPDF constructor
+        const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
         const dateStr = isViewingHistory && historyDateInput ? historyDateInput.value : counter_getTodayDateString();
         const analysis = analyzeDay();
@@ -1127,7 +836,6 @@ function generateDailyReport() {
         doc.text(adviceLines, 14, 61);
         let y = 61 + (adviceLines.length * 7) + 5;
 
-        // Ensure Y doesn't go off page before Summary
         if (y > 270) { doc.addPage(); y = 20; }
 
         doc.setFont('Helvetica', 'bold');
@@ -1143,7 +851,6 @@ function generateDailyReport() {
         doc.text(`- Tasks Completed: ${analysis.doneTasks} / ${analysis.totalTasks} (${analysis.pctTasks}%)`, 20, y);
         y += 10;
 
-        // Ensure Y doesn't go off page before Log
         if (y > 270) { doc.addPage(); y = 20; }
 
         doc.setFont('Helvetica', 'bold');
@@ -1153,12 +860,12 @@ function generateDailyReport() {
 
         doc.setFont('Helvetica', 'normal');
         doc.setFontSize(10);
-        if (analysis.log.length > 0) {
+        if (analysis.log && analysis.log.length > 0) {
             const logLines = analysis.log.map((entry, index) => `${index + 1}. ${entry}`);
              const splitLog = doc.splitTextToSize(logLines.join('\n'), 182);
-             // Check if splitLog will fit on current page
              if (y + (splitLog.length * 5) > 280) { doc.addPage(); y = 20;}
-             doc.text(splitLog, 14, y);
+             // Use text with options for potential Arabic display (if system supports it)
+             doc.text(splitLog, 14, y, { lang: 'ar' });
              y += (splitLog.length * 5) + 5;
         } else {
             if (y > 270) { doc.addPage(); y = 20; }
@@ -1175,27 +882,34 @@ function generateDailyReport() {
                  startY: y,
                  theme: 'grid',
                  headStyles: { font: 'Helvetica', fontStyle: 'bold', fillColor: [220, 220, 220], textColor: [0, 0, 0], fontSize: 10 },
-                 bodyStyles: { font: 'Helvetica', fontStyle: 'normal', fontSize: 9 },
+                 // Body styles require font that *might* support Arabic if present on user system
+                 bodyStyles: { font: 'Helvetica', fontStyle: 'normal', fontSize: 9, cellPadding: 2 },
                  columnStyles: { 0: { cellWidth: 'auto' } },
-                 margin: { left: 14, right: 14 }, // Add margins
-                 didDrawPage: function(data) { y = data.cursor.y; } // Update y after page break
+                 margin: { left: 14, right: 14 },
+                 didDrawPage: function(data) { y = data.cursor.y + 10; }
             };
 
-            if (completedTasks.length > 0) {
-                 if (y > 260) { doc.addPage(); y = 20; tableOptions.startY = y; } // Check page break before table
-                 doc.autoTable({ ...tableOptions, head: [['Completed Tasks']], body: completedTasks });
+             const drawTable = (headText, bodyData) => {
+                 const estimatedHeight = (bodyData.length + 1) * 7 + 10;
+                 if (y + estimatedHeight > 280) {
+                     doc.addPage();
+                     y = 20;
+                 }
+                 tableOptions.startY = y;
+                 doc.autoTable({ ...tableOptions, head: [[headText]], body: bodyData });
                  y = doc.autoTable.previous.finalY + 10;
+             };
+
+            if (completedTasks.length > 0) {
+                 drawTable('Completed Tasks', completedTasks);
             }
 
             if (pendingTasks.length > 0) {
-                 if (y > 260) { doc.addPage(); y = 20; tableOptions.startY = y; } // Check page break before table
-                 tableOptions.startY = y; // Update startY for the second table
-                 doc.autoTable({ ...tableOptions, head: [['Pending Tasks']], body: pendingTasks });
-                 y = doc.autoTable.previous.finalY + 10;
+                 drawTable('Pending Tasks', pendingTasks);
             }
         }
 
-        if (y > 270) { doc.addPage(); y = 20; } // Check page break before quote
+        if (y > 270) { doc.addPage(); y = 20; }
 
         doc.setFont('Helvetica', 'italic');
         doc.setFontSize(12);
@@ -1211,7 +925,6 @@ function generateDailyReport() {
         alert("PDF Generation Failed. See console for details.");
     }
 }
-
 
 // =================================================================
 // 🔥 INIT (Assign Elements & Attach Listeners) 🔥
@@ -1229,11 +942,16 @@ document.addEventListener('DOMContentLoaded', () => {
     dreadTaskNameEl = document.getElementById('dread-task-name');
     allCounterButtons = document.querySelectorAll('.counter-fieldset button');
     logTextareaEl = document.getElementById('emergency-log');
+    emergencyLogLegendEl = document.getElementById('emergency-log-legend'); // Assign legend
     soundTada = document.getElementById('sound-tada');
     soundError = document.getElementById('sound-error');
+    addTaskFieldset = document.getElementById('add-task-fieldset');
+    progressBarContainer = document.getElementById('progress-bar-container'); // Need to add this ID in HTML
+    dreadAnalysisFieldset = document.getElementById('dread-analysis-fieldset');
+    taskListLegendEl = document.getElementById('task-list-legend'); // Need to add this ID in HTML
 
-    const logonScreenEl = document.getElementById('logon-screen');
-    const logonBtnEl = document.getElementById('logon-ok');
+    logonScreenEl = document.getElementById('logon-screen');
+    logonBtnEl = document.getElementById('logon-ok');
     reportBtnEl = document.getElementById('report-panel-btn');
     clippyBtnEl = document.getElementById('clippy-panel-btn');
     resetTodayBtnEl = document.getElementById('reset-today-panel-btn');
@@ -1242,24 +960,35 @@ document.addEventListener('DOMContentLoaded', () => {
     historyLoadBtn = document.getElementById('history-load-btn');
     historyTodayBtn = document.getElementById('history-today-btn');
 
+     // Add IDs to elements that need show/hide
+     const progressBarDiv = document.getElementById('v-linear');
+     if (progressBarDiv) progressBarDiv.id = 'progress-bar-container'; // Assign if found
+     progressBarContainer = document.getElementById('progress-bar-container'); // Re-assign after potentially adding ID
+
+     const taskListFieldset = document.getElementById('task-list-fieldset'); // Find fieldset
+     const taskListLegend = taskListFieldset ? taskListFieldset.querySelector('legend') : null;
+     if(taskListLegend && !taskListLegend.id) taskListLegend.id = 'task-list-legend'; // Assign ID if not present
+     taskListLegendEl = document.getElementById('task-list-legend'); // Re-assign
+
+
     // Load Clippy Agent
     if (typeof clippy !== 'undefined') {
         clippy.load('Clippy', (agent) => {
             clippyAgent = agent;
             console.log("Clippy loaded successfully!");
-            // Attach listener only after agent is loaded
             if (clippyBtnEl) {
+                clippyBtnEl.disabled = false; // Enable button on load
                 clippyBtnEl.addEventListener('click', showClippyAnalysis);
             } else {
-                 console.warn("Clippy button not found.");
+                 console.warn("Clippy button not found during agent load.");
             }
         }, (error) => {
              console.error("Clippy failed to load:", error);
-             if (clippyBtnEl) clippyBtnEl.disabled = true; // Disable if load fails
+             if (clippyBtnEl) clippyBtnEl.disabled = true;
         });
     } else {
-        console.error("Clippy library not found!");
-        if (clippyBtnEl) clippyBtnEl.disabled = true; // Disable if library missing
+        console.error("Clippy library not found! Button will be disabled.");
+        if (clippyBtnEl) clippyBtnEl.disabled = true;
     }
 
 
@@ -1286,7 +1015,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (resetAllBtn) resetAllBtn.addEventListener('click', handleResetAll); else { console.warn("Reset All button not found."); }
 
     // History View Listeners
-    if (historyLoadBtn) {
+    if (historyLoadBtn && historyDateInput) {
         historyLoadBtn.addEventListener('click', () => {
             const date = historyDateInput.value;
             if (!date) {
@@ -1294,30 +1023,35 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
             isViewingHistory = true;
-            updateCounterUI();
-            counter_listenForChanges(date);
+            // Filter tasks for the selected date
+            const filteredTasks = tasks.filter(task => task.createdDate === date);
+            renderList(filteredTasks); // Render only historical tasks
+            counter_listenForChanges(date); // Load counters and triggers updateCounterUI
             clippySpeak(`Loading data for ${date}...`);
         });
-    } else { console.warn("History Load button not found."); }
+    } else { console.warn("History Load button or date input not found."); }
 
     if (historyTodayBtn) {
         historyTodayBtn.addEventListener('click', () => {
             isViewingHistory = false;
-            historyDateInput.value = ''; // Clear date input
-            updateCounterUI();
-            counter_listenForChanges(null); // Load today's data
+            historyDateInput.value = '';
+            renderList(); // Render all current tasks
+            counter_listenForChanges(null); // Load today's data and triggers updateCounterUI
             clippySpeak("Back to today's view!");
         });
     } else { console.warn("History Today button not found."); }
 
     // Start Firebase Listeners (only if db initialized)
     if (db) {
-        listenForTasks();
-        counter_listenForChanges(null); // Initial load for today
+        listenForTasks(); // Listens for ALL tasks
+        counter_listenForChanges(null); // Initial load for today's counters
     } else {
-        // Firebase failed, update status bar
         if(statusSaveEl) statusSaveEl.textContent = 'DB Connection Error!';
         console.error("Firebase DB object not initialized. Cannot start listeners.");
+        // Disable UI elements reliant on DB
+         const elementsToDisable = [addBtn, resetAllBtn, reportBtnEl, clippyBtnEl, resetTodayBtnEl, historyLoadBtn, newTaskEl];
+         elementsToDisable.forEach(el => { if (el) el.disabled = true; });
+         if (allCounterButtons) allCounterButtons.forEach(btn => btn.disabled = true);
     }
 });
 </script>
