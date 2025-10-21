@@ -8,6 +8,8 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
 <style>
   /* ====== Windows 95 Theme Variables (W95 Plus) ====== */
@@ -416,7 +418,6 @@
     </div>
   </div>
 
-
   <main class="wrap window">
     <div class="window-inner">
       <div class="title-bar">
@@ -517,6 +518,7 @@
 // 🔥 FIREBASE INITIALIZATION & CONFIG 🔥
 // =================================================================
 
+// The firebase object should be defined now, if internet is on.
 const firebaseConfig = {
   // مفاتيحك التي تم تأكيدها
   apiKey: "AIzaSyBvpcUP-DmXH82WHgm4ZLHezeBFaaxMnCE",
@@ -528,7 +530,14 @@ const firebaseConfig = {
   appId: "1:271781862481:web:dfd63b2c4b4a8d74ad2c70"
 };
 
-firebase.initializeApp(firebaseConfig);
+// Initialize Firebase
+try {
+    firebase.initializeApp(firebaseConfig);
+} catch (e) {
+    console.error("Firebase initialization failed:", e);
+    alert("CRITICAL ERROR: Firebase libraries did not load. Please check your internet connection and refresh the page.");
+}
+
 const db = firebase.database();
 
 // =================================================================
@@ -556,9 +565,9 @@ function counter_listenForChanges() {
             currentCounters = data;
         } else {
             currentCounters = { achievements: 0, neutral: 0, emergency: 0, emergencyLog: [] }; 
+            todayCounterRef.set(currentCounters).catch(e => console.error("Initial counter set failed:", e));
         }
         
-        // Update UI
         document.getElementById('achievements-count').innerText = currentCounters.achievements || 0;
         document.getElementById('neutral-count').innerText = currentCounters.neutral || 0;
         document.getElementById('emergency-count').innerText = currentCounters.emergency || 0;
@@ -566,11 +575,14 @@ function counter_listenForChanges() {
         const logTextarea = document.getElementById('emergency-log');
         const logData = currentCounters.emergencyLog || [];
         if (logData.length > 0) {
-            logTextarea.value = logData.join('\n'); // Join each log entry with a new line
+            logTextarea.value = logData.join('\n'); 
         } else {
             logTextarea.value = '(No emergencies logged today)';
         }
-        logTextarea.scrollTop = logTextarea.scrollHeight; // Auto-scroll to bottom
+        logTextarea.scrollTop = logTextarea.scrollHeight; 
+    }, (error) => {
+        console.error("Firebase Counter Read Failed. Check your Firebase Rules:", error);
+        if(statusSaveEl) updateStatus('Counter Sync Error');
     });
 }
 
@@ -586,7 +598,7 @@ function counter_increment(type) {
         else if (reasonInput === "3") finalReason = "Procrastination";
         else if (reasonInput === "4") finalReason = prompt("Specify 'Other' reason:") || "Other (Unspecified)";
         else if (reasonInput && reasonInput.trim() !== "") finalReason = reasonInput;
-        else return; // User cancelled
+        else return; 
         
         const currentLog = currentCounters.emergencyLog || [];
         currentLog.push(finalReason);
@@ -610,20 +622,16 @@ function counter_increment(type) {
 // =================================================================
 
 const tasksRef = db.ref('tasks');
-let tasks = []; // This will hold the tasks from Firebase
-const listEl    = document.getElementById('list');
-const newTaskEl = document.getElementById('newTask');
-const addBtn    = document.getElementById('addBtn');
-const resetBtn  = document.getElementById('resetBtn');
-const emptyMessageEl = document.getElementById('emptyMessage');
-const statusTotalEl = document.getElementById('status-total');
-const statusSaveEl = document.getElementById('status-save');
+let tasks = []; 
+let listEl, newTaskEl, addBtn, resetBtn, emptyMessageEl, statusTotalEl, statusSaveEl;
 
 function todayDate() { return new Date().toISOString().substring(0, 10); }
 
 function updateStatus(message) {
-    statusSaveEl.textContent = message;
-    setTimeout(() => { statusSaveEl.textContent = 'Ready'; }, 2000);
+    if (statusSaveEl) {
+        statusSaveEl.textContent = message;
+        setTimeout(() => { statusSaveEl.textContent = 'Ready'; }, 2000);
+    }
 }
 
 function listenForTasks() {
@@ -639,8 +647,8 @@ function listenForTasks() {
         updateLinearView();
         updateStatus('Synced');
     }, (error) => {
-        console.error("Firebase Read Failed (Rules check):", error);
-        updateStatus('Sync Error');
+        console.error("Firebase Read Failed. Check your Firebase Rules:", error);
+        updateStatus('Task Sync Error');
     });
 }
 
@@ -688,12 +696,14 @@ function getSortedTasks() {
 
 function renderList(){
     const sortedTasks = getSortedTasks();
+    if (!listEl) return; 
+    
     listEl.innerHTML = '';
     
     if (sortedTasks.length === 0) {
-        emptyMessageEl.style.display = 'block';
+        if (emptyMessageEl) emptyMessageEl.style.display = 'block';
     } else {
-        emptyMessageEl.style.display = 'none';
+        if (emptyMessageEl) emptyMessageEl.style.display = 'none';
     }
 
     sortedTasks.forEach(t=>{
@@ -713,7 +723,7 @@ function renderList(){
       listEl.appendChild(li);
     });
     
-    statusTotalEl.textContent = `Total: ${tasks.length}`;
+    if (statusTotalEl) statusTotalEl.textContent = `Total: ${tasks.length}`;
 }
 
 function handleAddTask(){
@@ -728,11 +738,7 @@ function handleAddTask(){
 
 function handleResetAll(){
     if(!confirm('Are you sure you want to delete ALL tasks?\n\nThis will ALSO reset today\'s counters and emergency log.')) return;
-    
-    // 1. Delete all tasks
     deleteAllTasks(); 
-    
-    // 2. Delete today's counters and log
     if (todayCounterRef) {
         todayCounterRef.remove().catch(e => console.error("Counter reset failed:", e));
     }
@@ -765,9 +771,7 @@ function updateLinearView(){
 // 🔥 NEW: Report Generation Logic 🔥
 // =================================================================
 
-// This function provides the "smart analysis"
 function analyzeDay() {
-    // Get data from our global variables
     const counters = currentCounters;
     const allTasks = tasks; 
 
@@ -781,7 +785,6 @@ function analyzeDay() {
     let level = "";
     let advice = "";
 
-    // Smart Analysis Logic
     if (ach >= 10 && emg < 3) {
         level = "Excellent Focus";
         advice = "Incredible performance! You hit your achievement goal with minimal distractions. This is a model day. Keep this momentum!";
@@ -820,39 +823,27 @@ function generateDailyReport() {
         const today = counter_getTodayDateString();
         const analysis = analyzeDay();
         
-        // --- PDF Content ---
         doc.setFont('Helvetica', 'bold');
         doc.setFontSize(18);
         doc.text("Mohammed's Daily Report", 14, 22);
-
         doc.setFontSize(12);
         doc.setFont('Helvetica', 'normal');
         doc.text(`Date: ${today}`, 14, 30);
-
-        doc.line(14, 35, 196, 35); // Separator
-
-        // --- Analysis Section ---
+        doc.line(14, 35, 196, 35); 
         doc.setFont('Helvetica', 'bold');
         doc.setFontSize(14);
         doc.text("Today's Analysis:", 14, 45);
-        
         doc.setFont('Helvetica', 'normal');
         doc.setFontSize(12);
         doc.text(`Your Level: ${analysis.level}`, 14, 53);
-        
         doc.setFont('Helvetica', 'italic');
-        // Use splitTextToSize to wrap long text
         const adviceLines = doc.splitTextToSize(analysis.advice, 182);
         doc.text(adviceLines, 14, 61);
-        
-        let y = 61 + (adviceLines.length * 7) + 5; // Dynamic Y position
-
-        // --- Summary Section ---
+        let y = 61 + (adviceLines.length * 7) + 5; 
         doc.setFont('Helvetica', 'bold');
         doc.setFontSize(14);
         doc.text("Summary:", 14, y);
         y += 8;
-
         doc.setFont('Helvetica', 'normal');
         doc.setFontSize(12);
         doc.text(`- Achievements Logged: ${analysis.ach}`, 20, y);
@@ -860,13 +851,10 @@ function generateDailyReport() {
         y += 8;
         doc.text(`- Tasks Completed: ${analysis.doneTasks} / ${analysis.totalTasks} (${analysis.pctTasks}%)`, 20, y);
         y += 10;
-
-        // --- Emergency Log Section ---
         doc.setFont('Helvetica', 'bold');
         doc.setFontSize(14);
         doc.text("Emergency Log Review:", 14, y);
         y += 8;
-
         doc.setFont('Helvetica', 'normal');
         doc.setFontSize(10);
         if (analysis.log.length > 0) {
@@ -878,21 +866,23 @@ function generateDailyReport() {
             doc.text("(No emergencies logged today. Excellent!)", 14, y);
             y += 10;
         }
-        
-        // --- Motivational Quote ---
-        doc.line(14, y, 196, y); // Separator
+        doc.line(14, y, 196, y); 
         y += 8;
         doc.setFont('Helvetica', 'italic');
         doc.setFontSize(12);
         const quoteLines = doc.splitTextToSize(`"${analysis.quote}"`, 182);
         doc.text(quoteLines, 14, y);
 
-        // --- Save PDF ---
         doc.save(`Daily-Report-Mohammed-${today}.pdf`);
 
     } catch (e) {
         console.error("PDF Generation Failed:", e);
-        alert("Error: Could not generate PDF. Make sure you are connected to the internet.\n\n(Error details: jsPDF library might be blocked or missing.)");
+        // Check if jsPDF loaded
+        if (typeof jsPDF === 'undefined') {
+            alert("Error: PDF library (jsPDF) failed to load. Please check your internet connection and refresh.");
+        } else {
+            alert("An unknown error occurred during PDF generation.");
+        }
     }
 }
 
@@ -901,25 +891,52 @@ function generateDailyReport() {
 // 🔥 INIT (Start all listeners) 🔥
 // =================================================================
 document.addEventListener('DOMContentLoaded', () => {
-    // Logon Screen Logic
+    
+    // Assign all element variables INSIDE this listener
+    listEl = document.getElementById('list');
+    newTaskEl = document.getElementById('newTask');
+    addBtn = document.getElementById('addBtn');
+    resetBtn = document.getElementById('resetBtn');
+    emptyMessageEl = document.getElementById('emptyMessage');
+    statusTotalEl = document.getElementById('status-total');
+    statusSaveEl = document.getElementById('status-save');
+    
     const logonScreenEl = document.getElementById('logon-screen');
     const logonBtnEl = document.getElementById('logon-ok');
-    logonBtnEl.addEventListener('click', () => {
-        logonScreenEl.style.display = 'none';
-    });
+    const reportBtnEl = document.getElementById('report-panel-btn');
+
+    // Logon Screen Logic
+    if (logonBtnEl) {
+        logonBtnEl.addEventListener('click', () => {
+            if (logonScreenEl) logonScreenEl.style.display = 'none';
+        });
+    }
 
     // Report Button Logic
-    const reportBtnEl = document.getElementById('report-panel-btn');
-    reportBtnEl.addEventListener('click', generateDailyReport);
+    if (reportBtnEl) {
+        reportBtnEl.addEventListener('click', generateDailyReport);
+    }
 
     // Task App Listeners
-    addBtn.addEventListener('click', handleAddTask);
-    newTaskEl.addEventListener('keydown', e => { if(e.key==='Enter') handleAddTask(); });
-    resetBtn.addEventListener('click', handleResetAll);
+    if (addBtn) {
+        addBtn.addEventListener('click', handleAddTask);
+    }
+    if (newTaskEl) {
+        newTaskEl.addEventListener('keydown', e => { if(e.key==='Enter') handleAddTask(); });
+    }
+    if (resetBtn) {
+        resetBtn.addEventListener('click', handleResetAll);
+    }
 
     // Start Firebase Listeners
-    listenForTasks();           // Start listening for FIREBASE task changes
-    counter_listenForChanges(); // Start listening for FIREBASE counter changes
+    // Check if firebase is defined before starting
+    if (typeof firebase !== 'undefined') {
+        listenForTasks();           // Start listening for FIREBASE task changes
+        counter_listenForChanges(); // Start listening for FIREBASE counter changes
+    } else {
+        // This will show if the libraries failed to load but the script still ran
+        alert("Error: Firebase is not loaded. Please check your internet connection and refresh the page.");
+    }
 });
 </script>
 </body>
