@@ -10,13 +10,16 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
+<script src="https://raw.githack.com/MrM-M/Amiri-Font-jsPDF/main/Amiri-Regular-normal.js"></script>
+
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 <script src="https://unpkg.com/clippyjs@0.0.3/dist/clippy.min.js"></script>
 
 
 <style>
-  /* Styles remain largely the same, minor adjustments if needed */
+  /* ... (جميع أكواد CSS الخاصة بك تبقى كما هي) ... */
   :root{--bg:#c0c0c0;--fg:#000000;--accent:#000080;--accent-fg:#ffffff;--line-dark:#808080;--line-medium:#a0a0a0;--line-light:#ffffff;--input-fill:#ffffff;--font:'Tahoma', 'Arial', sans-serif;--progress-color:#008040;--subtle: #d0d0d0;--taskbar-green: #008080;}
   *{box-sizing:border-box;font-family: var(--font);font-size: 10pt;transition: none !important;}
   html,body{margin:0; background:var(--taskbar-green);}
@@ -359,9 +362,9 @@ function counter_listenForChanges(dateString) {
             updateCounterUI();
         });
     } else {
-         console.log("Already listening to:", newRefPath);
-         // Force UI update even if listener exists, in case initial load failed or state is inconsistent
-         updateCounterUI();
+       console.log("Already listening to:", newRefPath);
+       // Force UI update even if listener exists, in case initial load failed or state is inconsistent
+       updateCounterUI();
     }
 }
 
@@ -795,14 +798,15 @@ function showClippyAnalysis() {
     clippyAgent.animate();
 }
 
-// ... (generateDailyReport remains the same, using Helvetica fallback)
+// 🔥🔥 [تم الاستبدال] دالة التقرير الجديدة والمحسّنة (تدعم اللغة العربية) 🔥🔥
 function generateDailyReport() {
     try {
-        if (typeof window.jspdf === 'undefined' || !window.jspdf.jsPDF || typeof window.jspdf.plugin === 'undefined' || typeof window.jspdf.plugin.autotable === 'undefined') {
-             clippySpeak("PDF libraries are missing. Cannot generate report. Check internet?");
-             console.error("jsPDF or jsPDF-AutoTable not loaded! Check network tab in developer tools.");
-             alert("Error: PDF Generation Failed (Libraries Missing).\n\nPlease ensure you are connected to the internet and try refreshing the page (Ctrl+Shift+R). If the problem persists, check the browser console for errors.");
-             return;
+        // 1. الإصلاح: تم تغيير طريقة التحقق من المكتبات
+        if (typeof window.jspdf === 'undefined' || typeof window.jspdf.jsPDF === 'undefined' || typeof window.jspdf.jsPDF.prototype.autoTable === 'undefined') {
+            clippySpeak("PDF libraries are missing. Cannot generate report. Check internet?");
+            console.error("jsPDF or jsPDF-AutoTable not loaded! Check network tab in developer tools.");
+            alert("Error: PDF Generation Failed (Libraries Missing).\n\nPlease ensure you are connected to the internet and try refreshing the page (Ctrl+Shift+R). If the problem persists, check the browser console for errors.");
+            return;
         }
 
         const { jsPDF } = window.jspdf;
@@ -810,114 +814,122 @@ function generateDailyReport() {
         const dateStr = isViewingHistory && historyDateInput ? historyDateInput.value : counter_getTodayDateString();
         const analysis = analyzeDay();
 
-        // Use standard Helvetica font
-        doc.setFont('Helvetica', 'normal');
+        // 2. تفعيل الخط العربي وتعيين اتجاه الصفحة (RTL)
+        doc.addFont('Amiri-Regular-normal.js', 'Amiri', 'normal');
+        doc.setFont('Amiri', 'normal');
+        doc.setR2L(true); // تفعيل وضع من اليمين لليسار
 
-        doc.setFont('Helvetica', 'bold');
+        const pageTitle = "تقرير الإنجاز اليومي";
+        const dateText = `التاريخ: ${dateStr}`;
+
+        doc.setFont('Amiri', 'bold');
         doc.setFontSize(18);
-        doc.text("Mohammed's Daily Report", 14, 22);
+        doc.text(pageTitle, doc.internal.pageSize.getWidth() - 14, 22, { align: 'right' });
 
         doc.setFontSize(12);
-        doc.setFont('Helvetica', 'normal');
-        doc.text(`Date: ${dateStr}`, 14, 30);
+        doc.setFont('Amiri', 'normal');
+        doc.text(dateText, doc.internal.pageSize.getWidth() - 14, 30, { align: 'right' });
 
-        doc.line(14, 35, 196, 35);
+        doc.line(14, 35, doc.internal.pageSize.getWidth() - 14, 35); // خط فاصل
 
-        doc.setFont('Helvetica', 'bold');
+        let y = 45; // متغير لتتبع الموضع الرأسي
+
+        doc.setFont('Amiri', 'bold');
         doc.setFontSize(14);
-        doc.text("Analysis:", 14, 45);
+        doc.text("التحليل:", doc.internal.pageSize.getWidth() - 14, y, { align: 'right' });
+        y += 8;
 
-        doc.setFont('Helvetica', 'normal');
+        doc.setFont('Amiri', 'normal');
         doc.setFontSize(12);
-        doc.text(`Level: ${analysis.level}`, 14, 53);
+        doc.text(`المستوى: ${analysis.level}`, doc.internal.pageSize.getWidth() - 14, y, { align: 'right' });
+        y += 8;
 
-        doc.setFont('Helvetica', 'italic');
+        doc.setFont('Amiri', 'italic');
         const adviceLines = doc.splitTextToSize(analysis.advice, 182);
-        doc.text(adviceLines, 14, 61);
-        let y = 61 + (adviceLines.length * 7) + 5;
+        doc.text(adviceLines, doc.internal.pageSize.getWidth() - 14, y, { align: 'right' });
+        y += (adviceLines.length * 7) + 5;
 
-        if (y > 270) { doc.addPage(); y = 20; }
-
-        doc.setFont('Helvetica', 'bold');
+        // 3. إعادة تصميم الملخص ليكون أفضل
+        doc.setFont('Amiri', 'bold');
         doc.setFontSize(14);
-        doc.text("Summary:", 14, y);
-        y += 8;
-
-        doc.setFont('Helvetica', 'normal');
-        doc.setFontSize(12);
-        doc.text(`- Achievements: ${analysis.ach}`, 20, y);
-        doc.text(`- Emergencies: ${analysis.emg}`, 100, y);
-        y += 8;
-        doc.text(`- Tasks Completed: ${analysis.doneTasks} / ${analysis.totalTasks} (${analysis.pctTasks}%)`, 20, y);
+        doc.text("الملخص:", doc.internal.pageSize.getWidth() - 14, y, { align: 'right' });
         y += 10;
 
-        if (y > 270) { doc.addPage(); y = 20; }
+        doc.setFont('Amiri', 'normal');
+        doc.setFontSize(12);
+        doc.text(`- الإنجازات: ${analysis.ach}`, doc.internal.pageSize.getWidth() - 20, y, { align: 'right' });
+        doc.text(`- الطوارئ: ${analysis.emg}`, doc.internal.pageSize.getWidth() - 100, y, { align: 'right' });
+        y += 8;
+        doc.text(`- المهام المنجزة: ${analysis.doneTasks} / ${analysis.totalTasks} (${analysis.pctTasks}%)`, doc.internal.pageSize.getWidth() - 20, y, { align: 'right' });
+        y += 10;
+        
+        if (y > 270) { doc.addPage(); y = 20; } // إضافة صفحة جديدة إذا لزم الأمر
 
-        doc.setFont('Helvetica', 'bold');
+        // 4. سجل الطوارئ (يدعم العربية)
+        doc.setFont('Amiri', 'bold');
         doc.setFontSize(14);
-        doc.text("Emergency Log:", 14, y);
+        doc.text("سجل الطوارئ:", doc.internal.pageSize.getWidth() - 14, y, { align: 'right' });
         y += 8;
 
-        doc.setFont('Helvetica', 'normal');
+        doc.setFont('Amiri', 'normal');
         doc.setFontSize(10);
         if (analysis.log && analysis.log.length > 0) {
             const logLines = analysis.log.map((entry, index) => `${index + 1}. ${entry}`);
-             const splitLog = doc.splitTextToSize(logLines.join('\n'), 182);
-             if (y + (splitLog.length * 5) > 280) { doc.addPage(); y = 20;}
-             // Use text with options for potential Arabic display (if system supports it)
-             doc.text(splitLog, 14, y, { lang: 'ar' });
-             y += (splitLog.length * 5) + 5;
+            const splitLog = doc.splitTextToSize(logLines.join('\n'), 182);
+            if (y + (splitLog.length * 5) > 280) { doc.addPage(); y = 20; }
+            doc.text(splitLog, doc.internal.pageSize.getWidth() - 14, y, { align: 'right' });
+            y += (splitLog.length * 5) + 5;
         } else {
             if (y > 270) { doc.addPage(); y = 20; }
-            doc.text("(No emergencies logged.)", 14, y);
+            doc.text("(لا توجد طوارئ مسجلة)", doc.internal.pageSize.getWidth() - 14, y, { align: 'right' });
             y += 10;
         }
 
-        // Task List Tables
+        // 5. جداول المهام (تدعم العربية)
+        const tableOptions = {
+            startY: y,
+            theme: 'grid',
+            headStyles: { font: 'Amiri', fontStyle: 'bold', fillColor: [220, 220, 220], textColor: [0, 0, 0], fontSize: 10, halign: 'right' },
+            bodyStyles: { font: 'Amiri', fontStyle: 'normal', fontSize: 9, cellPadding: 2, halign: 'right' },
+            columnStyles: { 0: { cellWidth: 'auto' } },
+            margin: { left: 14, right: 14 },
+            didDrawPage: function(data) { y = data.cursor.y + 10; }
+        };
+
+        const drawTable = (headText, bodyData) => {
+            const estimatedHeight = (bodyData.length + 1) * 7 + 10;
+            if (y + estimatedHeight > 280) {
+                doc.addPage();
+                y = 20;
+            }
+            tableOptions.startY = y;
+            doc.autoTable({ ...tableOptions, head: [[headText]], body: bodyData });
+            y = doc.autoTable.previous.finalY + 10;
+        };
+
         if (analysis.allTasks.length > 0) {
             const completedTasks = analysis.allTasks.filter(t => t.done).map(t => [t.text]);
             const pendingTasks = analysis.allTasks.filter(t => !t.done).map(t => [t.text]);
 
-            const tableOptions = {
-                 startY: y,
-                 theme: 'grid',
-                 headStyles: { font: 'Helvetica', fontStyle: 'bold', fillColor: [220, 220, 220], textColor: [0, 0, 0], fontSize: 10 },
-                 // Body styles require font that *might* support Arabic if present on user system
-                 bodyStyles: { font: 'Helvetica', fontStyle: 'normal', fontSize: 9, cellPadding: 2 },
-                 columnStyles: { 0: { cellWidth: 'auto' } },
-                 margin: { left: 14, right: 14 },
-                 didDrawPage: function(data) { y = data.cursor.y + 10; }
-            };
-
-             const drawTable = (headText, bodyData) => {
-                 const estimatedHeight = (bodyData.length + 1) * 7 + 10;
-                 if (y + estimatedHeight > 280) {
-                     doc.addPage();
-                     y = 20;
-                 }
-                 tableOptions.startY = y;
-                 doc.autoTable({ ...tableOptions, head: [[headText]], body: bodyData });
-                 y = doc.autoTable.previous.finalY + 10;
-             };
-
             if (completedTasks.length > 0) {
-                 drawTable('Completed Tasks', completedTasks);
+                drawTable('المهام المنجزة', completedTasks);
             }
-
             if (pendingTasks.length > 0) {
-                 drawTable('Pending Tasks', pendingTasks);
+                drawTable('المهام المتبقية', pendingTasks);
             }
         }
 
-        if (y > 270) { doc.addPage(); y = 20; }
+        if (y > 270) { doc.addPage(); y = 20; } // صفحة جديدة للاقتباس
 
-        doc.setFont('Helvetica', 'italic');
+        // 6. الاقتباس
+        doc.setFont('Amiri', 'italic');
         doc.setFontSize(12);
         const quoteLines = doc.splitTextToSize(`"${analysis.quote}"`, 182);
-        doc.text(quoteLines, 14, y);
+        doc.text(quoteLines, doc.internal.pageSize.getWidth() / 2, y, { align: 'center' }); // الاقتباس في المنتصف
 
+        // حفظ الملف
         doc.save(`Daily-Report-Mohammed-${dateStr}.pdf`);
-        clippySpeak("Your PDF report has been generated!");
+        clippySpeak("تم إنشاء تقرير PDF الخاص بك!");
 
     } catch (e) {
         console.error("PDF Generation Failed:", e);
@@ -925,6 +937,7 @@ function generateDailyReport() {
         alert("PDF Generation Failed. See console for details.");
     }
 }
+
 
 // =================================================================
 // 🔥 INIT (Assign Elements & Attach Listeners) 🔥
