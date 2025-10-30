@@ -88,19 +88,12 @@
   #logon-content i {font-size: 48px;color: var(--accent);}
   #logon-buttons {text-align: center;padding: 0 20px;}
   #logon-ok {width: 100px;}
-  .dread-btn {appearance: none; border: 0; background: transparent;font-size: 1.1rem; cursor: pointer; padding: 0 4px; line-height: 1; flex-shrink: 0;}
-  .dread-btn:hover { opacity: 0.6; }
-  .dread-btn:active { transform: scale(0.9); }
-  .dread-btn:disabled { cursor: not-allowed; opacity: 0.5; } /* Style disabled dread button */
-  .dread-analysis-panel {padding: 5px;font-size: 0.95rem;}
-  .dread-analysis-panel .task-name {font-weight: bold;color: var(--accent);}
-  .history-controls {display: flex;gap: 8px;align-items: center;}
-  .history-controls input[type="date"] {border: 1px solid var(--fg); border-left-color: var(--line-dark); border-top-color: var(--line-dark);border-right-color: var(--line-light); border-bottom-color: var(--line-light);background: var(--input-fill); color: var(--fg); padding: 4px 6px; font-size: 10pt;outline: none; box-shadow: none; flex: 1; height: 30px;}
-  .history-controls button {flex-shrink: 0; height: 30px;}
 
+  /* 🔥 [تم الحذف] تنسيق زر الرهبة .dread-btn */
+  
   /* Notes Page Styles (Modified) */
   .note-item { 
-    display: block; /* Changed from flex to block */
+    display: block; 
     padding: 10px 8px; 
     cursor: pointer; 
     border-bottom: 1px solid var(--line-medium); 
@@ -121,7 +114,7 @@
   #notes-editor-area {
       width: 100%;
       height: 200px;
-      box-sizing: border-box; /* Important */
+      box-sizing: border-box; 
       border: 1px solid var(--fg); 
       border-left-color: var(--line-dark); 
       border-top-color: var(--line-dark);
@@ -137,7 +130,8 @@
   }
   /* End of Notes Styles */
 
-  @media (max-width: 768px) {.wrap {max-width: 100%;margin: 0;height: 100vh;box-shadow: none;}.main-content { padding: 4px 4px 30px 4px; }.controls { flex-direction: column; align-items: stretch; gap: 4px; }.controls > * { width: 100%; }.controls label { flex: none; width: 100%; padding-bottom: 2px; }.toolbar button { flex: 1; }.task-list-box { min-height: 200px; }li { padding: 6px 8px; }.status-bar { width: 100%; left: 0; right: 0; bottom: 0; position: fixed; }.status-panel-group { margin-left: auto; }.counters-container {gap: 4px;padding: 4px 0 4px 0;}.counter-fieldset {padding: 6px 4px 4px 4px;}.counter-fieldset h1 {font-size: 1.8rem;}.counter-fieldset button {height: 24px;font-size: 1rem;}.counter-fieldset legend {font-size: 8pt;}.info-box p, .info-box .sunken-panel {font-size: 8pt;}.history-controls {flex-direction: column;align-items: stretch;}.history-controls input[type="date"] {margin-bottom: 4px;}}
+  @media (max-width: 768px) {.wrap {max-width: 100%;margin: 0;height: 100vh;box-shadow: none;}.main-content { padding: 4px 4px 30px 4px; }.controls { flex-direction: column; align-items: stretch; gap: 4px; }.controls > * { width: 100%; }.controls label { flex: none; width: 100%; padding-bottom: 2px; }.toolbar button { flex: 1; }.task-list-box { min-height: 200px; }li { padding: 6px 8px; }.status-bar { width: 100%; left: 0; right: 0; bottom: 0; position: fixed; }.status-panel-group { margin-left: auto; }.counters-container {gap: 4px;padding: 4px 0 4px 0;}.counter-fieldset {padding: 6px 4px 4px 4px;}.counter-fieldset h1 {font-size: 1.8rem;}.counter-fieldset button {height: 24px;font-size: 1rem;}.counter-fieldset legend {font-size: 8pt;}.info-box p, .info-box .sunken-panel {font-size: 8pt;}}
+  /* 🔥 [تم الحذف] تنسيق .history-controls من الميديا كويري */
 </style>
 </head>
 <body dir="ltr">
@@ -227,23 +221,6 @@
                 <div id="bar1" class="bar"></div>
               </div>
             </div>
-
-            <fieldset>
-                <legend>Historical View</legend>
-                <div class="history-controls">
-                    <input type="date" id="history-date-input">
-                    <button class="btn" id="history-load-btn">Load Date</button>
-                    <button class="btn ghost" id="history-today-btn" style="display: none;">Back to Today</button>
-                </div>
-            </fieldset>
-
-            <fieldset id="dread-analysis-fieldset" class="info-box" style="padding: 8px; margin-top: 15px;">
-                <legend>Dread Analysis</legend>
-                <div class="dread-analysis-panel">
-                    <span>Most Evaded Task:</span>
-                    <span id="dread-task-name" class="task-name">(None)</span>
-                </div>
-            </fieldset>
 
             <fieldset id="task-list-fieldset">
                  <legend id="task-list-legend">Current Tasks</legend>
@@ -357,7 +334,6 @@ try {
 // =================================================================
 let todayCounterRef = null;
 let currentCounters = { achievements: 0, neutral: 0, emergency: 0, emergencyLog: [] };
-let isViewingHistory = false;
 let tasks = [];
 
 // Notes Page Variables
@@ -368,18 +344,17 @@ let currentEditingNoteId = null;
 
 // DOM Elements
 let listEl, newTaskEl, addBtn, resetAllBtn, emptyMessageEl, statusTotalEl, statusSaveEl, startBtn;
-let historyDateInput, historyLoadBtn, historyTodayBtn;
-let dreadTaskNameEl;
+// 🔥 [تم الحذف] متغيرات العرض التاريخي والتحليل
 let allCounterButtons;
 let resetTodayBtnEl; 
 let logTextareaEl, emergencyLogLegendEl;
 let soundTada, soundError;
 let logonScreenEl, logonBtnEl;
-let addTaskFieldset, progressBarContainer, dreadAnalysisFieldset, taskListLegendEl;
+let addTaskFieldset, progressBarContainer, taskListLegendEl; // 🔥 [تم الحذف] dreadAnalysisFieldset
 
 // Notes Page DOM Elements
 let pageTasks, pageNotes, notesListView, notesEditorView, notesListEl, notesEmptyMsg, notesNewBtn, notesEditorArea, notesSaveBtn, notesDeleteBtn, notesBackBtn, navNotesBtn;
-let notesEditorTitle; // 🔥 [NEW] Title input variable
+let notesEditorTitle; 
 
 
 // =================================================================
@@ -393,12 +368,13 @@ function counter_getTodayDateString() {
     return `${year}-${month}-${day}`;
 }
 
-function counter_listenForChanges(dateString) {
+// 🔥 [مبسط] دالة الاستماع للعدادات أصبحت لليوم فقط
+function counter_listenForChanges() {
     if (!db) {
         console.warn("DB not initialized, cannot listen for counter changes.");
         return;
     }
-    const dateToLoad = dateString || counter_getTodayDateString();
+    const dateToLoad = counter_getTodayDateString(); // 🔥 دائماً يقرأ اليوم
     const newRefPath = 'dailyCounters/' + dateToLoad;
     const newRef = db.ref(newRefPath); 
     if (todayCounterRef && todayCounterRef.toString() !== newRef.toString()) {
@@ -416,7 +392,8 @@ function counter_listenForChanges(dateString) {
                 currentCounters = { ...data, emergencyLog: data.emergencyLog || [] };
             } else {
                 currentCounters = { achievements: 0, neutral: 0, emergency: 0, emergencyLog: [] };
-                if (!isViewingHistory && dateToLoad === counter_getTodayDateString()) {
+                // 🔥 [مبسط] الفحص الآن أبسط
+                if (dateToLoad === counter_getTodayDateString()) {
                     console.log("Setting default counters for today.");
                     todayCounterRef.set(currentCounters).catch(e => console.error("Initial counter set failed:", e));
                 }
@@ -434,6 +411,7 @@ function counter_listenForChanges(dateString) {
     }
 }
 
+// 🔥 [مبسط] دالة تحديث الواجهة بدون خيارات التاريخ
 function updateCounterUI() {
     const achEl = document.getElementById('achievements-count');
     const neuEl = document.getElementById('neutral-count');
@@ -446,33 +424,29 @@ function updateCounterUI() {
         if (logData.length > 0) {
             logTextareaEl.value = logData.join('\n');
         } else {
-             logTextareaEl.value = isViewingHistory ? '(No data for this day)' : '(No emergencies logged today)';
+             logTextareaEl.value = '(No emergencies logged today)'; // 🔥 مبسط
         }
         logTextareaEl.scrollTop = logTextareaEl.scrollHeight;
     }
-    if (allCounterButtons) {
-        allCounterButtons.forEach(btn => btn.disabled = isViewingHistory);
-    }
-    if (historyTodayBtn) historyTodayBtn.style.display = isViewingHistory ? 'inline-block' : 'none';
-    if (historyLoadBtn) historyLoadBtn.style.display = isViewingHistory ? 'none' : 'inline-block';
+    
+    // 🔥 [تم الحذف] كل ما يتعلق بـ isViewingHistory
+    
     if (emergencyLogLegendEl) {
-        emergencyLogLegendEl.textContent = isViewingHistory && historyDateInput ? `Emergency Log (${historyDateInput.value})` : "Today's Emergency Log";
+        emergencyLogLegendEl.textContent = "Today's Emergency Log"; // 🔥 مبسط
     }
-    const showTodayElements = !isViewingHistory;
-    if (addTaskFieldset) addTaskFieldset.style.display = showTodayElements ? '' : 'none';
-    if (progressBarContainer) progressBarContainer.style.display = showTodayElements ? '' : 'none';
-    if (dreadAnalysisFieldset) dreadAnalysisFieldset.style.display = showTodayElements ? '' : 'none';
-    if (taskListLegendEl) taskListLegendEl.textContent = showTodayElements ? "Current Tasks" : (historyDateInput ? `Tasks Created On (${historyDateInput.value})` : "Tasks");
+    if (taskListLegendEl) {
+        taskListLegendEl.textContent = "Current Tasks"; // 🔥 مبسط
+    }
 }
 
+// 🔥 [مبسط] دالة زيادة العداد بدون فحص التاريخ
 function counter_increment(type) {
     if (!db || !todayCounterRef) {
         console.warn("Cannot increment counter, DB or ref not ready.");
         return;
     }
-    if (isViewingHistory) {
-        return;
-    }
+    // 🔥 [تم الحذف] فحص isViewingHistory
+    
     let finalReason = "";
     let updates = {}; 
     if (type === 'emergency') {
@@ -534,6 +508,63 @@ function updateStatus(message) {
     }
 }
 
+// 🔥 [جديد] دالة لحذف المهام القديمة عند بداية اليوم
+function clearOldTasks() {
+    const today = todayDate();
+    const lastCheck = localStorage.getItem('lastTaskClearDate');
+
+    // إذا تم الفحص اليوم، لا تفعل شيئاً
+    if (lastCheck === today) {
+        console.log('Tasks already cleared today.');
+        return;
+    }
+
+    console.log('Running daily task cleanup for tasks not on:', today);
+    if (!tasksRef) {
+        console.warn('Cannot clear tasks, DB not ready.');
+        return;
+    }
+
+    // اقرأ البيانات مرة واحدة فقط للتنظيف
+    tasksRef.once('value', snapshot => {
+        const allTasks = snapshot.val();
+        if (!allTasks) {
+            localStorage.setItem('lastTaskClearDate', today); // لا يوجد مهام، سجل التاريخ وانتهى
+            return;
+        }
+
+        let updates = {}; // كائن لتنفيذ الحذف المجمع
+        let tasksToDelete = 0;
+
+        for (const id in allTasks) {
+            // إذا تاريخ المهمة لا يساوي تاريخ اليوم، أضفها للحذف
+            if (allTasks[id].createdDate !== today) {
+                updates[id] = null; // الحذف في Firebase يتم بوضع القيمة null
+                tasksToDelete++;
+            }
+        }
+
+        if (tasksToDelete > 0) {
+            // نفذ الحذف المجمع
+            tasksRef.update(updates)
+                .then(() => {
+                    console.log(`Successfully cleared ${tasksToDelete} old tasks.`);
+                    updateStatus('Old tasks cleared');
+                    localStorage.setItem('lastTaskClearDate', today); // سجل أن التنظيف تم بنجاح
+                })
+                .catch(error => {
+                    console.error('Failed to clear old tasks:', error);
+                    updateStatus('Cleanup Error');
+                });
+        } else {
+            console.log('No old tasks to clear.');
+            localStorage.setItem('lastTaskClearDate', today); // كل المهام لليوم، سجل التاريخ
+        }
+    });
+}
+
+
+// 🔥 [مبسط] دالة الاستماع للمهام بدون فحص التاريخ
 function listenForTasks() {
     if (!tasksRef) {
          console.warn("DB not initialized, cannot listen for task changes.");
@@ -547,11 +578,12 @@ function listenForTasks() {
                 tasks.push({ ...rawData[id], id: id, dreadCount: rawData[id].dreadCount || 0 });
             }
         }
-        if (!isViewingHistory) {
-            renderList(); 
-            updateLinearView();
-            updateDreadAnalysis();
-        }
+        
+        // 🔥 [مبسط] التحديث دائم
+        renderList(); 
+        updateLinearView();
+        // 🔥 [تم الحذف] updateDreadAnalysis()
+        
         updateStatus('Synced');
     }, (error) => {
         console.error("Firebase Task Read Failed. Check Rules:", error);
@@ -577,12 +609,7 @@ function updateTaskStatus(id, isDone) {
     if (isDone && soundTada) soundTada.play().catch(e => console.warn("Audio play failed:", e));
 }
 
-function incrementDreadCount(id) {
-    if (!tasksRef) return;
-    tasksRef.child(id).child('dreadCount').transaction((currentCount) => {
-        return (currentCount || 0) + 1;
-    });
-}
+// 🔥 [تم الحذف] دالة incrementDreadCount
 
 function deleteTask(id) {
     if (!tasksRef) return;
@@ -600,15 +627,16 @@ function deleteAllTasks() {
     });
 }
 
-function renderList(tasksToRender) {
-    const displayTasks = tasksToRender || tasks; 
-    const sortedTasks = [...displayTasks].sort((a, b) => (b.createdDate || "").localeCompare(a.createdDate || ""));
+// 🔥 [مبسط] دالة عرض القائمة بدون زر الرهبة وخيارات التاريخ
+function renderList() {
+    // 🔥 [تم الحذف] tasksToRender
+    const sortedTasks = [...tasks].sort((a, b) => (b.createdDate || "").localeCompare(a.createdDate || ""));
     if (!listEl) return;
     listEl.innerHTML = '';
-    const isInHistory = isViewingHistory; 
+
     if (sortedTasks.length === 0) {
         if (emptyMessageEl) {
-             emptyMessageEl.textContent = isInHistory ? "No tasks created on this date." : "No tasks currently. Start by adding one!";
+             emptyMessageEl.textContent = "No tasks currently. Start by adding one!"; // 🔥 مبسط
              emptyMessageEl.style.display = 'block';
         }
     } else {
@@ -620,58 +648,35 @@ function renderList(tasksToRender) {
         const cb = document.createElement('input');
         cb.type = 'checkbox';
         cb.checked = t.done;
-        cb.disabled = isInHistory; 
-        if (!isInHistory) {
-            cb.addEventListener('change', () => { updateTaskStatus(t.id, cb.checked); });
-        }
+        // 🔥 [تم الحذف] cb.disabled
+        cb.addEventListener('change', () => { updateTaskStatus(t.id, cb.checked); });
+        
         const span = document.createElement('span');
         span.className = 'txt';
         span.textContent = t.text;
-        const dreadBtn = document.createElement('button');
-        dreadBtn.className = 'dread-btn';
-        dreadBtn.title = `Mark as dreaded (${t.dreadCount || 0})`;
-        dreadBtn.innerHTML = '😰';
-        dreadBtn.disabled = isInHistory; 
-        if (!isInHistory) {
-             dreadBtn.addEventListener('click', () => { incrementDreadCount(t.id); });
-        }
+        
+        // 🔥 [تم الحذف] dreadBtn
+        
         const del = document.createElement('button');
         del.className = 'del';
         del.innerHTML = '<i class="fas fa-trash"></i>';
-        del.disabled = isInHistory; 
-        if (!isInHistory) {
-             del.addEventListener('click', () => { deleteTask(t.id); });
-        }
+        // 🔥 [تم الحذف] del.disabled
+        del.addEventListener('click', () => { deleteTask(t.id); });
+
         li.appendChild(cb);
         li.appendChild(span);
-        li.appendChild(dreadBtn);
+        // 🔥 [تم الحذف] li.appendChild(dreadBtn);
         li.appendChild(del);
         listEl.appendChild(li);
     });
     if (statusTotalEl) statusTotalEl.textContent = `Total: ${tasks.length}`;
 }
 
-function updateDreadAnalysis() {
-    if (!dreadTaskNameEl) return;
-    const pendingTasks = tasks.filter(t => !t.done);
-    if (pendingTasks.length === 0) {
-         dreadTaskNameEl.textContent = '(None)';
-         return;
-    }
-    const mostDreaded = pendingTasks.sort((a, b) => {
-        const dreadDiff = (b.dreadCount || 0) - (a.dreadCount || 0);
-        if (dreadDiff !== 0) return dreadDiff;
-        return (b.createdDate || "").localeCompare(a.createdDate || "");
-    })[0];
-    if (mostDreaded && mostDreaded.dreadCount > 0) {
-        dreadTaskNameEl.textContent = `${mostDreaded.text} (${mostDreaded.dreadCount})`;
-    } else {
-        dreadTaskNameEl.textContent = '(None)';
-    }
-}
+// 🔥 [تم الحذف] دالة updateDreadAnalysis
 
+// 🔥 [مبسط] دالة إضافة مهمة
 function handleAddTask(){
-     if (isViewingHistory) return; 
+    // 🔥 [تم الحذف] فحص isViewingHistory
     const text = (newTaskEl.value||'').trim();
     if(!text) {
         alert("Please enter a task description first!");
@@ -682,10 +687,11 @@ function handleAddTask(){
     newTaskEl.focus();
 }
 
+// 🔥 [مبسط] دالة حذف الكل
 function handleResetAll(){
     if(!confirm('ARE YOU SURE?\n\nThis will delete ALL tasks (permanently!)\nAND reset today\'s counters and log.')) return;
     deleteAllTasks();
-    if (todayCounterRef && !isViewingHistory) {
+    if (todayCounterRef) { // 🔥 [مبسط]
          const defaultCounters = { achievements: 0, neutral: 0, emergency: 0, emergencyLog: [] };
          todayCounterRef.set(defaultCounters).then(() => {
              updateStatus("All Reset");
@@ -693,10 +699,9 @@ function handleResetAll(){
     }
 }
 
+// 🔥 [مبسط] دالة حذف عدادات اليوم
 function handleResetTodayCounters() {
-    if (isViewingHistory) {
-        return;
-    }
+    // 🔥 [تم الحذف] فحص isViewingHistory
     if (!confirm('Reset Today\'s Counters?\n\nThis will reset Achievements, Neutral, Emergency counts and the Emergency Log for today ONLY.\nTasks will NOT be affected.')) return;
     if (todayCounterRef) {
          const defaultCounters = { achievements: 0, neutral: 0, emergency: 0, emergencyLog: [] };
@@ -733,34 +738,24 @@ function updateLinearView(){
 // =================================================================
 // 🔥 Notes Page & Navigation Logic (MODIFIED)
 // =================================================================
+// (قسم الملاحظات يبقى كما هو - التعديلات كانت في قسم المهام)
 
-/**
- * Shows the selected page and hides others
- * @param {string} pageId ('page-tasks' or 'page-notes')
- */
 function showPage(pageId) {
     if (pageTasks) pageTasks.style.display = (pageId === 'page-tasks') ? 'block' : 'none';
     if (pageNotes) pageNotes.style.display = (pageId === 'page-notes') ? 'block' : 'none';
     
-    // When showing notes, always show the list view first
     if (pageId === 'page-notes') {
         handleBackToList();
     }
 }
 
-/**
- * Shows the notes list and hides the editor
- */
 function handleBackToList() {
     currentEditingNoteId = null;
     if (notesListView) notesListView.style.display = 'block';
     if (notesEditorView) notesEditorView.style.display = 'none';
-    renderNotesList(); // Re-render the list to show any changes
+    renderNotesList(); 
 }
 
-/**
- * 🔥 [MODIFIED] Listens for changes in Firebase notes (with title and sorting)
- */
 function listenForNotes() {
   if (!notesRef) return;
   notesRef.on('value', (snapshot) => {
@@ -768,7 +763,6 @@ function listenForNotes() {
     notes = [];
     if (rawData) {
       for (let id in rawData) {
-        // 🔥 [MODIFIED] Read the full note object
         notes.push({ 
             id: id, 
             title: rawData[id].title, 
@@ -777,15 +771,11 @@ function listenForNotes() {
         });
       }
     }
-    // 🔥 [MODIFIED] Sort notes by last modified date (newest first)
     notes.sort((a, b) => (b.lastModified || 0) - (a.lastModified || 0)); 
     renderNotesList();
   });
 }
 
-/**
- * 🔥 [MODIFIED] Renders the notes list in the <ul> (with title and preview)
- */
 function renderNotesList() {
   if (!notesListEl) return;
   notesListEl.innerHTML = '';
@@ -799,12 +789,10 @@ function renderNotesList() {
     const li = document.createElement('li');
     li.className = 'note-item';
     
-    // 🔥 [MODIFIED] Show title and content preview
     const title = note.title || '(Untitled Note)';
     const contentPreview = (note.content || '').split('\n')[0] || '(Empty Note)';
     const preview = contentPreview.substring(0, 45) + (contentPreview.length > 45 ? '...' : '');
     
-    // Use .txt for title, add a <small> tag for the preview
     li.innerHTML = `<span class="txt">${title}</span>
                     <small>${preview}</small>`; 
                     
@@ -813,67 +801,51 @@ function renderNotesList() {
   });
 }
 
-/**
- * 🔥 [MODIFIED] Opens the note editor (with title)
- * @param {string | null} noteId - The Firebase key, or null for a new note
- */
 function openNoteEditor(noteId) {
   currentEditingNoteId = noteId;
   const note = notes.find(n => n.id === noteId);
   
-  // 🔥 [MODIFIED] Populate both title and content
   if (notesEditorTitle) notesEditorTitle.value = note ? note.title : '';
   if (notesEditorArea) notesEditorArea.value = note ? note.content : '';
 
   if (notesListView) notesListView.style.display = 'none';
   if (notesEditorView) notesEditorView.style.display = 'block';
-  if (notesDeleteBtn) notesDeleteBtn.disabled = !noteId; // Can't delete a new note
+  if (notesDeleteBtn) notesDeleteBtn.disabled = !noteId; 
   
-  if (notesEditorTitle) notesEditorTitle.focus(); // 🔥 Focus the title first
+  if (notesEditorTitle) notesEditorTitle.focus(); 
 }
 
-/**
- * "New Note" button handler
- */
 function handleNewNote() {
-  openNoteEditor(null); // Open editor with no ID
+  openNoteEditor(null); 
 }
 
-/**
- * 🔥 [MODIFIED] "Save Note" button handler (with title and lastModified)
- */
 function handleSaveNote() {
   if (!notesRef || !notesEditorArea || !notesEditorTitle) return;
   
-  // 🔥 [MODIFIED] Get new values
   const content = notesEditorArea.value;
   let title = notesEditorTitle.value.trim();
 
-  // 🔥 [NEW] If title is empty, use first line of content
   if (!title) {
      title = content.split('\n')[0].substring(0, 50) || 'New Note';
   }
   
-  // 🔥 [NEW] The new note object
   const noteData = {
       title: title,
       content: content,
-      lastModified: Date.now() // Use current timestamp for sorting
+      lastModified: Date.now() 
   };
 
   updateStatus('Saving Note...');
   
   if (currentEditingNoteId) {
-    // Update existing note
-    notesRef.child(currentEditingNoteId).set(noteData) // 🔥 [MODIFIED]
+    notesRef.child(currentEditingNoteId).set(noteData) 
       .then(() => {
           updateStatus('Note Saved!');
           handleBackToList();
       })
       .catch(e => updateStatus('Save Error!'));
   } else {
-    // Create new note
-    notesRef.push(noteData) // 🔥 [MODIFIED]
+    notesRef.push(noteData) 
       .then(() => {
           updateStatus('Note Created!');
           handleBackToList();
@@ -882,9 +854,6 @@ function handleSaveNote() {
   }
 }
 
-/**
- * "Delete Note" button handler
- */
 function handleDeleteNote() {
   if (!currentEditingNoteId) return; 
   if (!confirm('Are you sure you want to delete this note? This cannot be undone.')) return;
@@ -912,7 +881,7 @@ document.addEventListener('DOMContentLoaded', () => {
     emptyMessageEl = document.getElementById('emptyMessage');
     statusTotalEl = document.getElementById('status-total');
     statusSaveEl = document.getElementById('status-save');
-    dreadTaskNameEl = document.getElementById('dread-task-name');
+    // 🔥 [تم الحذف] dreadTaskNameEl
     allCounterButtons = document.querySelectorAll('.counter-fieldset button');
     logTextareaEl = document.getElementById('emergency-log');
     emergencyLogLegendEl = document.getElementById('emergency-log-legend'); 
@@ -920,7 +889,7 @@ document.addEventListener('DOMContentLoaded', () => {
     soundError = document.getElementById('sound-error');
     addTaskFieldset = document.getElementById('add-task-fieldset');
     progressBarContainer = document.getElementById('progress-bar-container'); 
-    dreadAnalysisFieldset = document.getElementById('dread-analysis-fieldset');
+    // 🔥 [تم الحذف] dreadAnalysisFieldset
     taskListLegendEl = document.getElementById('task-list-legend'); 
 
     logonScreenEl = document.getElementById('logon-screen');
@@ -929,10 +898,8 @@ document.addEventListener('DOMContentLoaded', () => {
     resetTodayBtnEl = document.getElementById('reset-today-panel-btn');
     startBtn = document.querySelector('.start-btn'); 
 
-    historyDateInput = document.getElementById('history-date-input');
-    historyLoadBtn = document.getElementById('history-load-btn');
-    historyTodayBtn = document.getElementById('history-today-btn');
-
+    // 🔥 [تم الحذف] متغيرات أزرار التاريخ
+    
      // 🔥 Assign Notes & Nav Elements
     pageTasks = document.getElementById('page-tasks');
     pageNotes = document.getElementById('page-notes');
@@ -942,7 +909,7 @@ document.addEventListener('DOMContentLoaded', () => {
     notesEmptyMsg = document.getElementById('notes-empty-msg');
     notesNewBtn = document.getElementById('notes-new-btn');
     notesEditorArea = document.getElementById('notes-editor-area');
-    notesEditorTitle = document.getElementById('notes-editor-title'); // 🔥 [NEW] Assign title input
+    notesEditorTitle = document.getElementById('notes-editor-title'); 
     notesSaveBtn = document.getElementById('notes-save-btn');
     notesDeleteBtn = document.getElementById('notes-delete-btn');
     notesBackBtn = document.getElementById('notes-back-btn');
@@ -965,30 +932,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (newTaskEl) newTaskEl.addEventListener('keydown', e => { if(e.key==='Enter') handleAddTask(); }); else { console.warn("New task input not found."); }
     if (resetAllBtn) resetAllBtn.addEventListener('click', handleResetAll); else { console.warn("Reset All button not found."); }
 
-    // History View Listeners
-    if (historyLoadBtn && historyDateInput) {
-        historyLoadBtn.addEventListener('click', () => {
-            const date = historyDateInput.value;
-            if (!date) {
-                alert("Please select a date first.");
-                return;
-            }
-            isViewingHistory = true;
-            const filteredTasks = tasks.filter(task => task.createdDate === date);
-            renderList(filteredTasks); 
-            counter_listenForChanges(date); 
-        });
-    } else { console.warn("History Load button or date input not found."); }
-
-    if (historyTodayBtn) {
-        historyTodayBtn.addEventListener('click', () => {
-            isViewingHistory = false;
-            historyDateInput.value = '';
-            renderList(); 
-            counter_listenForChanges(null); 
-        });
-    } else { console.warn("History Today button not found."); }
-
+    // 🔥 [تم الحذف] مستمعات أزرار التاريخ
 
     // 🔥 Attach Nav & Notes Listeners
     if(startBtn) {
@@ -1005,20 +949,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Start Firebase Listeners (only if db initialized)
     if (db) {
-        // 🔥 Define notes ref
         notesRef = db.ref('notes');
-
-        listenForTasks(); // Listens for ALL tasks
-        counter_listenForChanges(null); // Initial load for today's counters
         
-        // 🔥 Start listening for notes
-        listenForNotes();
+        // 🔥 [جديد] قم بتنظيف المهام القديمة أولاً
+        clearOldTasks(); 
+
+        listenForTasks(); // استمع للمهام (التي تبقت لليوم فقط)
+        counter_listenForChanges(); // استمع لعدادات اليوم
+        
+        listenForNotes(); // استمع للملاحظات
 
     } else {
         if(statusSaveEl) statusSaveEl.textContent = 'DB Connection Error!';
         console.error("Firebase DB object not initialized. Cannot start listeners.");
         // Disable UI elements reliant on DB
-         const elementsToDisable = [addBtn, resetAllBtn, resetTodayBtnEl, historyLoadBtn, newTaskEl, navNotesBtn, notesNewBtn, notesSaveBtn, notesDeleteBtn];
+         const elementsToDisable = [addBtn, resetAllBtn, resetTodayBtnEl, newTaskEl, navNotesBtn, notesNewBtn, notesSaveBtn, notesDeleteBtn];
          elementsToDisable.forEach(el => { if (el) el.disabled = true; });
          if (allCounterButtons) allCounterButtons.forEach(btn => btn.disabled = true);
     }
