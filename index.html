@@ -11,331 +11,346 @@
 
 
 <style>
-  /* ... (أكواد CSS الحالية) ... */
-  :root{--bg:#c0c0c0;--fg:#000000;--accent:#000080;--accent-fg:#ffffff;--line-dark:#808080;--line-medium:#a0a0a0;--line-light:#ffffff;--input-fill:#ffffff;--font:'Tahoma', 'Arial', sans-serif;--progress-color:#008040;--subtle: #d0d0d0;--taskbar-green: #008080;}
-  *{box-sizing:border-box;font-family: var(--font);font-size: 10pt;transition: none !important;}
-  html,body{margin:0; background:var(--taskbar-green);}
-  .wrap{max-width:400px;margin: 40px auto;padding:0;background: var(--bg);box-shadow: 6px 6px 0 var(--line-dark);position: relative;}
-  .window {border-style: solid;border-width: 1px;border-color: var(--fg) var(--line-light) var(--line-light) var(--fg);padding: 2px;background: var(--bg);}
-  .window-inner {border-style: solid;border-width: 1px;border-color: var(--line-dark) var(--line-light) var(--line-light) var(--line-dark);padding: 1px;background: var(--bg);}
-  .title-bar {background: var(--accent);color: var(--accent-fg);padding: 3px 6px;font-size: 11pt;font-weight: bold;display: flex;justify-content: space-between;align-items: center;border-bottom: 1px solid var(--fg);background: linear-gradient(90deg, var(--accent) 0%, #1084d8 100%);}
-  .title-bar-text { flex: 1; padding-left: 8px; display: flex; align-items: center; gap: 6px; }
-  .title-bar-controls button {background: var(--bg);border: 1px solid var(--fg);border-right-color: var(--line-dark);border-bottom-color: var(--line-dark);border-top-color: var(--line-light);border-left-color: var(--line-light);width: 18px; height: 18px; font-size: 10pt; padding: 0; line-height: 1;cursor: default; font-weight: bold;}
-  .title-bar-controls button:active {border-left-color: var(--line-dark);border-top-color: var(--line-dark);border-right-color: var(--line-light);border-bottom-color: var(--line-light);padding: 1px 0 0 1px;}
-  .main-content { padding: 8px; }
-  fieldset {border-style: solid; border-width: 1px;border-color: var(--line-dark) var(--line-light) var(--line-light) var(--line-dark);padding: 10px; margin: 8px 0; background: var(--bg);box-shadow: 1px 1px 0 var(--line-light) inset, -1px -1px 0 var(--line-dark) inset;}
-  legend {background: var(--bg); padding: 0 6px; font-weight: bold; color: var(--accent); margin-left: 5px;}
-  .controls{display:flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 8px;}
-  input[type="text"] {border: 1px solid var(--fg); border-left-color: var(--line-dark); border-top-color: var(--line-dark);border-right-color: var(--line-light); border-bottom-color: var(--line-light);background: var(--input-fill); color: var(--fg); padding: 4px 6px; font-size: 10pt;outline: none; box-shadow: none; flex: 1; min-width: 120px;}
-  input:focus, .btn:focus, .del:focus, input[type="checkbox"]:focus, textarea:focus, input[type="date"]:focus {outline: 1px dashed var(--fg);outline-offset: -2px;}
-  .btn {border: 1px solid var(--fg); border-right-color: var(--line-dark); border-bottom-color: var(--line-dark);border-top-color: var(--line-light); border-left-color: var(--line-light);background: var(--bg); color: var(--fg); padding: 5px 12px; font-weight: normal;cursor: pointer; box-shadow: none; line-height: 1; font-size: 10pt; flex-shrink: 0;}
-  .btn:active {border: 1px solid var(--fg); border-left-color: var(--line-dark); border-top-color: var(--line-dark);border-right-color: var(--line-light); border-bottom-color: var(--line-light);padding: 6px 12px 4px 12px;}
-  .btn.ghost { background: var(--bg); box-shadow: none; }
-  .btn:hover { background: var(--subtle); }
-  .btn:disabled { color: var(--line-dark); text-shadow: 1px 1px var(--line-light); cursor: not-allowed;} /* Style disabled buttons */
-  .muted{color:var(--fg);font-size:9pt; padding: 0 4px;}
-  .toolbar {display: flex; gap: 4px;padding: 0;margin-top: 8px;}
-  .toolbar button {border: 1px solid var(--fg); border-right-color: var(--line-dark); border-bottom-color: var(--line-dark);border-top-color: var(--line-light); border-left-color: var(--line-light);padding: 4px 8px;flex: 1;}
-  .toolbar button:active { padding: 5px 8px 3px 8px; }
-  .task-list-box {border: 1px solid var(--fg); border-left-color: var(--line-dark); border-top-color: var(--line-dark);border-right-color: var(--line-light); border-bottom-color: var(--line-light);background: var(--input-fill); padding: 0; min-height: 100px; margin-top: 8px;box-shadow: 1px 1px 0 var(--line-dark) inset, -1px -1px 0 var(--line-light) inset;}
-  ul{list-style:none;padding:0;margin:0}
-  li{display:flex; align-items:center; gap:8px; padding: 4px 8px;background: var(--input-fill); color: var(--fg); margin: 0;border-bottom: 1px solid var(--line-medium);cursor: default;}
-  li:hover { background: var(--subtle); }
-  li.done { color: var(--line-dark); opacity: 0.9; }
-  li.done .txt { text-decoration: line-through; }
-  .txt{flex:1; line-height:1.4; font-size: 10pt; min-width: 0;}
-  input[type="checkbox"]{appearance: none; width: 13px; height: 13px;border: 1px solid var(--fg); background: var(--input-fill);box-shadow: 1px 1px 0 var(--line-dark) inset, -1px -1px 0 var(--line-light) inset;margin: 0; padding: 0; display: grid; place-items: center; flex-shrink: 0;cursor: pointer;}
-  input[type="checkbox"]:checked::after { content: '✓'; color: var(--fg); font-size: 10pt; line-height: 0.8; }
-  input[type="checkbox"]:active { box-shadow: 1px 1px 0 var(--line-light) inset, -1px -1px 0 var(--line-dark) inset; }
-  input[type="checkbox"]:disabled { background: var(--subtle); box-shadow: none; cursor: not-allowed; } /* Style disabled checkbox */
-  input[type="checkbox"]:disabled::after { color: var(--line-dark); }
-  .del{appearance:none; border:0; background:transparent; color:var(--line-dark); font-size:10pt;cursor: pointer; padding: 0 4px; line-height:1; flex-shrink: 0;}
-  .del:hover{color:red;}
-  .del:disabled { color: var(--line-medium); cursor: not-allowed; } /* Style disabled delete */
-  .linear-progress-box { margin-top: 8px; }
-  .head{display:flex;justify-content:space-between;align-items:center;margin:0 0 4px 0}
-  .big{font-weight:bold; font-size: 11pt;}
-  .progress{height:14px; background: var(--line-dark);border: 1px solid var(--fg); border-left-color: var(--line-dark); border-top-color: var(--line-dark);border-right-color: var(--line-light); border-bottom-color: var(--line-light);overflow:hidden; padding: 2px;}
-  .bar{ height:100%; width:0; background: var(--progress-color); }
-  .status-bar {border-top: 1px solid var(--line-light);display: flex; align-items: center;padding: 0 0;background: var(--bg);height: 24px;position: absolute;bottom: -2px;left: 2px;right: 2px;width: calc(100% - 4px);}
-  .start-btn {background: var(--bg);border: 1px solid var(--fg); border-right-color: var(--line-dark); border-bottom-color: var(--line-dark);border-top-color: var(--line-light); border-left-color: var(--line-light);font-weight: bold;padding: 1px 6px 0 6px;margin-right: 2px;height: 100%;line-height: 1.8;font-size: 11pt;color: var(--fg);cursor: pointer;box-shadow: none;flex-shrink: 0;}
-  .start-btn:active {border: 1px solid var(--fg); border-left-color: var(--line-dark); border-top-color: var(--line-dark);border-right-color: var(--line-light); border-bottom-color: var(--line-light);padding: 2px 6px 0 7px;}
-  .separator {height: 100%;width: 2px;background: var(--bg);border-left: 1px solid var(--line-light);border-right: 1px solid var(--line-dark);margin: 0 2px;}
-  .status-panel-group {display: flex;margin-left: auto;align-items: center;height: 100%;}
-  .status-panel {border: 1px solid var(--line-dark); border-left-color: var(--line-light); border-top-color: var(--line-light);padding: 0 8px; line-height: 2.1; font-size: 9pt; flex-shrink: 0; min-width: 60px;height: calc(100% - 4px);margin: 2px 0 2px 2px;}
-  .main-content { padding: 8px 8px 30px 8px; }
-  .counters-container {display: grid;grid-template-columns: 1fr 1fr 1fr;gap: 8px;padding: 0 0 8px 0;}
-  .counter-fieldset {text-align: center;padding: 8px 5px 5px 5px;}
-  .counter-fieldset legend {font-weight: bold;padding: 0 4px;font-size: 9pt;}
-  .counter-fieldset h1 {font-size: 2.2rem;margin: 0 0 5px 0;font-weight: bold;color: #000;line-height: 1;}
-  .counter-fieldset button {font-size: 1.1rem;font-weight: bold;width: 100%;height: 28px;padding: 0;}
-  .counter-fieldset button:disabled {color: var(--line-dark);text-shadow: 1px 1px var(--line-light);cursor: not-allowed;}
-  .emergency-fieldset {background-color: #CC4444;color: #FFFFFF;}
-  .emergency-fieldset h1 {color: #FFFFFF;}
-  .emergency-fieldset legend {color: #FFFFFF;background: #CC4444;}
-  hr {border: 0;border-top: 1px solid var(--line-dark);border-bottom: 1px solid var(--line-light);margin: 15px 0;}
-  .info-box fieldset {margin-top: 0;padding: 8px;}
-  .info-box legend {font-size: 9pt;margin-left: 2px;}
-  #emergency-log {width: 100%;box-sizing: border-box;font-family: var(--font);font-size: 9pt;background: var(--input-fill);color: var(--fg);border: 1px solid var(--fg);border-left-color: var(--line-dark);border-top-color: var(--line-dark);border-right-color: var(--line-light);border-bottom-color: var(--line-light);box-shadow: 1px 1px 0 var(--line-dark) inset, -1px -1px 0 var(--line-light) inset;}
-  .status-panel-btn {cursor: pointer;border: 1px solid var(--line-light);border-right-color: var(--line-dark);border-bottom-color: var(--line-dark);}
-  .status-panel-btn:active {border: 1px solid var(--line-dark);border-right-color: var(--line-light);border-bottom-color: var(--line-light);}
-  #clippy-panel-btn {font-size: 1.2rem;line-height: 1.5;padding: 0 6px;min-width: 30px;}
-  #report-panel-btn {padding: 0 6px;}
-  #reset-today-panel-btn {padding: 0 6px;}
-  #logon-screen {position: fixed;top: 0;left: 0;width: 100%;height: 100%;background: var(--taskbar-green);display: flex;justify-content: center;align-items: center;z-index: 1000;}
-  #logon-window {width: 350px;padding-bottom: 10px;}
-  #logon-content {padding: 20px;display: flex;align-items: center;gap: 15px;}
-  #logon-content i {font-size: 48px;color: var(--accent);}
-  #logon-buttons {text-align: center;padding: 0 20px;}
-  #logon-ok {width: 100px;}
-  .dread-btn {appearance: none; border: 0; background: transparent;font-size: 1.1rem; cursor: pointer; padding: 0 4px; line-height: 1; flex-shrink: 0;}
-  .dread-btn:hover { opacity: 0.6; }
-  .dread-btn:active { transform: scale(0.9); }
-  .dread-btn:disabled { cursor: not-allowed; opacity: 0.5; } /* Style disabled dread button */
-  .dread-analysis-panel {padding: 5px;font-size: 0.95rem;}
-  .dread-analysis-panel .task-name {font-weight: bold;color: var(--accent);}
-  .history-controls {display: flex;gap: 8px;align-items: center;}
-  .history-controls input[type="date"] {border: 1px solid var(--fg); border-left-color: var(--line-dark); border-top-color: var(--line-dark);border-right-color: var(--line-light); border-bottom-color: var(--line-light);background: var(--input-fill); color: var(--fg); padding: 4px 6px; font-size: 10pt;outline: none; box-shadow: none; flex: 1; height: 30px;}
-  .history-controls button {flex-shrink: 0; height: 30px;}
+  /* ... (أكواد CSS الحالية) ... */
+  :root{--bg:#c0c0c0;--fg:#000000;--accent:#000080;--accent-fg:#ffffff;--line-dark:#808080;--line-medium:#a0a0a0;--line-light:#ffffff;--input-fill:#ffffff;--font:'Tahoma', 'Arial', sans-serif;--progress-color:#008040;--subtle: #d0d0d0;--taskbar-green: #008080;}
+  *{box-sizing:border-box;font-family: var(--font);font-size: 10pt;transition: none !important;}
+  html,body{margin:0; background:var(--taskbar-green);}
+  .wrap{max-width:400px;margin: 40px auto;padding:0;background: var(--bg);box-shadow: 6px 6px 0 var(--line-dark);position: relative;}
+  .window {border-style: solid;border-width: 1px;border-color: var(--fg) var(--line-light) var(--line-light) var(--fg);padding: 2px;background: var(--bg);}
+  .window-inner {border-style: solid;border-width: 1px;border-color: var(--line-dark) var(--line-light) var(--line-light) var(--line-dark);padding: 1px;background: var(--bg);}
+  .title-bar {background: var(--accent);color: var(--accent-fg);padding: 3px 6px;font-size: 11pt;font-weight: bold;display: flex;justify-content: space-between;align-items: center;border-bottom: 1px solid var(--fg);background: linear-gradient(90deg, var(--accent) 0%, #1084d8 100%);}
+  .title-bar-text { flex: 1; padding-left: 8px; display: flex; align-items: center; gap: 6px; }
+  .title-bar-controls button {background: var(--bg);border: 1px solid var(--fg);border-right-color: var(--line-dark);border-bottom-color: var(--line-dark);border-top-color: var(--line-light);border-left-color: var(--line-light);width: 18px; height: 18px; font-size: 10pt; padding: 0; line-height: 1;cursor: default; font-weight: bold;}
+  .title-bar-controls button:active {border-left-color: var(--line-dark);border-top-color: var(--line-dark);border-right-color: var(--line-light);border-bottom-color: var(--line-light);padding: 1px 0 0 1px;}
+  .main-content { padding: 8px; }
+  fieldset {border-style: solid; border-width: 1px;border-color: var(--line-dark) var(--line-light) var(--line-light) var(--line-dark);padding: 10px; margin: 8px 0; background: var(--bg);box-shadow: 1px 1px 0 var(--line-light) inset, -1px -1px 0 var(--line-dark) inset;}
+  legend {background: var(--bg); padding: 0 6px; font-weight: bold; color: var(--accent); margin-left: 5px;}
+  .controls{display:flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 8px;}
+  input[type="text"] {border: 1px solid var(--fg); border-left-color: var(--line-dark); border-top-color: var(--line-dark);border-right-color: var(--line-light); border-bottom-color: var(--line-light);background: var(--input-fill); color: var(--fg); padding: 4px 6px; font-size: 10pt;outline: none; box-shadow: none; flex: 1; min-width: 120px;}
+  input:focus, .btn:focus, .del:focus, input[type="checkbox"]:focus, textarea:focus, input[type="date"]:focus {outline: 1px dashed var(--fg);outline-offset: -2px;}
+  .btn {border: 1px solid var(--fg); border-right-color: var(--line-dark); border-bottom-color: var(--line-dark);border-top-color: var(--line-light); border-left-color: var(--line-light);background: var(--bg); color: var(--fg); padding: 5px 12px; font-weight: normal;cursor: pointer; box-shadow: none; line-height: 1; font-size: 10pt; flex-shrink: 0;}
+  .btn:active {border: 1px solid var(--fg); border-left-color: var(--line-dark); border-top-color: var(--line-dark);border-right-color: var(--line-light); border-bottom-color: var(--line-light);padding: 6px 12px 4px 12px;}
+  .btn.ghost { background: var(--bg); box-shadow: none; }
+  .btn:hover { background: var(--subtle); }
+  .btn:disabled { color: var(--line-dark); text-shadow: 1px 1px var(--line-light); cursor: not-allowed;} /* Style disabled buttons */
+  .muted{color:var(--fg);font-size:9pt; padding: 0 4px;}
+  .toolbar {display: flex; gap: 4px;padding: 0;margin-top: 8px;}
+  .toolbar button {border: 1px solid var(--fg); border-right-color: var(--line-dark); border-bottom-color: var(--line-dark);border-top-color: var(--line-light); border-left-color: var(--line-light);padding: 4px 8px;flex: 1;}
+  .toolbar button:active { padding: 5px 8px 3px 8px; }
+  .task-list-box {border: 1px solid var(--fg); border-left-color: var(--line-dark); border-top-color: var(--line-dark);border-right-color: var(--line-light); border-bottom-color: var(--line-light);background: var(--input-fill); padding: 0; min-height: 100px; margin-top: 8px;box-shadow: 1px 1px 0 var(--line-dark) inset, -1px -1px 0 var(--line-light) inset;}
+  ul{list-style:none;padding:0;margin:0}
+  li{display:flex; align-items:center; gap:8px; padding: 4px 8px;background: var(--input-fill); color: var(--fg); margin: 0;border-bottom: 1px solid var(--line-medium);cursor: default;}
+  li:hover { background: var(--subtle); }
+  li.done { color: var(--line-dark); opacity: 0.9; }
+  li.done .txt { text-decoration: line-through; }
+  .txt{flex:1; line-height:1.4; font-size: 10pt; min-width: 0;}
+  input[type="checkbox"]{appearance: none; width: 13px; height: 13px;border: 1px solid var(--fg); background: var(--input-fill);box-shadow: 1px 1px 0 var(--line-dark) inset, -1px -1px 0 var(--line-light) inset;margin: 0; padding: 0; display: grid; place-items: center; flex-shrink: 0;cursor: pointer;}
+  input[type="checkbox"]:checked::after { content: '✓'; color: var(--fg); font-size: 10pt; line-height: 0.8; }
+  input[type="checkbox"]:active { box-shadow: 1px 1px 0 var(--line-light) inset, -1px -1px 0 var(--line-dark) inset; }
+  input[type="checkbox"]:disabled { background: var(--subtle); box-shadow: none; cursor: not-allowed; } /* Style disabled checkbox */
+  input[type="checkbox"]:disabled::after { color: var(--line-dark); }
+  .del{appearance:none; border:0; background:transparent; color:var(--line-dark); font-size:10pt;cursor: pointer; padding: 0 4px; line-height:1; flex-shrink: 0;}
+  .del:hover{color:red;}
+  .del:disabled { color: var(--line-medium); cursor: not-allowed; } /* Style disabled delete */
+  .linear-progress-box { margin-top: 8px; }
+  .head{display:flex;justify-content:space-between;align-items:center;margin:0 0 4px 0}
+  .big{font-weight:bold; font-size: 11pt;}
+  .progress{height:14px; background: var(--line-dark);border: 1px solid var(--fg); border-left-color: var(--line-dark); border-top-color: var(--line-dark);border-right-color: var(--line-light); border-bottom-color: var(--line-light);overflow:hidden; padding: 2px;}
+  .bar{ height:100%; width:0; background: var(--progress-color); }
+  .status-bar {border-top: 1px solid var(--line-light);display: flex; align-items: center;padding: 0 0;background: var(--bg);height: 24px;position: absolute;bottom: -2px;left: 2px;right: 2px;width: calc(100% - 4px);}
+  .start-btn {background: var(--bg);border: 1px solid var(--fg); border-right-color: var(--line-dark); border-bottom-color: var(--line-dark);border-top-color: var(--line-light); border-left-color: var(--line-light);font-weight: bold;padding: 1px 6px 0 6px;margin-right: 2px;height: 100%;line-height: 1.8;font-size: 11pt;color: var(--fg);cursor: pointer;box-shadow: none;flex-shrink: 0;}
+  .start-btn:active {border: 1px solid var(--fg); border-left-color: var(--line-dark); border-top-color: var(--line-dark);border-right-color: var(--line-light); border-bottom-color: var(--line-light);padding: 2px 6px 0 7px;}
+  .separator {height: 100%;width: 2px;background: var(--bg);border-left: 1px solid var(--line-light);border-right: 1px solid var(--line-dark);margin: 0 2px;}
+  .status-panel-group {display: flex;margin-left: auto;align-items: center;height: 100%;}
+  .status-panel {border: 1px solid var(--line-dark); border-left-color: var(--line-light); border-top-color: var(--line-light);padding: 0 8px; line-height: 2.1; font-size: 9pt; flex-shrink: 0; min-width: 60px;height: calc(100% - 4px);margin: 2px 0 2px 2px;}
+  .main-content { padding: 8px 8px 30px 8px; }
+  .counters-container {display: grid;grid-template-columns: 1fr 1fr 1fr;gap: 8px;padding: 0 0 8px 0;}
+  .counter-fieldset {text-align: center;padding: 8px 5px 5px 5px;}
+  .counter-fieldset legend {font-weight: bold;padding: 0 4px;font-size: 9pt;}
+  .counter-fieldset h1 {font-size: 2.2rem;margin: 0 0 5px 0;font-weight: bold;color: #000;line-height: 1;}
+  .counter-fieldset button {font-size: 1.1rem;font-weight: bold;width: 100%;height: 28px;padding: 0;}
+  .counter-fieldset button:disabled {color: var(--line-dark);text-shadow: 1px 1px var(--line-light);cursor: not-allowed;}
+  .emergency-fieldset {background-color: #CC4444;color: #FFFFFF;}
+  .emergency-fieldset h1 {color: #FFFFFF;}
+  .emergency-fieldset legend {color: #FFFFFF;background: #CC4444;}
+  hr {border: 0;border-top: 1px solid var(--line-dark);border-bottom: 1px solid var(--line-light);margin: 15px 0;}
+  .info-box fieldset {margin-top: 0;padding: 8px;}
+  .info-box legend {font-size: 9pt;margin-left: 2px;}
+  #emergency-log {width: 100%;box-sizing: border-box;font-family: var(--font);font-size: 9pt;background: var(--input-fill);color: var(--fg);border: 1px solid var(--fg);border-left-color: var(--line-dark);border-top-color: var(--line-dark);border-right-color: var(--line-light);border-bottom-color: var(--line-light);box-shadow: 1px 1px 0 var(--line-dark) inset, -1px -1px 0 var(--line-light) inset;}
+  .status-panel-btn {cursor: pointer;border: 1px solid var(--line-light);border-right-color: var(--line-dark);border-bottom-color: var(--line-dark);}
+  .status-panel-btn:active {border: 1px solid var(--line-dark);border-right-color: var(--line-light);border-bottom-color: var(--line-light);}
+  #clippy-panel-btn {font-size: 1.2rem;line-height: 1.5;padding: 0 6px;min-width: 30px;}
+  #report-panel-btn {padding: 0 6px;}
+  #reset-today-panel-btn {padding: 0 6px;}
+  #logon-screen {position: fixed;top: 0;left: 0;width: 100%;height: 100%;background: var(--taskbar-green);display: flex;justify-content: center;align-items: center;z-index: 1000;}
+  #logon-window {width: 350px;padding-bottom: 10px;}
+  #logon-content {padding: 20px;display: flex;align-items: center;gap: 15px;}
+  #logon-content i {font-size: 48px;color: var(--accent);}
+  #logon-buttons {text-align: center;padding: 0 20px;}
+  #logon-ok {width: 100px;}
+  .dread-btn {appearance: none; border: 0; background: transparent;font-size: 1.1rem; cursor: pointer; padding: 0 4px; line-height: 1; flex-shrink: 0;}
+  .dread-btn:hover { opacity: 0.6; }
+  .dread-btn:active { transform: scale(0.9); }
+  .dread-btn:disabled { cursor: not-allowed; opacity: 0.5; } /* Style disabled dread button */
+  .dread-analysis-panel {padding: 5px;font-size: 0.95rem;}
+  .dread-analysis-panel .task-name {font-weight: bold;color: var(--accent);}
+  .history-controls {display: flex;gap: 8px;align-items: center;}
+  .history-controls input[type="date"] {border: 1px solid var(--fg); border-left-color: var(--line-dark); border-top-color: var(--line-dark);border-right-color: var(--line-light); border-bottom-color: var(--line-light);background: var(--input-fill); color: var(--fg); padding: 4px 6px; font-size: 10pt;outline: none; box-shadow: none; flex: 1; height: 30px;}
+  .history-controls button {flex-shrink: 0; height: 30px;}
 
-  /* 🔥 [جديد] تنسيقات صفحة الملاحظات */
-  .note-item { 
-    padding: 10px 8px; 
-    cursor: pointer; 
-    border-bottom: 1px solid var(--line-medium); 
-    display: block; /* Make <li> full width */
-    background: var(--input-fill);
-  }
-  .note-item:hover { background: var(--subtle); }
-  .note-item .txt {
-      font-weight: bold;
-      color: var(--fg);
-  }
-  #notes-editor-area {
-      width: 100%;
-      height: 200px;
-      box-sizing: border-box; /* Important */
-      border: 1px solid var(--fg); 
-      border-left-color: var(--line-dark); 
-      border-top-color: var(--line-dark);
-      border-right-color: var(--line-light); 
-      border-bottom-color: var(--line-light);
-      background: var(--input-fill); 
-      color: var(--fg); 
-      padding: 4px 6px; 
-      font-size: 10pt;
-      outline: none; 
-      box-shadow: 1px 1px 0 var(--line-dark) inset, -1px -1px 0 var(--line-light) inset;
-      margin-bottom: 8px;
-  }
-  /* نهاية تنسيقات الملاحظات */
+  /* 🔥 تنسيقات صفحة الملاحظات */
+  .note-item { 
+    /* 🔥 [تعديل] تغيير li من flex إلى block للسماح بالعرض العمودي */
+    display: block; 
+    padding: 10px 8px; 
+    cursor: pointer; 
+    border-bottom: 1px solid var(--line-medium); 
+    background: var(--input-fill);
+  }
+  .note-item:hover { background: var(--subtle); }
+  .note-item .txt {
+      font-weight: bold;
+      color: var(--fg);
+  }
+  /* 🔥 [جديد] تنسيق لمعاينة الملاحظة */
+  .note-item small {
+      display: block;
+      color: var(--line-dark);
+      font-size: 9pt;
+      padding-top: 2px;
+  }
+  #notes-editor-area {
+      width: 100%;
+      height: 200px;
+      box-sizing: border-box; /* Important */
+      border: 1px solid var(--fg); 
+      border-left-color: var(--line-dark); 
+      border-top-color: var(--line-dark);
+      border-right-color: var(--line-light); 
+      border-bottom-color: var(--line-light);
+      background: var(--input-fill); 
+      color: var(--fg); 
+      padding: 4px 6px; 
+      font-size: 10pt;
+      outline: none; 
+      box-shadow: 1px 1px 0 var(--line-dark) inset, -1px -1px 0 var(--line-light) inset;
+      margin-bottom: 8px;
+  }
+  /* نهاية تنسيقات الملاحظات */
 
-  @media (max-width: 768px) {.wrap {max-width: 100%;margin: 0;height: 100vh;box-shadow: none;}.main-content { padding: 4px 4px 30px 4px; }.controls { flex-direction: column; align-items: stretch; gap: 4px; }.controls > * { width: 100%; }.controls label { flex: none; width: 100%; padding-bottom: 2px; }.toolbar button { flex: 1; }.task-list-box { min-height: 200px; }li { padding: 6px 8px; }.status-bar { width: 100%; left: 0; right: 0; bottom: 0; position: fixed; }.status-panel-group { margin-left: auto; }.counters-container {gap: 4px;padding: 4px 0 4px 0;}.counter-fieldset {padding: 6px 4px 4px 4px;}.counter-fieldset h1 {font-size: 1.8rem;}.counter-fieldset button {height: 24px;font-size: 1rem;}.counter-fieldset legend {font-size: 8pt;}.info-box p, .info-box .sunken-panel {font-size: 8pt;}.history-controls {flex-direction: column;align-items: stretch;}.history-controls input[type="date"] {margin-bottom: 4px;}}
+  @media (max-width: 768px) {.wrap {max-width: 100%;margin: 0;height: 100vh;box-shadow: none;}.main-content { padding: 4px 4px 30px 4px; }.controls { flex-direction: column; align-items: stretch; gap: 4px; }.controls > * { width: 100%; }.controls label { flex: none; width: 100%; padding-bottom: 2px; }.toolbar button { flex: 1; }.task-list-box { min-height: 200px; }li { padding: 6px 8px; }.status-bar { width: 100%; left: 0; right: 0; bottom: 0; position: fixed; }.status-panel-group { margin-left: auto; }.counters-container {gap: 4px;padding: 4px 0 4px 0;}.counter-fieldset {padding: 6px 4px 4px 4px;}.counter-fieldset h1 {font-size: 1.8rem;}.counter-fieldset button {height: 24px;font-size: 1rem;}.counter-fieldset legend {font-size: 8pt;}.info-box p, .info-box .sunken-panel {font-size: 8pt;}.history-controls {flex-direction: column;align-items: stretch;}.history-controls input[type="date"] {margin-bottom: 4px;}}
 </style>
 </head>
 <body dir="ltr">
 
-  <div id="logon-screen">
-    <div class="window" id="logon-window">
-        <div class="title-bar">
-            <div class="title-bar-text">Logon to Mohammed's System</div>
-        </div>
-        <div id="logon-content">
-            <i class="fas fa-user-circle"></i>
-            <div>
-                <p style="margin: 0 0 5px 0;">Welcome back, <strong>Mohammed</strong>.</p>
-                <p style="margin: 0;">Click OK to load your task environment.</p>
-            </div>
-        </div>
-        <div id="logon-buttons">
-            <button class="btn" id="logon-ok">OK</button>
-        </div>
-    </div>
-  </div>
+  <div id="logon-screen">
+    <div class="window" id="logon-window">
+        <div class="title-bar">
+            <div class="title-bar-text">Logon to Mohammed's System</div>
+        </div>
+        <div id="logon-content">
+            <i class="fas fa-user-circle"></i>
+            <div>
+                <p style="margin: 0 0 5px 0;">Welcome back, <strong>Mohammed</strong>.</p>
+                <p style="margin: 0;">Click OK to load your task environment.</p>
+            </div>
+        </div>
+        <div id="logon-buttons">
+            <button class="btn" id="logon-ok">OK</button>
+        </div>
+    </div>
+  </div>
 
-  <main class="wrap window">
-    <div class="window-inner">
-      <div class="title-bar">
-          <div class="title-bar-text">
-              <i class="fas fa-user-circle"></i>
-              <span>mohammed tasks</span>
-          </div>
-          <div class="title-bar-controls">
-              <button title="Minimize" class="title-btn-min">_</button>
-              <button title="Maximize" class="title-btn-max">□</button>
-              <button title="Close" class="title-btn-close">X</button>
-          </div>
-      </div>
+  <main class="wrap window">
+    <div class="window-inner">
+      <div class="title-bar">
+          <div class="title-bar-text">
+              <i class="fas fa-user-circle"></i>
+              <span>mohammed tasks</span>
+          </div>
+          <div class="title-bar-controls">
+              <button title="Minimize" class="title-btn-min">_</button>
+              <button title="Maximize" class="title-btn-max">□</button>
+              <button title="Close" class="title-btn-close">X</button>
+          </div>
+      </div>
 
-      <div class="main-content">
+      <div class="main-content">
 
-        <div id="page-tasks">
-            <div class="counters-container">
-                <fieldset class="counter-fieldset">
-                    <legend>Achievements</legend>
-                    <h1 id="achievements-count">0</h1>
-                    <button onclick="counter_increment('achievements')" class="btn">+</button>
-                </fieldset>
-                <fieldset class="counter-fieldset">
-                    <legend>Neutral</legend>
-                    <h1 id="neutral-count">0</h1>
-                    <button onclick="counter_increment('neutral')" class="btn">+</button>
-                </fieldset>
-                <fieldset class="counter-fieldset emergency-fieldset">
-                    <legend>Emergency</legend>
-                    <h1 id="emergency-count">0</h1>
-                    <button onclick="counter_increment('emergency')" class="btn">+</button>
-                </fieldset>
-            </div>
+        <div id="page-tasks">
+            <div class="counters-container">
+                <fieldset class="counter-fieldset">
+                    <legend>Achievements</legend>
+                    <h1 id="achievements-count">0</h1>
+                    <button onclick="counter_increment('achievements')" class="btn">+</button>
+                </fieldset>
+                <fieldset class="counter-fieldset">
+                    <legend>Neutral</legend>
+                    <h1 id="neutral-count">0</h1>
+                    <button onclick="counter_increment('neutral')" class="btn">+</button>
+                </fieldset>
+                <fieldset class="counter-fieldset emergency-fieldset">
+                    <legend>Emergency</legend>
+                    <h1 id="emergency-count">0</h1>
+                    <button onclick="counter_increment('emergency')" class="btn">+</button>
+                </fieldset>
+            </div>
 
-            <div class="info-box" style="padding: 0; margin: 0;">
-                <fieldset>
-                    <legend id="emergency-log-legend">Today's Emergency Log</legend>
-                    <div style="padding: 5px;">
-                        <textarea id="emergency-log" readonly rows="3"></textarea>
-                    </div>
-                </fieldset>
-            </div>
+            <div class="info-box" style="padding: 0; margin: 0;">
+                <fieldset>
+                    <legend id="emergency-log-legend">Today's Emergency Log</legend>
+                    <div style="padding: 5px;">
+                        <textarea id="emergency-log" readonly rows="3"></textarea>
+                    </div>
+                </fieldset>
+            </div>
 
-            <hr>
+            <hr>
 
-            <fieldset id="add-task-fieldset">
-                <legend>Add New Task</legend>
-                <div class="controls">
-                    <label for="newTask" style="flex: 0 0 100px;">Task (Required):</label>
-                    <input id="newTask" type="text" placeholder="Brief description of the task…"/>
-                </div>
-                <div class="toolbar">
-                    <button class="btn" id="addBtn"><i class="fas fa-plus"></i> Add Task</button>
-                    <button class="btn ghost" id="resetAllBtn" title="Delete ALL tasks & Today's Counters"><i class="fas fa-trash-alt"></i> Reset All</button>
-                </div>
-            </fieldset>
+            <fieldset id="add-task-fieldset">
+                <legend>Add New Task</legend>
+                <div class="controls">
+                    <label for="newTask" style="flex: 0 0 100px;">Task (Required):</label>
+                    <input id="newTask" type="text" placeholder="Brief description of the task…"/>
+                </div>
+                <div class="toolbar">
+                    <button class="btn" id="addBtn"><i class="fas fa-plus"></i> Add Task</button>
+                    <button class="btn ghost" id="resetAllBtn" title="Delete ALL tasks & Today's Counters"><i class="fas fa-trash-alt"></i> Reset All</button>
+                </div>
+            </fieldset>
 
-            <div id="progress-bar-container" class="linear-progress-box">
-              <div class="head">
-                <div><span class="big" id="pct1">0%</span> <span class="muted">Overall Progress</span></div>
-                <div class="muted"><span id="done1">0</span>/<span id="total1">0</span> Tasks</div>
-              </div>
-              <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-                <div id="bar1" class="bar"></div>
-              </div>
-            </div>
+            <div id="progress-bar-container" class="linear-progress-box">
+              <div class="head">
+          _D<span class="big" id="pct1">0%</span> <span class="muted">Overall Progress</span></div>
+                <div class="muted"><span id="done1">0</span>/<span id="total1">0</span> Tasks</div>
+              </div>
+              <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                <div id="bar1" class="bar"></div>
+              </div>
+            </div>
 
-            <fieldset>
-                <legend>Historical View</legend>
-                <div class="history-controls">
-                    <input type="date" id="history-date-input">
-                    <button class="btn" id="history-load-btn">Load Date</button>
-                    <button class="btn ghost" id="history-today-btn" style="display: none;">Back to Today</button>
-                </div>
-            </fieldset>
+            <fieldset>
+                <legend>Historical View</legend>
+                <div class="history-controls">
+                    <input type="date" id="history-date-input">
+                    <button class="btn" id="history-load-btn">Load Date</button>
+                    <button class="btn ghost" id="history-today-btn" style="display: none;">Back to Today</button>
+                </div>
+            </fieldset>
 
-            <fieldset id="dread-analysis-fieldset" class="info-box" style="padding: 8px; margin-top: 15px;">
-                <legend>Dread Analysis</legend>
-                <div class="dread-analysis-panel">
-                    <span>Most Evaded Task:</span>
-                    <span id="dread-task-name" class="task-name">(None)</span>
-                </div>
-            </fieldset>
+            <fieldset id="dread-analysis-fieldset" class="info-box" style="padding: 8px; margin-top: 15px;">
+                <legend>Dread Analysis</legend>
+                <div class="dread-analysis-panel">
+                    <span>Most Evaded Task:</span>
+                    <span id="dread-task-name" class="task-name">(None)</span>
+                </div>
+            </fieldset>
 
-            <fieldset id="task-list-fieldset">
-                 <legend id="task-list-legend">Current Tasks</legend>
-                 <div class="task-list-box">
-                     <ul id="list"></ul>
-                 </div>
-                 <div id="emptyMessage" class="muted" style="text-align: center; margin-top: 8px; font-weight: bold; display: none;">
-                     No tasks currently. Start by adding one!
-                 </div>
-             </fieldset>
-        </div> <div id="page-notes" style="display: none;">
-            
-            <div id="notes-list-view">
-                <fieldset>
-                    <legend>ملاحظاتي (Notes)</legend>
-                    <div class="toolbar">
-                        <button class="btn" id="notes-new-btn"><i class="fas fa-plus"></i> ملاحظة جديدة</button>
-                    </div>
-                    <div class="task-list-box" style="min-height: 400px;">
-                        <ul id="notes-list">
-                            </ul>
-                    </div>
-                    <div id="notes-empty-msg" class="muted" style="text-align: center; margin-top: 8px; font-weight: bold; display: none;">
-                        لا توجد ملاحظات. ابدأ بإضافة واحدة!
-                    </div>
-                </fieldset>
-            </div>
+            <fieldset id="task-list-fieldset">
+                 <legend id="task-list-legend">Current Tasks</legend>
+                 <div class="task-list-box">
+                     <ul id="list"></ul>
+                 </div>
+                 <div id="emptyMessage" class="muted" style="text-align: center; margin-top: 8px; font-weight: bold; display: none;">
+                     No tasks currently. Start by adding one!
+                 </div>
+        _      </fieldset>
+        </div> 
+       
+       <div id="page-notes" style="display: none;">
+            
+            <div id="notes-list-view">
+                <fieldset>
+                    <legend>ملاحظاتي (Notes)</legend>
+                    <div class="toolbar">
+                        <button class="btn" id="notes-new-btn"><i class="fas fa-plus"></i> ملاحظة جديدة</button>
+                    </div>
+                    <div class="task-list-box" style="min-height: 400px;">
+                        <ul id="notes-list">
+                                                    </ul>
+                    </div>
+                    <div id="notes-empty-msg" class="muted" style="text-align: center; margin-top: 8px; font-weight: bold; display: none;">
+                        لا توجد ملاحظات. ابدأ بإضافة واحدة!
+                    </div>
+                </fieldset>
+            </div>
 
-            <div id="notes-editor-view" style="display: none;">
-                 <fieldset>
-                    <legend>تعديل الملاحظة</legend>
-                    <textarea id="notes-editor-area" rows="15" placeholder="اكتب ملاحظتك هنا..."></textarea>
-                    <div class="toolbar">
-                        <button class="btn" id="notes-save-btn"><i class="fas fa-save"></i> حفظ</button>
-                        <button class="btn ghost" id="notes-delete-btn"><i class="fas fa-trash-alt"></i> حذف</button>
-                    </div>
-                    <div class="toolbar" style="margin-top: 4px;">
-                        <button class="btn ghost" id="notes-back-btn" style="width: 100%;"><i class="fas fa-arrow-left"></i> رجوع للقائمة</button>
-                    </div>
-                 </fieldset>
-            </div>
+                        <div id="notes-editor-view" style="display: none;">
+                 <fieldset>
+                    <legend>تعديل الملاحظة</legend>
+                    
+                    <input id="notes-editor-title" 
+                           type="text" 
+                           placeholder="العنوان..." 
+                           style="font-size: 1.2rem; font-weight: bold; margin-bottom: 8px; width: 100%;"/>
+                    
+                    <textarea id="notes-editor-area" rows="15" placeholder="اكتب ملاحظتك هنا..."></textarea>
+                    <div class="toolbar">
+                        <button class="btn" id="notes-save-btn"><i class="fas fa-save"></i> حفظ</button>
+                        <button class="btn ghost" id="notes-delete-btn"><i class="fas fa-trash-alt"></i> حذف</button>
+                    </div>
+                    <div class="toolbar" style="margin-top: 4px;">
+                        <button class="btn ghost" id="notes-back-btn" style="width: 100%;"><i class="fas fa-arrow-left"></i> رجوع للقائمة</button>
+                    </div>
+                 </fieldset>
+            </div>
 
-        </div> </div>
+        </div> 
+       </div>       <div class="status-bar">
+          <button class="start-btn">Start</button> <div class="separator"></div>
+          <div class="status-panel" style="flex-grow: 1; margin-right: 0; text-align: left; min-width: 0;">
+              mohammed tasks
+          </div>
+          <div class="status-panel-group">
+            
+            <div class="status-panel status-panel-btn" id="nav-notes-btn" role="button" title="My Notes">
+              <i class="fas fa-book"></i> ملاحظات
+            </div>
+            
+            <div class="status-panel status-panel-btn" id="reset-today-panel-btn" role="button" title="Reset Today's Counters & Log">
+              <i class="fas fa-undo"></i> Reset Today
+            </div>
+            <div class="status-panel" id="status-total">Total: 0</div>
+            <div class="status-panel" id="status-save">Ready</div>
+          </div>
+      </div>
+    </div>
+  </main>
 
-      <div class="status-bar">
-          <button class="start-btn">Start</button> <div class="separator"></div>
-          <div class="status-panel" style="flex-grow: 1; margin-right: 0; text-align: left; min-width: 0;">
-              mohammed tasks
-          </div>
-          <div class="status-panel-group">
-            
-            <div class="status-panel status-panel-btn" id="nav-notes-btn" role="button" title="My Notes">
-              <i class="fas fa-book"></i> ملاحظات
-            </div>
-            
-            <div class="status-panel status-panel-btn" id="reset-today-panel-btn" role="button" title="Reset Today's Counters & Log">
-              <i class="fas fa-undo"></i> Reset Today
-            </div>
-            <div class="status-panel" id="status-total">Total: 0</div>
-            <div class="status-panel" id="status-save">Ready</div>
-          </div>
-      </div>
-    </div>
-  </main>
-
-  <audio id="sound-tada" src="https://www.myinstants.com/media/sounds/tada.mp3" preload="auto"></audio>
-  <audio id="sound-error" src="https://www.myinstants.com/media/sounds/windows-xp-error.mp3" preload="auto"></audio>
+  <audio id="sound-tada" src="https://www.myinstants.com/media/sounds/tada.mp3" preload="auto"></audio>
+  <audio id="sound-error" src="https://www.myinstants.com/media/sounds/windows-xp-error.mp3" preload="auto"></audio>
 
 <script>
 // =================================================================
 // 🔥 FIREBASE INITIALIZATION & CONFIG 🔥
 // =================================================================
 const firebaseConfig = {
-  apiKey: "AIzaSyBvpcUP-DmXH82WHgm4ZLHezeBFaaxMnCE",
-  authDomain: "mohammedtasksapp.firebaseapp.com",
-  databaseURL: "https://mohammedtasksapp-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "mohammedtasksapp",
-  storageBucket: "mohammedtasksapp.firebasestorage.app",
-  messagingSenderId: "271781862481",
-  appId: "1:271781862481:web:dfd63b2c4b4a8d74ad2c70"
+  apiKey: "AIzaSyBvpcUP-DmXH82WHgm4ZLHezeBFaaxMnCE",
+  authDomain: "mohammedtasksapp.firebaseapp.com",
+  databaseURL: "https://mohammedtasksapp-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "mohammedtasksapp",
+  storageBucket: "mohammedtasksapp.firebasestorage.app",
+  messagingSenderId: "271781862481",
+  appId: "1:271781862481:web:dfd63b2c4b4a8d74ad2c70"
 };
 
 let db = null;
 try {
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-        console.log("Firebase initialized successfully.");
-    } else {
-        firebase.app();
-        console.log("Firebase already initialized.");
-    }
-    db = firebase.database();
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+        console.log("Firebase initialized successfully.");
+    } else {
+        firebase.app();
+        console.log("Firebase already initialized.");
+    }
+    db = firebase.database();
 } catch (e) {
-    console.error("Firebase initialization failed:", e);
-    document.addEventListener('DOMContentLoaded', () => {
-        const statusSaveEl = document.getElementById('status-save');
-        if (statusSaveEl) statusSaveEl.textContent = 'DB Init Error!';
-        alert("CRITICAL ERROR: Could not connect to the database. Please check your internet connection and Firebase configuration.");
-    });
+    console.error("Firebase initialization failed:", e);
+    document.addEventListener('DOMContentLoaded', () => {
+        const statusSaveEl = document.getElementById('status-save');
+        if (statusSaveEl) statusSaveEl.textContent = 'DB Init Error!';
+        alert("CRITICAL ERROR: Could not connect to the database. Please check your internet connection and Firebase configuration.");
+    });
 }
 
 // =================================================================
@@ -345,9 +360,8 @@ let todayCounterRef = null;
 let currentCounters = { achievements: 0, neutral: 0, emergency: 0, emergencyLog: [] };
 let isViewingHistory = false;
 let tasks = [];
-// [تم الحذف] متغير Clippy
 
-// 🔥 [جديد] متغيرات صفحة الملاحظات
+// 🔥 متغيرات صفحة الملاحظات
 let notesRef = null;
 let notes = [];
 let currentEditingNoteId = null;
@@ -358,14 +372,15 @@ let listEl, newTaskEl, addBtn, resetAllBtn, emptyMessageEl, statusTotalEl, statu
 let historyDateInput, historyLoadBtn, historyTodayBtn;
 let dreadTaskNameEl;
 let allCounterButtons;
-let resetTodayBtnEl; // [تم الحذف] متغيرات أزرار Clippy و Report
+let resetTodayBtnEl; 
 let logTextareaEl, emergencyLogLegendEl;
 let soundTada, soundError;
 let logonScreenEl, logonBtnEl;
 let addTaskFieldset, progressBarContainer, dreadAnalysisFieldset, taskListLegendEl;
 
-// 🔥 [جديد] عناصر واجهة الملاحظات
+// 🔥 عناصر واجهة الملاحظات
 let pageTasks, pageNotes, notesListView, notesEditorView, notesListEl, notesEmptyMsg, notesNewBtn, notesEditorArea, notesSaveBtn, notesDeleteBtn, notesBackBtn, navNotesBtn;
+let notesEditorTitle; // 🔥 [جديد] متغير حقل العنوان
 
 
 // =================================================================
@@ -373,140 +388,136 @@ let pageTasks, pageNotes, notesListView, notesEditorView, notesListEl, notesEmpt
 // =================================================================
 // ... (دالة counter_getTodayDateString تبقى كما هي)
 function counter_getTodayDateString() {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
 }
 
 // ... (دالة counter_listenForChanges تبقى كما هي)
 function counter_listenForChanges(dateString) {
-    if (!db) {
-        console.warn("DB not initialized, cannot listen for counter changes.");
-        return;
-    }
-    const dateToLoad = dateString || counter_getTodayDateString();
-    const newRefPath = 'dailyCounters/' + dateToLoad;
-    const newRef = db.ref(newRefPath); 
-    if (todayCounterRef && todayCounterRef.toString() !== newRef.toString()) {
-        console.log("Turning off listener for:", todayCounterRef.toString());
-        todayCounterRef.off('value');
-        todayCounterRef = null;
-    }
-    if (!todayCounterRef) {
-        console.log("Attaching listener for:", newRefPath);
-        todayCounterRef = newRef; 
-        todayCounterRef.on('value', (snapshot) => {
-            const data = snapshot.val();
-            console.log("Counter data received for", dateToLoad, ":", data);
-            if (data) {
-                currentCounters = { ...data, emergencyLog: data.emergencyLog || [] };
-            } else {
-                currentCounters = { achievements: 0, neutral: 0, emergency: 0, emergencyLog: [] };
-                if (!isViewingHistory && dateToLoad === counter_getTodayDateString()) {
-                    console.log("Setting default counters for today.");
-                    todayCounterRef.set(currentCounters).catch(e => console.error("Initial counter set failed:", e));
-                }
-            }
-            updateCounterUI(); 
-        }, (error) => {
-            console.error(`Firebase Counter Read Failed for ${dateToLoad}. Check Rules:`, error);
-            if (statusSaveEl) updateStatus('Counter Sync Error');
-            currentCounters = { achievements: 0, neutral: 0, emergency: 0, emergencyLog: [] };
-            updateCounterUI();
-        });
-    } else {
-       console.log("Already listening to:", newRefPath);
-       updateCounterUI();
-    }
+    if (!db) {
+        console.warn("DB not initialized, cannot listen for counter changes.");
+        return;
+    }
+    const dateToLoad = dateString || counter_getTodayDateString();
+    const newRefPath = 'dailyCounters/' + dateToLoad;
+    const newRef = db.ref(newRefPath); 
+    if (todayCounterRef && todayCounterRef.toString() !== newRef.toString()) {
+        console.log("Turning off listener for:", todayCounterRef.toString());
+        todayCounterRef.off('value');
+        todayCounterRef = null;
+    }
+    if (!todayCounterRef) {
+        console.log("Attaching listener for:", newRefPath);
+        todayCounterRef = newRef; 
+        todayCounterRef.on('value', (snapshot) => {
+            const data = snapshot.val();
+            console.log("Counter data received for", dateToLoad, ":", data);
+            if (data) {
+                currentCounters = { ...data, emergencyLog: data.emergencyLog || [] };
+            } else {
+                currentCounters = { achievements: 0, neutral: 0, emergency: 0, emergencyLog: [] };
+                if (!isViewingHistory && dateToLoad === counter_getTodayDateString()) {
+                    console.log("Setting default counters for today.");
+                    todayCounterRef.set(currentCounters).catch(e => console.error("Initial counter set failed:", e));
+                }
+            }
+            updateCounterUI(); 
+        }, (error) => {
+            console.error(`Firebase Counter Read Failed for ${dateToLoad}. Check Rules:`, error);
+            if (statusSaveEl) updateStatus('Counter Sync Error');
+            currentCounters = { achievements: 0, neutral: 0, emergency: 0, emergencyLog: [] };
+            updateCounterUI();
+        });
+    } else {
+       console.log("Already listening to:", newRefPath);
+       updateCounterUI();
+    }
 }
 
 // ... (دالة updateCounterUI تبقى كما هي)
 function updateCounterUI() {
-    const achEl = document.getElementById('achievements-count');
-    const neuEl = document.getElementById('neutral-count');
-    const emgEl = document.getElementById('emergency-count');
-    if (achEl) achEl.innerText = currentCounters.achievements || 0;
-    if (neuEl) neuEl.innerText = currentCounters.neutral || 0;
-    if (emgEl) emgEl.innerText = currentCounters.emergency || 0;
-    const logData = currentCounters.emergencyLog || [];
-    if (logTextareaEl) {
-        if (logData.length > 0) {
-            logTextareaEl.value = logData.join('\n');
-        } else {
-             logTextareaEl.value = isViewingHistory ? '(No data for this day)' : '(No emergencies logged today)';
-        }
-        logTextareaEl.scrollTop = logTextareaEl.scrollHeight;
-    }
-    if (allCounterButtons) {
-        allCounterButtons.forEach(btn => btn.disabled = isViewingHistory);
-    }
-    if (historyTodayBtn) historyTodayBtn.style.display = isViewingHistory ? 'inline-block' : 'none';
-    if (historyLoadBtn) historyLoadBtn.style.display = isViewingHistory ? 'none' : 'inline-block';
-    if (emergencyLogLegendEl) {
-        emergencyLogLegendEl.textContent = isViewingHistory && historyDateInput ? `Emergency Log (${historyDateInput.value})` : "Today's Emergency Log";
-    }
-    const showTodayElements = !isViewingHistory;
-    if (addTaskFieldset) addTaskFieldset.style.display = showTodayElements ? '' : 'none';
-    if (progressBarContainer) progressBarContainer.style.display = showTodayElements ? '' : 'none';
-    if (dreadAnalysisFieldset) dreadAnalysisFieldset.style.display = showTodayElements ? '' : 'none';
-    if (taskListLegendEl) taskListLegendEl.textContent = showTodayElements ? "Current Tasks" : (historyDateInput ? `Tasks Created On (${historyDateInput.value})` : "Tasks");
+    const achEl = document.getElementById('achievements-count');
+    const neuEl = document.getElementById('neutral-count');
+    const emgEl = document.getElementById('emergency-count');
+    if (achEl) achEl.innerText = currentCounters.achievements || 0;
+    if (neuEl) neuEl.innerText = currentCounters.neutral || 0;
+    if (emgEl) emgEl.innerText = currentCounters.emergency || 0;
+    const logData = currentCounters.emergencyLog || [];
+    if (logTextareaEl) {
+        if (logData.length > 0) {
+            logTextareaEl.value = logData.join('\n');
+        } else {
+             logTextareaEl.value = isViewingHistory ? '(No data for this day)' : '(No emergencies logged today)';
+        }
+        logTextareaEl.scrollTop = logTextareaEl.scrollHeight;
+    }
+    if (allCounterButtons) {
+        allCounterButtons.forEach(btn => btn.disabled = isViewingHistory);
+    }
+    if (historyTodayBtn) historyTodayBtn.style.display = isViewingHistory ? 'inline-block' : 'none';
+    if (historyLoadBtn) historyLoadBtn.style.display = isViewingHistory ? 'none' : 'inline-block';
+    if (emergencyLogLegendEl) {
+        emergencyLogLegendEl.textContent = isViewingHistory && historyDateInput ? `Emergency Log (${historyDateInput.value})` : "Today's Emergency Log";
+    }
+    const showTodayElements = !isViewingHistory;
+    if (addTaskFieldset) addTaskFieldset.style.display = showTodayElements ? '' : 'none';
+    if (progressBarContainer) progressBarContainer.style.display = showTodayElements ? '' : 'none';
+    if (dreadAnalysisFieldset) dreadAnalysisFieldset.style.display = showTodayElements ? '' : 'none';
+    if (taskListLegendEl) taskListLegendEl.textContent = showTodayElements ? "Current Tasks" : (historyDateInput ? `Tasks Created On (${historyDateInput.value})` : "Tasks");
 }
 
-// ... (دالة counter_increment تبقى كما هي، مع حذف استدعاءات clippySpeak)
+// ... (دالة counter_increment تبقى كما هي)
 function counter_increment(type) {
-    if (!db || !todayCounterRef) {
-        console.warn("Cannot increment counter, DB or ref not ready.");
-        // clippySpeak("Database connection error. Cannot save count."); // [تم الحذف]
-        return;
-    }
-    if (isViewingHistory) {
-        // clippySpeak("Cannot add data in 'History View'. Go 'Back to Today'."); // [تم الحذف]
-        return;
-    }
-    let finalReason = "";
-    let updates = {}; 
-    if (type === 'emergency') {
-        let reasonInput = prompt("EMERGENCY:\n\n1. Social Media\n2. Phone/Calls\n3. Procrastination\n4. Other (Specify)", "");
-        if (reasonInput === null) return; 
-        if (reasonInput === "1") finalReason = "Social Media";
-        else if (reasonInput === "2") finalReason = "Phone/Calls";
-        else if (reasonInput === "3") finalReason = "Procrastination";
-        else if (reasonInput === "4") finalReason = prompt("Specify 'Other' reason:", "") || "Other (Unspecified)";
-        else if (reasonInput.trim() !== "") finalReason = reasonInput.trim();
-        else {
-            finalReason = "Other (Unspecified)";
-        }
-        const currentLog = Array.isArray(currentCounters.emergencyLog) ? [...currentCounters.emergencyLog] : [];
-        currentLog.push(finalReason);
-        updates.emergencyLog = currentLog; 
-        if (soundError) soundError.play().catch(e => console.warn("Audio play failed:", e));
-    }
-    todayCounterRef.child(type).transaction((currentCount) => {
-        return (currentCount || 0) + 1;
-    }, (error, committed, snapshot) => {
-        if (error) {
-            console.error('Counter transaction failed abnormally!', error);
-            updateStatus('Counter Save Error');
-        } else if (!committed) {
-            console.warn('Counter transaction not committed (concurrent modification?).');
-             // clippySpeak("Hmm, someone else might be updating at the same time. Try again?"); // [تم الحذف]
-        } else {
-            console.log('Counter transaction committed.');
-            const newCount = snapshot.val(); 
-            if (type === 'achievements' && newCount === 10) {
-                 // clippySpeak("Congratulations! 10 Achievements! You deserve a prize!"); // [تم الحذف]
-                 alert("Congratulations! 10 Achievements! You deserve a prize!"); // بديل مؤقت
-            }
-        }
-    });
-    if (updates.emergencyLog) {
-         todayCounterRef.update({ emergencyLog: updates.emergencyLog }).catch(e => {
-            console.error("Emergency log update failed:", e);
-            updateStatus('Log Save Error');
-        });
-    }
+    if (!db || !todayCounterRef) {
+        console.warn("Cannot increment counter, DB or ref not ready.");
+        return;
+    }
+    if (isViewingHistory) {
+        return;
+    }
+    let finalReason = "";
+    let updates = {}; 
+    if (type === 'emergency') {
+        let reasonInput = prompt("EMERGENCY:\n\n1. Social Media\n2. Phone/Calls\n3. Procrastination\n4. Other (Specify)", "");
+        if (reasonInput === null) return; 
+        if (reasonInput === "1") finalReason = "Social Media";
+        else if (reasonInput === "2") finalReason = "Phone/Calls";
+        else if (reasonInput === "3") finalReason = "Procrastination";
+        else if (reasonInput === "4") finalReason = prompt("Specify 'Other' reason:", "") || "Other (Unspecified)";
+        else if (reasonInput.trim() !== "") finalReason = reasonInput.trim();
+        else {
+            finalReason = "Other (Unspecified)";
+        }
+        const currentLog = Array.isArray(currentCounters.emergencyLog) ? [...currentCounters.emergencyLog] : [];
+        currentLog.push(finalReason);
+        updates.emergencyLog = currentLog; 
+        if (soundError) soundError.play().catch(e => console.warn("Audio play failed:", e));
+    }
+    todayCounterRef.child(type).transaction((currentCount) => {
+        return (currentCount || 0) + 1;
+    }, (error, committed, snapshot) => {
+        if (error) {
+            console.error('Counter transaction failed abnormally!', error);
+            updateStatus('Counter Save Error');
+        } else if (!committed) {
+            console.warn('Counter transaction not committed (concurrent modification?).');
+        } else {
+            console.log('Counter transaction committed.');
+            const newCount = snapshot.val(); 
+            if (type === 'achievements' && newCount === 10) {
+                 alert("Congratulations! 10 Achievements! You deserve a prize!");
+            }
+        }
+    });
+    if (updates.emergencyLog) {
+         todayCounterRef.update({ emergencyLog: updates.emergencyLog }).catch(e => {
+            console.error("Emergency log update failed:", e);
+            updateStatus('Log Save Error');
+        });
+    }
 }
 
 
@@ -516,365 +527,381 @@ function counter_increment(type) {
 
 const tasksRef = db ? db.ref('tasks') : null;
 
-// ... (دوال المهام من todayDate إلى updateLinearView تبقى كما هي، مع حذف clippySpeak)
+// ... (دوال المهام من todayDate إلى updateLinearView تبقى كما هي)
 function todayDate() { return new Date().toISOString().substring(0, 10); }
 
 function updateStatus(message) {
-    if (statusSaveEl) {
-        statusSaveEl.textContent = message;
-        const isError = /error|fail/i.test(message); 
-        if (!isError) {
-             setTimeout(() => { if (statusSaveEl && statusSaveEl.textContent === message) statusSaveEl.textContent = 'Ready'; }, 2000);
-        }
-    }
+    if (statusSaveEl) {
+        statusSaveEl.textContent = message;
+        const isError = /error|fail/i.test(message); 
+        if (!isError) {
+             setTimeout(() => { if (statusSaveEl && statusSaveEl.textContent === message) statusSaveEl.textContent = 'Ready'; }, 2000);
+        }
+    }
 }
 
 function listenForTasks() {
-    if (!tasksRef) {
-         console.warn("DB not initialized, cannot listen for task changes.");
-         return;
-    }
-    tasksRef.on('value', (snapshot) => {
-        const rawData = snapshot.val();
-        tasks = []; 
-        if (rawData) {
-            for (let id in rawData) {
-                tasks.push({ ...rawData[id], id: id, dreadCount: rawData[id].dreadCount || 0 });
-            }
-        }
-        if (!isViewingHistory) {
-            renderList(); 
-            updateLinearView();
-            updateDreadAnalysis();
-        }
-        updateStatus('Synced');
-    }, (error) => {
-        console.error("Firebase Task Read Failed. Check Rules:", error);
-        updateStatus('Task Sync Error');
-    });
+    if (!tasksRef) {
+         console.warn("DB not initialized, cannot listen for task changes.");
+         return;
+    }
+    tasksRef.on('value', (snapshot) => {
+        const rawData = snapshot.val();
+        tasks = []; 
+        if (rawData) {
+            for (let id in rawData) {
+                tasks.push({ ...rawData[id], id: id, dreadCount: rawData[id].dreadCount || 0 });
+            }
+        }
+        if (!isViewingHistory) {
+            renderList(); 
+            updateLinearView();
+            updateDreadAnalysis();
+        }
+        updateStatus('Synced');
+    }, (error) => {
+        console.error("Firebase Task Read Failed. Check Rules:", error);
+        updateStatus('Task Sync Error');
+    });
 }
 
 function addTaskToDB(text) {
-    if (!tasksRef) return;
-    const newTask = { text: text, done: false, createdDate: todayDate(), dreadCount: 0 };
-    tasksRef.push(newTask).catch((error) => {
-        console.error("Firebase Write Failed. Check Rules.", error);
-        updateStatus('Write Error');
-    });
+    if (!tasksRef) return;
+    const newTask = { text: text, done: false, createdDate: todayDate(), dreadCount: 0 };
+    tasksRef.push(newTask).catch((error) => {
+        console.error("Firebase Write Failed. Check Rules.", error);
+        updateStatus('Write Error');
+    });
 }
 
 function updateTaskStatus(id, isDone) {
-    if (!tasksRef) return;
-    tasksRef.child(id).update({ done: isDone }).catch((error) => {
-        console.error("Firebase Update Failed. Check Rules.", error);
-        updateStatus('Update Error');
-    });
-    if (isDone && soundTada) soundTada.play().catch(e => console.warn("Audio play failed:", e));
+    if (!tasksRef) return;
+    tasksRef.child(id).update({ done: isDone }).catch((error) => {
+        console.error("Firebase Update Failed. Check Rules.", error);
+        updateStatus('Update Error');
+    });
+    if (isDone && soundTada) soundTada.play().catch(e => console.warn("Audio play failed:", e));
 }
 
 function incrementDreadCount(id) {
-    if (!tasksRef) return;
-    tasksRef.child(id).child('dreadCount').transaction((currentCount) => {
-        return (currentCount || 0) + 1;
-    });
+    if (!tasksRef) return;
+    tasksRef.child(id).child('dreadCount').transaction((currentCount) => {
+        return (currentCount || 0) + 1;
+    });
 }
 
 function deleteTask(id) {
-    if (!tasksRef) return;
-    tasksRef.child(id).remove().catch((error) => {
-        console.error("Firebase Delete Failed. Check Rules.", error);
-        updateStatus('Delete Error');
-    });
+    if (!tasksRef) return;
+    tasksRef.child(id).remove().catch((error) => {
+        console.error("Firebase Delete Failed. Check Rules.", error);
+        updateStatus('Delete Error');
+    });
 }
 
 function deleteAllTasks() {
-    if (!tasksRef) return;
-    tasksRef.remove().catch((error) => {
-        console.error("Firebase Clear Failed. Check Rules.", error);
-        updateStatus('Clear Error');
-    });
+    if (!tasksRef) return;
+    tasksRef.remove().catch((error) => {
+        console.error("Firebase Clear Failed. Check Rules.", error);
+        updateStatus('Clear Error');
+    });
 }
 
 function renderList(tasksToRender) {
-    const displayTasks = tasksToRender || tasks; 
-    const sortedTasks = [...displayTasks].sort((a, b) => (b.createdDate || "").localeCompare(a.createdDate || ""));
-    if (!listEl) return;
-    listEl.innerHTML = '';
-    const isInHistory = isViewingHistory; 
-    if (sortedTasks.length === 0) {
-        if (emptyMessageEl) {
-             emptyMessageEl.textContent = isInHistory ? "No tasks created on this date." : "No tasks currently. Start by adding one!";
-             emptyMessageEl.style.display = 'block';
-        }
-    } else {
-        if (emptyMessageEl) emptyMessageEl.style.display = 'none';
-    }
-    sortedTasks.forEach(t => {
-        const li = document.createElement('li');
-        if (t.done) li.classList.add('done');
-        const cb = document.createElement('input');
-        cb.type = 'checkbox';
-        cb.checked = t.done;
-        cb.disabled = isInHistory; 
-        if (!isInHistory) {
-            cb.addEventListener('change', () => { updateTaskStatus(t.id, cb.checked); });
-        }
-        const span = document.createElement('span');
-        span.className = 'txt';
-        span.textContent = t.text;
-        const dreadBtn = document.createElement('button');
-        dreadBtn.className = 'dread-btn';
-        dreadBtn.title = `Mark as dreaded (${t.dreadCount || 0})`;
-        dreadBtn.innerHTML = '😰';
-        dreadBtn.disabled = isInHistory; 
-        if (!isInHistory) {
-             dreadBtn.addEventListener('click', () => { incrementDreadCount(t.id); });
-        }
-        const del = document.createElement('button');
-        del.className = 'del';
-        del.innerHTML = '<i class="fas fa-trash"></i>';
-        del.disabled = isInHistory; 
-        if (!isInHistory) {
-             del.addEventListener('click', () => { deleteTask(t.id); });
-        }
-        li.appendChild(cb);
-        li.appendChild(span);
-        li.appendChild(dreadBtn);
-        li.appendChild(del);
-        listEl.appendChild(li);
-    });
-    if (statusTotalEl) statusTotalEl.textContent = `Total: ${tasks.length}`;
+    const displayTasks = tasksToRender || tasks; 
+    const sortedTasks = [...displayTasks].sort((a, b) => (b.createdDate || "").localeCompare(a.createdDate || ""));
+    if (!listEl) return;
+    listEl.innerHTML = '';
+    const isInHistory = isViewingHistory; 
+    if (sortedTasks.length === 0) {
+        if (emptyMessageEl) {
+             emptyMessageEl.textContent = isInHistory ? "No tasks created on this date." : "No tasks currently. Start by adding one!";
+             emptyMessageEl.style.display = 'block';
+        }
+    } else {
+        if (emptyMessageEl) emptyMessageEl.style.display = 'none';
+    }
+    sortedTasks.forEach(t => {
+        const li = document.createElement('li');
+        if (t.done) li.classList.add('done');
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.checked = t.done;
+        cb.disabled = isInHistory; 
+        if (!isInHistory) {
+            cb.addEventListener('change', () => { updateTaskStatus(t.id, cb.checked); });
+        }
+        const span = document.createElement('span');
+        span.className = 'txt';
+        span.textContent = t.text;
+        const dreadBtn = document.createElement('button');
+        dreadBtn.className = 'dread-btn';
+        dreadBtn.title = `Mark as dreaded (${t.dreadCount || 0})`;
+        dreadBtn.innerHTML = '😰';
+        dreadBtn.disabled = isInHistory; 
+        if (!isInHistory) {
+             dreadBtn.addEventListener('click', () => { incrementDreadCount(t.id); });
+        }
+        const del = document.createElement('button');
+        del.className = 'del';
+        del.innerHTML = '<i class="fas fa-trash"></i>';
+        del.disabled = isInHistory; 
+        if (!isInHistory) {
+             del.addEventListener('click', () => { deleteTask(t.id); });
+        }
+        li.appendChild(cb);
+        li.appendChild(span);
+        li.appendChild(dreadBtn);
+        li.appendChild(del);
+        listEl.appendChild(li);
+    });
+    if (statusTotalEl) statusTotalEl.textContent = `Total: ${tasks.length}`;
 }
 
 function updateDreadAnalysis() {
-    if (!dreadTaskNameEl) return;
-    const pendingTasks = tasks.filter(t => !t.done);
-    if (pendingTasks.length === 0) {
-         dreadTaskNameEl.textContent = '(None)';
-         return;
-    }
-    const mostDreaded = pendingTasks.sort((a, b) => {
-        const dreadDiff = (b.dreadCount || 0) - (a.dreadCount || 0);
-        if (dreadDiff !== 0) return dreadDiff;
-        return (b.createdDate || "").localeCompare(a.createdDate || "");
-    })[0];
-    if (mostDreaded && mostDreaded.dreadCount > 0) {
-        dreadTaskNameEl.textContent = `${mostDreaded.text} (${mostDreaded.dreadCount})`;
-    } else {
-        dreadTaskNameEl.textContent = '(None)';
-    }
+    if (!dreadTaskNameEl) return;
+    const pendingTasks = tasks.filter(t => !t.done);
+    if (pendingTasks.length === 0) {
+         dreadTaskNameEl.textContent = '(None)';
+         return;
+    }
+    const mostDreaded = pendingTasks.sort((a, b) => {
+        const dreadDiff = (b.dreadCount || 0) - (a.dreadCount || 0);
+        if (dreadDiff !== 0) return dreadDiff;
+        return (b.createdDate || "").localeCompare(a.createdDate || "");
+    })[0];
+    if (mostDreaded && mostDreaded.dreadCount > 0) {
+        dreadTaskNameEl.textContent = `${mostDreaded.text} (${mostDreaded.dreadCount})`;
+    } else {
+        dreadTaskNameEl.textContent = '(None)';
+    }
 }
 
 function handleAddTask(){
-     if (isViewingHistory) return; 
-    const text = (newTaskEl.value||'').trim();
-    if(!text) {
-        // clippySpeak("Please enter a task description first!"); // [تم الحذف]
-        alert("Please enter a task description first!");
-        return;
-    }
-    addTaskToDB(text);
-    newTaskEl.value='';
-    newTaskEl.focus();
+     if (isViewingHistory) return; 
+    const text = (newTaskEl.value||'').trim();
+    if(!text) {
+        alert("Please enter a task description first!");
+        return;
+    }
+    addTaskToDB(text);
+    newTaskEl.value='';
+    newTaskEl.focus();
 }
 
 function handleResetAll(){
-    if(!confirm('ARE YOU SURE?\n\nThis will delete ALL tasks (permanently!)\nAND reset today\'s counters and log.')) return;
-    deleteAllTasks();
-    if (todayCounterRef && !isViewingHistory) {
-         const defaultCounters = { achievements: 0, neutral: 0, emergency: 0, emergencyLog: [] };
-         todayCounterRef.set(defaultCounters).then(() => {
-             // clippySpeak("All tasks and today's counters have been reset."); // [تم الحذف]
-             updateStatus("All Reset");
-         }).catch(e => console.error("Counter reset failed:", e));
-    } else if (isViewingHistory) {
-         // clippySpeak("Tasks cleared, but historical counters remain untouched."); // [تم الحذف]
-    }
+    if(!confirm('ARE YOU SURE?\n\nThis will delete ALL tasks (permanently!)\nAND reset today\'s counters and log.')) return;
+    deleteAllTasks();
+    if (todayCounterRef && !isViewingHistory) {
+         const defaultCounters = { achievements: 0, neutral: 0, emergency: 0, emergencyLog: [] };
+         todayCounterRef.set(defaultCounters).then(() => {
+             updateStatus("All Reset");
+         }).catch(e => console.error("Counter reset failed:", e));
+    }
 }
 
 function handleResetTodayCounters() {
-    if (isViewingHistory) {
-        // clippySpeak("Cannot reset historical data. Go 'Back to Today' first."); // [تم الحذف]
-        return;
-    }
-    if (!confirm('Reset Today\'s Counters?\n\nThis will reset Achievements, Neutral, Emergency counts and the Emergency Log for today ONLY.\nTasks will NOT be affected.')) return;
-    if (todayCounterRef) {
-         const defaultCounters = { achievements: 0, neutral: 0, emergency: 0, emergencyLog: [] };
-         todayCounterRef.set(defaultCounters).then(() => {
-             // clippySpeak("Today's counters have been reset."); // [تم الحذف]
-             updateStatus("Counters Reset");
-         }).catch(e => {
-            console.error("Counter reset failed:", e);
-            updateStatus('Reset Error');
-         });
-    }
+    if (isViewingHistory) {
+        return;
+    }
+    if (!confirm('Reset Today\'s Counters?\n\nThis will reset Achievements, Neutral, Emergency counts and the Emergency Log for today ONLY.\nTasks will NOT be affected.')) return;
+    if (todayCounterRef) {
+         const defaultCounters = { achievements: 0, neutral: 0, emergency: 0, emergencyLog: [] };
+         todayCounterRef.set(defaultCounters).then(() => {
+             updateStatus("Counters Reset");
+         }).catch(e => {
+            console.error("Counter reset failed:", e);
+            updateStatus('Reset Error');
+         });
+    }
 }
 
 function getProgress(){
-    const total = tasks.length;
-    const done  = tasks.filter(t=>t.done).length;
-    const pct   = total ? Math.round((done/total)*100) : 0;
-    return {total, done, pct};
+    const total = tasks.length;
+    const done  = tasks.filter(t=>t.done).length;
+    const pct   = total ? Math.round((done/total)*100) : 0;
+    return {total, done, pct};
 }
 
 function updateLinearView(){
-    const {total,done,pct} = getProgress();
-    const bar = document.getElementById('bar1');
-    const pctEl = document.getElementById('pct1');
-    const doneEl= document.getElementById('done1');
-    const totalEl= document.getElementById('total1');
-    if(bar) bar.style.width = pct + '%';
-    if(pctEl) pctEl.textContent = pct + '%';
-    if(doneEl) doneEl.textContent = done;
-    if(totalEl) totalEl.textContent = total;
-    const pb = document.querySelector('#v-linear .progress[role="progressbar"]');
-    if(pb) pb.setAttribute('aria-valuenow', pct);
+    const {total,done,pct} = getProgress();
+    const bar = document.getElementById('bar1');
+    const pctEl = document.getElementById('pct1');
+    const doneEl= document.getElementById('done1');
+    const totalEl= document.getElementById('total1');
+    if(bar) bar.style.width = pct + '%';
+    if(pctEl) pctEl.textContent = pct + '%';
+    if(doneEl) doneEl.textContent = done;
+    if(totalEl) totalEl.textContent = total;
+    const pb = document.querySelector('#v-linear .progress[role="progressbar"]');
+    if(pb) pb.setAttribute('aria-valuenow', pct);
 }
 
 // =================================================================
-// 🔥 [تم الحذف] Report & Clippy Logic 🔥
-// =================================================================
-// (تم حذف دوال analyzeDay, clippySpeak, showClippyAnalysis, generateDailyReport)
-
-
-// =================================================================
-// 🔥 [جديد] دوال صفحة الملاحظات والتنقل
+// 🔥 دوال صفحة الملاحظات والتنقل
 // =================================================================
 
 /**
- * يعرض الصفحة المحددة ويخفي البقية
- * @param {string} pageId ('page-tasks' or 'page-notes')
- */
+ * يعرض الصفحة المحددة ويخفي البقية
+ * @param {string} pageId ('page-tasks' or 'page-notes')
+ */
 function showPage(pageId) {
-    if (pageTasks) pageTasks.style.display = (pageId === 'page-tasks') ? 'block' : 'none';
-    if (pageNotes) pageNotes.style.display = (pageId === 'page-notes') ? 'block' : 'none';
-    
-    // عند عرض صفحة الملاحظات، تأكد دائماً من عرض القائمة أولاً
-    if (pageId === 'page-notes') {
-        handleBackToList();
-    }
+    if (pageTasks) pageTasks.style.display = (pageId === 'page-tasks') ? 'block' : 'none';
+    if (pageNotes) pageNotes.style.display = (pageId === 'page-notes') ? 'block' : 'none';
+    
+    // عند عرض صفحة الملاحظات، تأكد دائماً من عرض القائمة أولاً
+    if (pageId === 'page-notes') {
+        handleBackToList();
+    }
 }
 
 /**
- * يعرض قائمة الملاحظات ويخفي المحرر
- */
+ * يعرض قائمة الملاحظات ويخفي المحرر
+ */
 function handleBackToList() {
-    currentEditingNoteId = null;
-    if (notesListView) notesListView.style.display = 'block';
-    if (notesEditorView) notesEditorView.style.display = 'none';
-    renderNotesList(); // أعد تحميل القائمة لإظهار أي تغييرات
+    currentEditingNoteId = null;
+    if (notesListView) notesListView.style.display = 'block';
+    if (notesEditorView) notesEditorView.style.display = 'none';
+    renderNotesList(); // أعد تحميل القائمة لإظهار أي تغييرات
 }
 
 /**
- * يستمع للتغييرات في ملاحظات Firebase
- */
+ * 🔥 [معدلة] يستمع للتغييرات في ملاحظات Firebase (مع العنوان والترتيب)
+ */
 function listenForNotes() {
-  if (!notesRef) return;
-  notesRef.on('value', (snapshot) => {
-    const rawData = snapshot.val();
-    notes = [];
-    if (rawData) {
-      for (let id in rawData) {
-        notes.push({ id: id, content: rawData[id].content });
-      }
-    }
-    // رتب الملاحظات لإظهار الأحدث أولاً (اختياري)
-    notes.sort((a, b) => b.id.localeCompare(a.id)); 
-    renderNotesList();
-  });
+  if (!notesRef) return;
+  notesRef.on('value', (snapshot) => {
+    const rawData = snapshot.val();
+    notes = [];
+    if (rawData) {
+      for (let id in rawData) {
+        // 🔥 [تعديل] اقرأ الكائن كاملاً
+        notes.push({ 
+            id: id, 
+            title: rawData[id].title, 
+            content: rawData[id].content,
+            lastModified: rawData[id].lastModified 
+        });
+      }
+    }
+    // 🔥 [تعديل] رتب الملاحظات حسب تاريخ آخر تعديل (الأحدث أولاً)
+    notes.sort((a, b) => (b.lastModified || 0) - (a.lastModified || 0)); 
+    renderNotesList();
+  });
 }
 
 /**
- * يعرض قائمة الملاحظات في <ul>
- */
+ * 🔥 [معدلة] يعرض قائمة الملاحظات في <ul> (مع العنوان والمعاينة)
+ */
 function renderNotesList() {
-  if (!notesListEl) return;
-  notesListEl.innerHTML = '';
-  if (notes.length === 0) {
-    if (notesEmptyMsg) notesEmptyMsg.style.display = 'block';
-    return;
-  }
-  if (notesEmptyMsg) notesEmptyMsg.style.display = 'none';
+  if (!notesListEl) return;
+  notesListEl.innerHTML = '';
+  if (notes.length === 0) {
+    if (notesEmptyMsg) notesEmptyMsg.style.display = 'block';
+    return;
+  }
+  if (notesEmptyMsg) notesEmptyMsg.style.display = 'none';
 
-  notes.forEach(note => {
-    const li = document.createElement('li');
-    li.className = 'note-item';
-    
-    // اعرض السطر الأول فقط كمعاينة
-    const firstLine = (note.content || '').split('\n')[0] || '(ملاحظة فارغة)';
-    const preview = firstLine.substring(0, 40) + (firstLine.length > 40 ? '...' : '');
-    
-    li.innerHTML = `<span class="txt">${preview}</span>`; // أعد استخدام تنسيق .txt
-    li.addEventListener('click', () => openNoteEditor(note.id));
-    notesListEl.appendChild(li);
-  });
+  notes.forEach(note => {
+    const li = document.createElement('li');
+    li.className = 'note-item';
+    
+    // 🔥 [تعديل] أظهر العنوان والمعاينة
+    const title = note.title || '(ملاحظة بلا عنوان)';
+    const contentPreview = (note.content || '').split('\n')[0] || '(ملاحظة فارغة)';
+    const preview = contentPreview.substring(0, 45) + (contentPreview.length > 45 ? '...' : '');
+    
+    // استخدم .txt للعنوان، وأضف وسم <small> للمعاينة
+    li.innerHTML = `<span class="txt">${title}</span>
+                    <small>${preview}</small>`; 
+                    
+    li.addEventListener('click', () => openNoteEditor(note.id));
+    notesListEl.appendChild(li);
+  });
 }
 
 /**
- * يفتح محرر الملاحظات لملاحظة معينة (أو جديدة)
- * @param {string | null} noteId - مفتاح الملاحظة في Firebase، أو null لإنشاء ملاحظة جديدة
- */
+ * 🔥 [معدلة] يفتح محرر الملاحظات (مع العنوان)
+ * @param {string | null} noteId - مفتاح الملاحظة في Firebase، أو null لإنشاء ملاحظة جديدة
+ */
 function openNoteEditor(noteId) {
-  currentEditingNoteId = noteId;
-  const note = notes.find(n => n.id === noteId);
-  
-  if (notesEditorArea) notesEditorArea.value = note ? note.content : '';
-  if (notesListView) notesListView.style.display = 'none';
-  if (notesEditorView) notesEditorView.style.display = 'block';
-  if (notesDeleteBtn) notesDeleteBtn.disabled = !noteId; // لا يمكن حذف ملاحظة جديدة قبل حفظها
-  
-  if (notesEditorArea) notesEditorArea.focus();
+  currentEditingNoteId = noteId;
+  const note = notes.find(n => n.id === noteId);
+  
+  // 🔥 [تعديل] املأ حقل العنوان والمحتوى
+  if (notesEditorTitle) notesEditorTitle.value = note ? note.title : '';
+  if (notesEditorArea) notesEditorArea.value = note ? note.content : '';
+
+  if (notesListView) notesListView.style.display = 'none';
+  if (notesEditorView) notesEditorView.style.display = 'block';
+  if (notesDeleteBtn) notesDeleteBtn.disabled = !noteId; // لا يمكن حذف ملاحظة جديدة قبل حفظها
+  
+  if (notesEditorTitle) notesEditorTitle.focus(); // 🔥 ركز على العنوان أولاً
 }
 
 /**
- * معالج زر "ملاحظة جديدة"
- */
+ * معالج زر "ملاحظة جديدة"
+ */
 function handleNewNote() {
-  openNoteEditor(null); // افتح المحرر بـ ID فارغ
+  openNoteEditor(null); // افتح المحرر بـ ID فارغ
 }
 
 /**
- * معالج زر "حفظ الملاحظة"
- */
+ * 🔥 [معدلة] معالج زر "حفظ الملاحظة" (مع العنوان وتاريخ التعديل)
+ */
 function handleSaveNote() {
-  if (!notesRef || !notesEditorArea) return;
-  
-  const content = notesEditorArea.value;
-  updateStatus('Saving Note...');
-  
-  if (currentEditingNoteId) {
-    // تحديث ملاحظة موجودة
-    notesRef.child(currentEditingNoteId).set({ content: content })
-      .then(() => {
-          updateStatus('Note Saved!');
-          handleBackToList();
-      })
-      .catch(e => updateStatus('Save Error!'));
-  } else {
-    // إنشاء ملاحظة جديدة
-    notesRef.push({ content: content })
-      .then(() => {
-          updateStatus('Note Created!');
-          handleBackToList();
-      })
-      .catch(e => updateStatus('Save Error!'));
+  if (!notesRef || !notesEditorArea || !notesEditorTitle) return;
+  
+  // 🔥 [تعديل] احصل على القيم الجديدة
+  const content = notesEditorArea.value;
+  let title = notesEditorTitle.value.trim();
+
+  // 🔥 [جديد] إذا كان العنوان فارغاً، استخدم أول سطر من المحتوى كعنوان
+  if (!title) {
+     title = content.split('\n')[0].substring(0, 50) || 'ملاحظة جديدة';
   }
+  
+  // 🔥 [جديد] كائن الملاحظة الجديد
+  const noteData = {
+      title: title,
+      content: content,
+      lastModified: Date.now() // استخدم التوقيت الحالي للترتيب
+  };
+
+  updateStatus('Saving Note...');
+  
+  if (currentEditingNoteId) {
+    // تحديث ملاحظة موجودة
+    notesRef.child(currentEditingNoteId).set(noteData) // 🔥 [تعديل]
+      .then(() => {
+          updateStatus('Note Saved!');
+          handleBackToList();
+      })
+      .catch(e => updateStatus('Save Error!'));
+  } else {
+    // إنشاء ملاحظة جديدة
+    notesRef.push(noteData) // 🔥 [تعديل]
+      .then(() => {
+          updateStatus('Note Created!');
+          handleBackToList();
+      })
+      .catch(e => updateStatus('Save Error!'));
+  }
 }
 
 /**
- * معالج زر "حذف الملاحظة"
- */
+ * معالج زر "حذف الملاحظة"
+ */
 function handleDeleteNote() {
-  if (!currentEditingNoteId) return; // يجب أن يكون الزر معطلاً، ولكن كإجراء احترازي
-  if (!confirm('هل أنت متأكد من حذف هذه الملاحظة؟ لا يمكن التراجع عن هذا الأمر.')) return;
-  
-  updateStatus('Deleting Note...');
-  notesRef.child(currentEditingNoteId).remove()
-    .then(() => {
-        updateStatus('Note Deleted!');
-        handleBackToList();
-    })
-    .catch(e => updateStatus('Delete Error!'));
+  if (!currentEditingNoteId) return; 
+  if (!confirm('هل أنت متأكد من حذف هذه الملاحظة؟ لا يمكن التراجع عن هذا الأمر.')) return;
+  
+  updateStatus('Deleting Note...');
+  notesRef.child(currentEditingNoteId).remove()
+    .then(() => {
+        updateStatus('Note Deleted!');
+        handleBackToList();
+    })
+    .catch(e => updateStatus('Delete Error!'));
 }
 
 
@@ -883,133 +910,124 @@ function handleDeleteNote() {
 // =================================================================
 document.addEventListener('DOMContentLoaded', () => {
 
-    // Assign DOM Elements Safely
-    listEl = document.getElementById('list');
-    newTaskEl = document.getElementById('newTask');
-    addBtn = document.getElementById('addBtn');
-    resetAllBtn = document.getElementById('resetAllBtn');
-    emptyMessageEl = document.getElementById('emptyMessage');
-    statusTotalEl = document.getElementById('status-total');
-    statusSaveEl = document.getElementById('status-save');
-    dreadTaskNameEl = document.getElementById('dread-task-name');
-    allCounterButtons = document.querySelectorAll('.counter-fieldset button');
-    logTextareaEl = document.getElementById('emergency-log');
-    emergencyLogLegendEl = document.getElementById('emergency-log-legend'); 
-    soundTada = document.getElementById('sound-tada');
-    soundError = document.getElementById('sound-error');
-    addTaskFieldset = document.getElementById('add-task-fieldset');
-    progressBarContainer = document.getElementById('progress-bar-container'); 
-    dreadAnalysisFieldset = document.getElementById('dread-analysis-fieldset');
-    taskListLegendEl = document.getElementById('task-list-legend'); 
+    // Assign DOM Elements Safely
+    listEl = document.getElementById('list');
+    newTaskEl = document.getElementById('newTask');
+    addBtn = document.getElementById('addBtn');
+    resetAllBtn = document.getElementById('resetAllBtn');
+    emptyMessageEl = document.getElementById('emptyMessage');
+    statusTotalEl = document.getElementById('status-total');
+    statusSaveEl = document.getElementById('status-save');
+    dreadTaskNameEl = document.getElementById('dread-task-name');
+    allCounterButtons = document.querySelectorAll('.counter-fieldset button');
+    logTextareaEl = document.getElementById('emergency-log');
+    emergencyLogLegendEl = document.getElementById('emergency-log-legend'); 
+    soundTada = document.getElementById('sound-tada');
+    soundError = document.getElementById('sound-error');
+    addTaskFieldset = document.getElementById('add-task-fieldset');
+    progressBarContainer = document.getElementById('progress-bar-container'); 
+    dreadAnalysisFieldset = document.getElementById('dread-analysis-fieldset');
+    taskListLegendEl = document.getElementById('task-list-legend'); 
 
-    logonScreenEl = document.getElementById('logon-screen');
-    logonBtnEl = document.getElementById('logon-ok');
-    
-    // [تم الحذف] أزرار Clippy و Report
-    
-    resetTodayBtnEl = document.getElementById('reset-today-panel-btn');
-    startBtn = document.querySelector('.start-btn'); // زر "ابدأ"
+    logonScreenEl = document.getElementById('logon-screen');
+    logonBtnEl = document.getElementById('logon-ok');
+    
+    resetTodayBtnEl = document.getElementById('reset-today-panel-btn');
+    startBtn = document.querySelector('.start-btn'); 
 
-    historyDateInput = document.getElementById('history-date-input');
-    historyLoadBtn = document.getElementById('history-load-btn');
-    historyTodayBtn = document.getElementById('history-today-btn');
+    historyDateInput = document.getElementById('history-date-input');
+    historyLoadBtn = document.getElementById('history-load-btn');
+    historyTodayBtn = document.getElementById('history-today-btn');
 
-     // 🔥 [جديد] تحديد عناصر الملاحظات والتنقل
-    pageTasks = document.getElementById('page-tasks');
-    pageNotes = document.getElementById('page-notes');
-    notesListView = document.getElementById('notes-list-view');
-    notesEditorView = document.getElementById('notes-editor-view');
-    notesListEl = document.getElementById('notes-list');
-    notesEmptyMsg = document.getElementById('notes-empty-msg');
-    notesNewBtn = document.getElementById('notes-new-btn');
-    notesEditorArea = document.getElementById('notes-editor-area');
-    notesSaveBtn = document.getElementById('notes-save-btn');
-    notesDeleteBtn = document.getElementById('notes-delete-btn');
-    notesBackBtn = document.getElementById('notes-back-btn');
-    navNotesBtn = document.getElementById('nav-notes-btn');
+     // 🔥 [جديد] تحديد عناصر الملاحظات والتنقل
+    pageTasks = document.getElementById('page-tasks');
+    pageNotes = document.getElementById('page-notes');
+    notesListView = document.getElementById('notes-list-view');
+    notesEditorView = document.getElementById('notes-editor-view');
+    notesListEl = document.getElementById('notes-list');
+    notesEmptyMsg = document.getElementById('notes-empty-msg');
+    notesNewBtn = document.getElementById('notes-new-btn');
+    notesEditorArea = document.getElementById('notes-editor-area');
+    notesEditorTitle = document.getElementById('notes-editor-title'); // 🔥 [جديد] ربط حقل العنوان
+    notesSaveBtn = document.getElementById('notes-save-btn');
+    notesDeleteBtn = document.getElementById('notes-delete-btn');
+    notesBackBtn = document.getElementById('notes-back-btn');
+    navNotesBtn = document.getElementById('nav-notes-btn');
 
+    // Logon Screen Logic
+    if (logonBtnEl) {
+        logonBtnEl.addEventListener('click', () => {
+            if (logonScreenEl) logonScreenEl.style.display = 'none';
+        });
+    } else { console.warn("Logon button not found."); }
+    
+    // Reset Today Button Logic
+    if (resetTodayBtnEl) {
+        resetTodayBtnEl.addEventListener('click', handleResetTodayCounters);
+    } else { console.warn("Reset Today button not found."); }
 
-     // [تم الحذف] تحميل Clippy Agent
+    // Task App Listeners
+    if (addBtn) addBtn.addEventListener('click', handleAddTask); else { console.warn("Add Task button not found."); }
+    if (newTaskEl) newTaskEl.addEventListener('keydown', e => { if(e.key==='Enter') handleAddTask(); }); else { console.warn("New task input not found."); }
+    if (resetAllBtn) resetAllBtn.addEventListener('click', handleResetAll); else { console.warn("Reset All button not found."); }
 
-    // Logon Screen Logic
-    if (logonBtnEl) {
-        logonBtnEl.addEventListener('click', () => {
-            if (logonScreenEl) logonScreenEl.style.display = 'none';
-        });
-    } else { console.warn("Logon button not found."); }
+    // History View Listeners
+    if (historyLoadBtn && historyDateInput) {
+        historyLoadBtn.addEventListener('click', () => {
+            const date = historyDateInput.value;
+            if (!date) {
+                alert("Please select a date first.");
+                return;
+            }
+            isViewingHistory = true;
+            const filteredTasks = tasks.filter(task => task.createdDate === date);
+            renderList(filteredTasks); 
+            counter_listenForChanges(date); 
+        });
+    } else { console.warn("History Load button or date input not found."); }
 
-    // [تم الحذف] Report Button Logic
-    
-    // Reset Today Button Logic
-    if (resetTodayBtnEl) {
-        resetTodayBtnEl.addEventListener('click', handleResetTodayCounters);
-    } else { console.warn("Reset Today button not found."); }
-
-    // Task App Listeners
-    if (addBtn) addBtn.addEventListener('click', handleAddTask); else { console.warn("Add Task button not found."); }
-    if (newTaskEl) newTaskEl.addEventListener('keydown', e => { if(e.key==='Enter') handleAddTask(); }); else { console.warn("New task input not found."); }
-    if (resetAllBtn) resetAllBtn.addEventListener('click', handleResetAll); else { console.warn("Reset All button not found."); }
-
-    // History View Listeners
-    if (historyLoadBtn && historyDateInput) {
-        historyLoadBtn.addEventListener('click', () => {
-            const date = historyDateInput.value;
-            if (!date) {
-                // clippySpeak("Please select a date first."); // [تم الحذف]
-                alert("Please select a date first.");
-                return;
-            }
-            isViewingHistory = true;
-            const filteredTasks = tasks.filter(task => task.createdDate === date);
-            renderList(filteredTasks); 
-            counter_listenForChanges(date); 
-            // clippySpeak(`Loading data for ${date}...`); // [تم الحذف]
-        });
-    } else { console.warn("History Load button or date input not found."); }
-
-    if (historyTodayBtn) {
-        historyTodayBtn.addEventListener('click', () => {
-            isViewingHistory = false;
-            historyDateInput.value = '';
-            renderList(); 
-            counter_listenForChanges(null); 
-            // clippySpeak("Back to today's view!"); // [تم الحذف]
-        });
-    } else { console.warn("History Today button not found."); }
+    if (historyTodayBtn) {
+        historyTodayBtn.addEventListener('click', () => {
+            isViewingHistory = false;
+            historyDateInput.value = '';
+            renderList(); 
+            counter_listenForChanges(null); 
+        });
+    } else { console.warn("History Today button not found."); }
 
 
-    // 🔥 [جديد] ربط أزرار التنقل والملاحظات
-    if(startBtn) {
-        startBtn.addEventListener('click', () => showPage('page-tasks'));
-    }
-    if(navNotesBtn) {
-        navNotesBtn.addEventListener('click', () => showPage('page-notes'));
-    }
-    if(notesNewBtn) notesNewBtn.addEventListener('click', handleNewNote);
-    if(notesSaveBtn) notesSaveBtn.addEventListener('click', handleSaveNote);
-    if(notesDeleteBtn) notesDeleteBtn.addEventListener('click', handleDeleteNote);
-    if(notesBackBtn) notesBackBtn.addEventListener('click', handleBackToList);
+    // 🔥 ربط أزرار التنقل والملاحظات
+    if(startBtn) {
+        startBtn.addEventListener('click', () => showPage('page-tasks'));
+    }
+    if(navNotesBtn) {
+        navNotesBtn.addEventListener('click', () => showPage('page-notes'));
+    }
+    if(notesNewBtn) notesNewBtn.addEventListener('click', handleNewNote);
+    if(notesSaveBtn) notesSaveBtn.addEventListener('click', handleSaveNote);
+    if(notesDeleteBtn) notesDeleteBtn.addEventListener('click', handleDeleteNote);
+    if(notesBackBtn) notesBackBtn.addEventListener('click', handleBackToList);
 
 
-    // Start Firebase Listeners (only if db initialized)
-    if (db) {
-        // 🔥 [جديد] تعريف مسار الملاحظات
-        notesRef = db.ref('notes');
+    // Start Firebase Listeners (only if db initialized)
+    if (db) {
+        // 🔥 تعريف مسار الملاحظات
+        notesRef = db.ref('notes');
 
-        listenForTasks(); // Listens for ALL tasks
-        counter_listenForChanges(null); // Initial load for today's counters
-        
-        // 🔥 [جديد] بدء الاستماع للملاحظات
-        listenForNotes();
+        listenForTasks(); // Listens for ALL tasks
+        counter_listenForChanges(null); // Initial load for today's counters
+        
+        // 🔥 بدء الاستماع للملاحظات
+        listenForNotes();
 
-    } else {
-        if(statusSaveEl) statusSaveEl.textContent = 'DB Connection Error!';
-        console.error("Firebase DB object not initialized. Cannot start listeners.");
-        // Disable UI elements reliant on DB
-         const elementsToDisable = [addBtn, resetAllBtn, resetTodayBtnEl, historyLoadBtn, newTaskEl, navNotesBtn];
-         elementsToDisable.forEach(el => { if (el) el.disabled = true; });
-         if (allCounterButtons) allCounterButtons.forEach(btn => btn.disabled = true);
-    }
+    } else {
+        if(statusSaveEl) statusSaveEl.textContent = 'DB Connection Error!';
+        console.error("Firebase DB object not initialized. Cannot start listeners.");
+        // Disable UI elements reliant on DB
+         const elementsToDisable = [addBtn, resetAllBtn, resetTodayBtnEl, historyLoadBtn, newTaskEl, navNotesBtn, notesNewBtn, notesSaveBtn, notesDeleteBtn];
+         elementsToDisable.forEach(el => { if (el) el.disabled = true; });
+         if (allCounterButtons) allCounterButtons.forEach(btn => btn.disabled = true);
+    }
 });
 </script>
 </body>
